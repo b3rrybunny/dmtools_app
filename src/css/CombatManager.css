@@ -1,0 +1,78 @@
+.monster-card {
+    background: linear-gradient(to right top, #650d0d, #ff5959);
+    backdrop-filter: blur(8px);
+}
+
+.player-card {
+    background: linear-gradient(to right top, #0a4419, #59ff82);
+    backdrop-filter: blur(8px);
+}
+
+.npc-card {
+    background: linear-gradient(to right top, #08144f, #4463fe);
+    backdrop-filter: blur(8px);
+}
+
+.active {
+    border: 5px solid #00ff33 !important;
+    padding: 10px;
+}
+
+.inactive {
+    filter: grayscale(95%);
+    padding: 10px;
+}
+
+.card {
+    border-radius: 1rem !important;
+    padding: 10px;
+}
+
+.input-window {
+    background-color: #ffffffb8;
+    border-radius: 10px;
+    padding: 7px;
+}
+
+.manual-add {
+    display: grid flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.side-by-side {
+     display: flex; 
+     gap: 10px; 
+     align-items: center; 
+     text-align: center; 
+     height: auto; 
+     width: 100%
+}
+
+.page {
+    height: rem;
+    width: rem;
+    padding: 5px;
+}
+
+p {
+    min-width: 50px;
+}
+
+table {
+    margin: 3px;
+    background: #ffffffad;
+    border-radius: 5px;
+    width: 100%;
+}
+
+td {
+    font-size: 20px;
+    display: grid flex;
+    height: 100%;
+    max-width: 50px;
+    border: 2px solid #000000 !important;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+}
