@@ -36,7 +36,7 @@ export function rollDice(notation = '1d6 + 3') {
       total += Number(part);
     }
   }
-  
+  console.log('Rolled ' + cleanNotation + ': ' + total.toString());
   return total;
 }
 

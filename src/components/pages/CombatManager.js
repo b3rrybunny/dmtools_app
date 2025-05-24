@@ -1,14 +1,20 @@
-// Modules
+// Modules ------------------------------------------------------------------
 import * as bootstrap from 'bootstrap';
 import { useState } from 'react';
-import * as dice from '../../scripts/dice';
 
-// Custom
+
+// Custom -------------------------------------------------------------------
+// Elements / Scripts
+import HPBlock from '../basic/HPBlock';
+import * as tools from '../tools';
+import * as dice from '../../scripts/dice';
+// Data
 import rawMonstersData from '../../data/srd_5e_monsters.json';
+// CSS / Assets
 import '../../css/CombatManager.css';
 import player_character from '../../assets/player_character.png';
 import NPC_img from '../../assets/NPC.png';
-import * as tools from '../tools';
+
 
 
 function getModifier(stat) {
@@ -97,24 +103,42 @@ function CreatureImg({ img }) {
     }
 }
 
-function CreatureCard({ data = null, index }) {
+function CreatureCard({ data = null, index, onChange }) {
+
+    const handleHPChange = (mod) => {
+        if (data?.rolledHP !== undefined) {
+            // Working with rolledHP
+            const newValue = mod === '+' ? data.rolledHP + 1 : data.rolledHP - 1;
+            onChange(data.id, 'rolledHP', newValue); // Prevent negative HP
+        } else {
+            // Working with regular hp
+            const currentHP = data.hp || 0;
+            const newValue = mod === '+' ? currentHP + 1 : currentHP - 1;
+            onChange(data.id, 'hp', newValue);
+        }
+    }
+
     return (
         <div className={"card mb-3 " + (
-            data?.isPlayer ? 'player-card' :
-                data?.isNPC ? 'npc-card' :
-                    'monster-card'
+            data?.isPlayer ? 'player-card' : //player card style
+                data?.isNPC ? 'npc-card' : //npc cards style
+                    'monster-card' //default (monster) style
         ) + (
-                index === 1 ? ' active' :
-                    ' inactive'
+                index === 1 ? ' active' : //Active combatant
+                    ' inactive' //Nonactive combatant
+            ) + (
+                data?.rolledHP <= 0 ? ' danger' : //HP <=0, bg changes to warning
+                data.hp <= 0 ? ' danger' : //HP <=0, bg changes to warning
+                ''
             )
         }>
             <div className="row g-0">
                 {
-                    data?.isPlayer ? <CreatureImg img='player' /> :
-                        data?.isNPC ? <CreatureImg img='npc' /> :
-                            <CreatureImg img={data.img_url} />
+                    data?.isPlayer ? <CreatureImg img='player' /> : //player img
+                        data?.isNPC ? <CreatureImg img='npc' /> : //npc img
+                            <CreatureImg img={data.img_url} /> //default img
                 }
-                <div className="col-md-8">
+                <div className="col-md-8" style={{padding: '5px'}}>
                     {/* Index. Name */}
                     <div className='side-by-side'>
                         <h1 className="card-title">{index}. {data.name}</h1>
@@ -123,18 +147,10 @@ function CreatureCard({ data = null, index }) {
                     {/* HP, AC */}
                     <div className="side-by-side">
                         <div>
-                            <h5>❤ HP: {
-                                data?.isPlayer ? data.hp :
-                                    data?.isNPC ? data.hp :
-                                        dice.extractNumbersOutsideParentheses(data.hp)
-                            } {
-                                    data?.isPlayer ? null :
-                                        data?.isNPC ? null :
-                                            dice.rollDice(data.hp)
-                                }</h5>
+                            <HPBlock hp={data?.rolledHP ? data.rolledHP : data.hp} onChange={handleHPChange} />
                         </div>
                         <div>
-                            <h5>⛊ AC: {dice.extractNumbersOutsideParentheses(data.ac)}</h5>
+                            <h4>⛊ AC: {dice.extractNumbersOutsideParentheses(data.ac)}</h4>
                         </div>
                     </div>
                     {/* Stats */}
@@ -150,7 +166,7 @@ function CreatureCard({ data = null, index }) {
 
 }
 
-function CardContainer({ combatants }) {
+function CardContainer({ combatants, onChange }) {
     // Sort combatants by initiative in descending order (highest first)
     const sortedCombatants = [...combatants].sort((a, b) => {
         // Handle cases where init might be undefined or null
@@ -159,6 +175,11 @@ function CardContainer({ combatants }) {
         return bInit - aInit; // Descending order (highest initiative first)
     });
 
+    // Passes change to parent CombatManager
+    const handleOnChange = (id, key, value) => {
+        onChange(id, key, value);
+    }
+
     return (
         <div className="card-container">
             {sortedCombatants.map((combatant, index) => (
@@ -166,6 +187,7 @@ function CardContainer({ combatants }) {
                     key={combatant.id}
                     data={combatant}
                     index={index + 1}
+                    onChange={handleOnChange}
                 />
             ))}
         </div>
@@ -448,12 +470,15 @@ function CombatManager() {
 
         // Create a copy of the monster object instead of modifying the original
         const monsterToAdd = { ...originalMonster };
+        // Assign Init
         if (adv.length > 0) {
             monsterToAdd.init = dice.rollInit(monsterToAdd.DEX, adv);
         }
         else {
             monsterToAdd.init = dice.rollInit(monsterToAdd.DEX);
         }
+        // Assign Rolled HP
+        monsterToAdd.rolledHP = dice.rollDice(monsterToAdd.hp);
         monsterToAdd.id = Date.now() + Math.random();;
         setCombatants(prevCombatants => [...prevCombatants, monsterToAdd]);
     }
@@ -468,8 +493,6 @@ function CombatManager() {
             const monsterName = rawMonstersData[index].name;
             addMonsterData(monsterName);
         })
-        /*const testCreatures = selections.map(index => rawMonstersData[index]);
-        setCreatures(prevCreatures => [...prevCreatures, ...testCreatures]);*/
     }
 
     function handleAutoAdd(monsterName, advantage) {
@@ -480,11 +503,25 @@ function CombatManager() {
         setCombatants(prevCombatants => [...prevCombatants, manualData]);
     }
 
+    function handleCardOnChange(id, key, value) {
+        console.log(`Updating combatant ${id}, ${key} changed to: ${value}`);
+        setCombatants(prevCombatants =>
+            prevCombatants.map(combatant =>
+                combatant.id === id
+                    ? { ...combatant, [key]: value }
+                    : combatant
+            )
+        );
+    }
+
     return (
         <div className='page'>
             <div className='row'>
-                <div className='col'>
-                    <CardContainer combatants={combatants} />
+                <div className='col card-container'>
+                    <CardContainer
+                        combatants={combatants}
+                        onChange={handleCardOnChange}
+                    />
                 </div>
                 <div className='col'>
                     <InputWindow

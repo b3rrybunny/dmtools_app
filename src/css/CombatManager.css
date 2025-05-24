@@ -23,9 +23,45 @@
     padding: 10px;
 }
 
+.monster-card.danger {
+    background:
+        url('../assets/warning.png'),
+        linear-gradient(to right top, #650d0d, #ff5959);
+    background-blend-mode: overlay;
+    background-repeat: repeat;
+    backdrop-filter: blur(8px);
+}
+
+.player-card.danger {
+    background:
+        url('../assets/warning.png'),
+        linear-gradient(to right top, #0a4419, #59ff82);
+    background-blend-mode: overlay;
+    background-repeat: repeat;
+    backdrop-filter: blur(8px);
+}
+
+.npc-card.danger {
+    background:
+        url('../assets/warning.png'),
+        linear-gradient(to right top, #08144f, #4463fe);
+    background-blend-mode: overlay;
+    background-repeat: repeat;
+    backdrop-filter: blur(8px);
+}
+
+
+
 .card {
     border-radius: 1rem !important;
     padding: 10px;
+}
+
+.card-container {
+    height: 94vh;
+    overflow-y: auto !important;
+    flex-direction: column;
+    display: flex;
 }
 
 .input-window {
@@ -41,12 +77,12 @@
 }
 
 .side-by-side {
-     display: flex; 
-     gap: 10px; 
-     align-items: center; 
-     text-align: center; 
-     height: auto; 
-     width: 100%
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    text-align: center;
+    height: auto;
+    width: 100%
 }
 
 .page {

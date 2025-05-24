@@ -1,0 +1,15 @@
+.side-by-side {
+     display: flex; 
+     gap: 10px; 
+     align-items: center; 
+     text-align: center; 
+     height: auto; 
+     width: 100%
+}
+
+.hp-block {
+    background-color: rgba(255, 255, 255, 0.616);
+    padding: 2px;
+    border: 2px solid black;
+    border-radius: 8px;
+}
