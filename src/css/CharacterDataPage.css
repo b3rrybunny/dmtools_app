@@ -17,6 +17,10 @@
     margin: 5px;
 }
 
+.saving-throws {
+    height: rem !important;
+}
+
 table {
     margin: 3px;
     background: #ffffffad;

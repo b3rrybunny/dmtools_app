@@ -192,6 +192,32 @@ function CharacterInput() {
         setSurvival(e.target.checked);
     };
 
+    // Saving Throws
+    const [STRThrow, setSTRThrow] = useState(false); //Strength Saving Throw
+    const onSTRThrowChange = (e) => {
+        setSTRThrow(e.target.checked);
+    };
+    const [DEXThrow, setDEXThrow] = useState(false); //DexteritySaving Throw
+    const onDEXThrowChange = (e) => {
+        setDEXThrow(e.target.checked);
+    };
+    const [CONThrow, setCONThrow] = useState(false); //Constituion Saving Throw
+    const onCONThrowChange = (e) => {
+        setCONThrow(e.target.checked);
+    };
+    const [INTThrow, setINTThrow] = useState(false); //Intelligence Saving Throw
+    const onINTThrowChange = (e) => {
+        setINTThrow(e.target.checked);
+    };
+    const [WISThrow, setWISThrow] = useState(false); //Wisdom Saving Throw
+    const onWISThrowChange = (e) => {
+        setWISThrow(e.target.checked);
+    };
+    const [CHAThrow, setCHAThrow] = useState(false); //Charisma Saving Throw
+    const onCHAThrowChange = (e) => {
+        setCHAThrow(e.target.checked);
+    };
+
     function ModifierText({ stat, prof = false }) {
         let modifier;
 
@@ -272,7 +298,7 @@ function CharacterInput() {
                 modifier = prof ? 5 + parseInt(profBonus) : 5;
                 break;
         }
-        return (<p style={{ color: getColor(modifier), textAlign: 'center', margin: '0px' }}>{modifier > 0 ? ('+'+modifier) : modifier === 0 ? modifier : ('-'+modifier)}</p>);
+        return (<p style={{ color: getColor(modifier), textAlign: 'center', margin: '0px' }}>{modifier > 0 ? ('+' + modifier) : modifier === 0 ? modifier : ('-' + modifier)}</p>);
     }
 
     function StatsInputTable() {
@@ -290,7 +316,7 @@ function CharacterInput() {
                                 onChange={onSTRChange}
                                 placeholder="..."
                                 className="form-control"
-                                style={{ width: '100px' }}
+                                style={{ maxWidth: '100px' }}
                             /></td>
                             <td><ModifierText stat={STR} /></td>
                             <td>DEX: </td>
@@ -302,7 +328,7 @@ function CharacterInput() {
                                 onChange={onDEXChange}
                                 placeholder="..."
                                 className="form-control"
-                                style={{ width: '100px' }}
+                                style={{ maxWidth: '100px' }}
                             /></td>
                             <td><ModifierText stat={DEX} /></td>
                         </tr>
@@ -316,7 +342,7 @@ function CharacterInput() {
                                 onChange={onCONChange}
                                 placeholder="..."
                                 className="form-control"
-                                style={{ width: '100px' }}
+                                style={{ maxWidth: '100px' }}
                             /></td>
                             <td><ModifierText stat={CON} /></td>
                             <td>INT: </td>
@@ -328,7 +354,7 @@ function CharacterInput() {
                                 onChange={onINTChange}
                                 placeholder="..."
                                 className="form-control"
-                                style={{ width: '100px' }}
+                                style={{ maxWidth: '100px' }}
                             /></td>
                             <td><ModifierText stat={INT} /></td>
                         </tr>
@@ -342,7 +368,7 @@ function CharacterInput() {
                                 onChange={onWISChange}
                                 placeholder="..."
                                 className="form-control"
-                                style={{ width: '100px' }}
+                                style={{ maxWidth: '100px' }}
                             /></td>
                             <td><ModifierText stat={WIS} /></td>
                             <td>CHA: </td>
@@ -354,7 +380,7 @@ function CharacterInput() {
                                 onChange={onCHAChange}
                                 placeholder="..."
                                 className="form-control"
-                                style={{ width: '100px' }}
+                                style={{ maxWidth: '100px' }}
                             /></td>
                             <td><ModifierText stat={CHA} /></td>
                         </tr>
@@ -366,8 +392,69 @@ function CharacterInput() {
 
     function SavingThrowsInput() {
         return (
-            <>
-            </>
+            <div className='basic-container saving-throws'>
+                <h3>Saving Throws: </h3>
+                <div className="btn-group-vertical" data-toggle="buttons">
+                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        <input
+                            type="checkbox"
+                            autoComplete="off"
+                            checked={STRThrow}
+                            onChange={onSTRThrowChange}
+                        /> STR <ModifierText stat={STR} prof={STRThrow} />
+                    </label>
+                </div>
+                <div className="btn-group-vertical" data-toggle="buttons">
+                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        <input
+                            type="checkbox"
+                            autoComplete="off"
+                            checked={DEXThrow}
+                            onChange={onDEXThrowChange}
+                        /> DEX <ModifierText stat={DEX} prof={DEXThrow} />
+                    </label>
+                </div>
+                <div className="btn-group-vertical" data-toggle="buttons">
+                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        <input
+                            type="checkbox"
+                            autoComplete="off"
+                            checked={CONThrow}
+                            onChange={onCONThrowChange}
+                        /> CON <ModifierText stat={CON} prof={CONThrow} />
+                    </label>
+                </div>
+                <div className="btn-group-vertical" data-toggle="buttons">
+                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        <input
+                            type="checkbox"
+                            autoComplete="off"
+                            checked={INTThrow}
+                            onChange={onINTThrowChange}
+                        /> INT <ModifierText stat={INT} prof={INTThrow} />
+                    </label>
+                </div>
+                <div className="btn-group-vertical" data-toggle="buttons">
+                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        <input
+                            type="checkbox"
+                            autoComplete="off"
+                            checked={WISThrow}
+                            onChange={onWISThrowChange}
+                        /> WIS <ModifierText stat={WIS} prof={WISThrow} />
+                    </label>
+                </div>
+                <div className="btn-group-vertical" data-toggle="buttons">
+                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        <input
+                            type="checkbox"
+                            autoComplete="off"
+                            checked={CHAThrow}
+                            onChange={onCHAThrowChange}
+                        /> CHA <ModifierText stat={CHA} prof={CHAThrow} />
+                    </label>
+                </div>
+            </div>
         );
     }
 
@@ -542,174 +629,196 @@ function CharacterInput() {
         );
     }
 
+    function GeneralInfoinput() {
+        return (
+            <>
+                <div className='basic-container'>
+                    <SideBySide content={
+                        <>
+                            <h4>Name: </h4>
+                            <input
+                                type="text"
+                                value={name}
+                                onChange={onNameChange}
+                                placeholder="'Izalith the Stinky'"
+                                className="form-control"
+                                style={{ width: '300px' }}
+                            />
+                        </>
+                    } />
+                </div>
+                <div className='basic-container'>
+                    <SideBySide content={
+                        <>
+                            <h4>Class: </h4>
+                            <select id="class" value={chrClass} onChange={onChrClassChange}>
+                                <option value="Barbarian">Barbarian</option>
+                                <option value="Bard">Bard</option>
+                                <option value="Ceric">Cleric</option>
+                                <option value="Druid">Druid</option>
+                                <option value="Fighter">Fighter</option>
+                                <option value="Monk">Monk</option>
+                                <option value="Paladin">Paladin</option>
+                                <option value="Ranger">Ranger</option>
+                                <option value="Rogue">Rogue</option>
+                                <option value="Sorcerer">Sorcerer</option>
+                                <option value="Warlock">Warlock</option>
+                                <option value="Wizard">Wizard</option>
+                                <option value="Artificer">Artificer</option>
+                            </select>
+                        </>
+                    } />
+                </div>
+                <div className='basic-container'>
+                    <SideBySide content={
+                        <>
+                            <h4>Level: </h4>
+                            <input
+                                type="number"
+                                min='1'
+                                value={level}
+                                onChange={onLevelChange}
+                                placeholder="..."
+                                className="form-control"
+                                style={{ width: '100px' }}
+                            />
+                        </>
+                    } />
+                </div>
+                <div className='basic-container'>
+                    <SideBySide content={
+                        <>
+                            <h4>Race: </h4>
+                            <input
+                                type="text"
+                                value={race}
+                                onChange={onRaceChange}
+                                placeholder="'Wood Elf'"
+                                className="form-control"
+                                style={{ width: '200px' }}
+                            />
+                        </>
+                    } />
+                </div>
+                <div className='basic-container'>
+                    <SideBySide content={
+                        <>
+                            <h4>Alignment: </h4>
+                            <select id="alignment" value={alignment} onChange={onAlignmentChange}>
+                                <option value="Lawful Good">Lawful Good</option>
+                                <option value="Neutral Good">Neutral Good</option>
+                                <option value="Chaotic Good">Chaotic Good</option>
+                                <option value="Lawful Neutral">Lawful Neutral</option>
+                                <option value="True Neutral">True Neutral</option>
+                                <option value="Chaotic Neutral">Chaotic Neutral</option>
+                                <option value="Lawful Evil">Lawful Evil</option>
+                                <option value="Neutral Evil">Neutral Evil</option>
+                                <option value="Chaotic Evil">Chaotic Evil</option>
+                            </select>
+                        </>
+                    } />
+                </div>
+                <div className='basic-container'>
+                    <SideBySide content={
+                        <>
+                            <h4>XP: </h4>
+                            <input
+                                type="number"
+                                step='10'
+                                value={xp}
+                                onChange={onXpChange}
+                                placeholder="..."
+                                className="form-control"
+                                style={{ width: '100px' }}
+                            />
+                        </>
+                    } />
+                </div>
+            </>
+        )
+    }
+
+    function CombatInfoInput() {
+        return (
+            <>
+                {/* HP */}
+                <SideBySide content={
+                    <>
+                        <HPBlock hp={hp} onChange={handleHPChange} />
+                        <ACBlock ac={ac} onChange={handleACChange} />
+                    </>
+                } />
+                {/* Init, Speed */}
+                <SideBySide content={
+                    <>
+                        <div className='basic-container'>
+                            <SideBySide content={
+                                <>
+                                    <h4>Init Bonus: </h4>
+                                    <input
+                                        type="number"
+                                        value={initBonus}
+                                        onChange={onInitBonusChange}
+                                        placeholder="..."
+                                        className="form-control"
+                                        style={{ width: '100px' }}
+                                    />
+                                </>
+                            } />
+                        </div>
+                        <div className='basic-container'>
+                            <SideBySide content={
+                                <>
+                                    <h4>Speed: </h4>
+                                    <input
+                                        type="number"
+                                        min='0'
+                                        step='5'
+                                        value={speed}
+                                        onChange={onSpeedChange}
+                                        placeholder="..."
+                                        className="form-control"
+                                        style={{ width: '100px' }}
+                                    />
+                                </>
+                            } />
+                        </div>
+                    </>
+                } />
+            </>
+        )
+    }
+
     return (
         <div className='character-input'>
             <h2>Add Character</h2>
             <HorizLine />
-            {/* General Info */}
             <div className='row'>
                 <div className='col'>
-                    <div className='basic-container'>
-                        <SideBySide content={
-                            <>
-                                <h4>Name: </h4>
-                                <input
-                                    type="text"
-                                    value={name}
-                                    onChange={onNameChange}
-                                    placeholder="'Izalith the Stinky'"
-                                    className="form-control"
-                                    style={{ width: '300px' }}
-                                />
-                            </>
-                        } />
-                    </div>
-                    <div className='basic-container'>
-                        <SideBySide content={
-                            <>
-                                <h4>Class: </h4>
-                                <select id="class" value={chrClass} onChange={onChrClassChange}>
-                                    <option value="Barbarian">Barbarian</option>
-                                    <option value="Bard">Bard</option>
-                                    <option value="Ceric">Cleric</option>
-                                    <option value="Druid">Druid</option>
-                                    <option value="Fighter">Fighter</option>
-                                    <option value="Monk">Monk</option>
-                                    <option value="Paladin">Paladin</option>
-                                    <option value="Ranger">Ranger</option>
-                                    <option value="Rogue">Rogue</option>
-                                    <option value="Sorcerer">Sorcerer</option>
-                                    <option value="Warlock">Warlock</option>
-                                    <option value="Wizard">Wizard</option>
-                                    <option value="Artificer">Artificer</option>
-                                </select>
-                            </>
-                        } />
-                    </div>
-                    <div className='basic-container'>
-                        <SideBySide content={
-                            <>
-                                <h4>Level: </h4>
-                                <input
-                                    type="number"
-                                    min='1'
-                                    value={level}
-                                    onChange={onLevelChange}
-                                    placeholder="..."
-                                    className="form-control"
-                                    style={{ width: '100px' }}
-                                />
-                            </>
-                        } />
-                    </div>
-                    <div className='basic-container'>
-                        <SideBySide content={
-                            <>
-                                <h4>Race: </h4>
-                                <input
-                                    type="text"
-                                    value={race}
-                                    onChange={onRaceChange}
-                                    placeholder="'Wood Elf'"
-                                    className="form-control"
-                                    style={{ width: '200px' }}
-                                />
-                            </>
-                        } />
-                    </div>
-                    <div className='basic-container'>
-                        <SideBySide content={
-                            <>
-                                <h4>Alignment: </h4>
-                                <select id="alignment" value={alignment} onChange={onAlignmentChange}>
-                                    <option value="Lawful Good">Lawful Good</option>
-                                    <option value="Neutral Good">Neutral Good</option>
-                                    <option value="Chaotic Good">Chaotic Good</option>
-                                    <option value="Lawful Neutral">Lawful Neutral</option>
-                                    <option value="True Neutral">True Neutral</option>
-                                    <option value="Chaotic Neutral">Chaotic Neutral</option>
-                                    <option value="Lawful Evil">Lawful Evil</option>
-                                    <option value="Neutral Evil">Neutral Evil</option>
-                                    <option value="Chaotic Evil">Chaotic Evil</option>
-                                </select>
-                            </>
-                        } />
-                    </div>
-                    <div className='basic-container'>
-                        <SideBySide content={
-                            <>
-                                <h4>XP: </h4>
-                                <input
-                                    type="number"
-                                    step='10'
-                                    value={xp}
-                                    onChange={onXpChange}
-                                    placeholder="..."
-                                    className="form-control"
-                                    style={{ width: '100px' }}
-                                />
-                            </>
-                        } />
-                    </div>
+                   <GeneralInfoinput/>
+                   <StatsInputTable/>
                 </div>
+                {/* Skills */}
+                <div className=''>
+                    <SideBySide content={
+                        <>
+                            <SkillsInput />
+                            <div>
+                                <SavingThrowsInput />
+                            </div>
 
-                {/* Stats */}
+                        </>
+                    } />
+
+                </div>
                 <div className='col'>
-                    {/* HP */}
-                    <SideBySide content={
-                        <>
-                            <HPBlock hp={hp} onChange={handleHPChange} />
-                            <ACBlock ac={ac} onChange={handleACChange} />
-                        </>
-                    } />
-                    {/* Init, Speed */}
-                    <SideBySide content={
-                        <>
-                            <div className='basic-container'>
-                                <SideBySide content={
-                                    <>
-                                        <h4>Init Bonus: </h4>
-                                        <input
-                                            type="number"
-                                            value={initBonus}
-                                            onChange={onInitBonusChange}
-                                            placeholder="..."
-                                            className="form-control"
-                                            style={{ width: '100px' }}
-                                        />
-                                    </>
-                                } />
-                            </div>
-                            <div className='basic-container'>
-                                <SideBySide content={
-                                    <>
-                                        <h4>Speed: </h4>
-                                        <input
-                                            type="number"
-                                            min='0'
-                                            step='5'
-                                            value={speed}
-                                            onChange={onSpeedChange}
-                                            placeholder="..."
-                                            className="form-control"
-                                            style={{ width: '100px' }}
-                                        />
-                                    </>
-                                } />
-                            </div>
-                        </>
-                    } />
-                    {/* Main Stats */}
-                    <StatsInputTable />
-                    {/* Skills */}
-                    <div className='col'>
-                        <SkillsInput />
-                    </div>
 
                 </div>
 
             </div>
+
         </div>
+
     );
 }
 
