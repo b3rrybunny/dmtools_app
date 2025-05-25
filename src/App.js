@@ -4,7 +4,8 @@ import Navbar from './components/basic/Navbar';
 import Home from './components/pages/Home';
 import About from './components/pages/About';
 import Contact from './components/pages/Contact';
-import CombatManager from './components/pages/CombatManager'
+import CombatManager from './components/pages/CombatManager';
+import CharacterDataPage from './components/pages/CharacterDataPage';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path='/CombatManager' element={<CombatManager />} />
+          <Route path='/CharacterData' element={<CharacterDataPage />} />
         </Routes>
       </div>
     </div>

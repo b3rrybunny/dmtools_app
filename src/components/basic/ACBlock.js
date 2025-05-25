@@ -1,6 +1,6 @@
-import '../../css/HPBlock.css';
+import '../../css/ACBlock.css';
 
-function HPBlock({ hp, onChange }) {
+function ACBlock({ ac, onChange }) {
 
     const handleAdd = () => {
         onChange('+');
@@ -12,7 +12,7 @@ function HPBlock({ hp, onChange }) {
 
     return (
         <div className='hp-block side-by-side'>
-            <h4>❤ HP: </h4>
+            <h4>⛊ AC: </h4>
             <button
                 type='button'
                 className='btn btn-outline-dark'
@@ -22,7 +22,7 @@ function HPBlock({ hp, onChange }) {
                     '--bs-btn-padding-x': '1rem',
                     '--bs-btn-font-size': '1rem'
                 }}>+</button>
-            <h4> {hp} </h4>
+            <h4> {ac} </h4>
             <button
                 type='button'
                 className='btn btn-outline-dark'
@@ -36,4 +36,4 @@ function HPBlock({ hp, onChange }) {
     );
 }
 
-export default HPBlock;
+export default ACBlock;

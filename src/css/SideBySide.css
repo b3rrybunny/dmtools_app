@@ -1,0 +1,26 @@
+.side-by-side {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    height: auto;
+    width: 100%;
+    margin: 5px;
+}
+.side-by-side h1 {
+    margin: 0px;
+}
+.side-by-side h2 {
+    margin: 0px;
+}
+.side-by-side h3 {
+    margin: 0px;
+}
+.side-by-side h4 {
+    margin: 0px;
+}
+.side-by-side h5 {
+    margin: 0px;
+}
+.side-by-side p {
+    margin: 0px;
+}

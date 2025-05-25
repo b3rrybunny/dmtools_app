@@ -17,6 +17,10 @@ function Navbar() {
             <li className="nav-item">
               <Link className="nav-link" to="/CombatManager">CombatManager</Link>
             </li>
+            {/* Character Data */}
+            <li className="nav-item">
+              <Link className="nav-link" to="/CharacterData">Character Data</Link>
+            </li>
             {/* Home */}
             <li className="nav-item">
               <Link className="nav-link" to="/">Home</Link>

@@ -1,16 +1,25 @@
+.card {
+    border-radius: 1rem !important;
+    padding: 10px !important;
+}
+
 .monster-card {
     background: linear-gradient(to right top, #650d0d, #ff5959);
     backdrop-filter: blur(8px);
+    padding: 5px;
 }
 
 .player-card {
     background: linear-gradient(to right top, #0a4419, #59ff82);
     backdrop-filter: blur(8px);
+    padding: 5px;
+
 }
 
 .npc-card {
     background: linear-gradient(to right top, #08144f, #4463fe);
     backdrop-filter: blur(8px);
+    padding: 5px;
 }
 
 .active {
@@ -30,6 +39,8 @@
     background-blend-mode: overlay;
     background-repeat: repeat;
     backdrop-filter: blur(8px);
+    padding: 5px;
+
 }
 
 .player-card.danger {
@@ -39,6 +50,8 @@
     background-blend-mode: overlay;
     background-repeat: repeat;
     backdrop-filter: blur(8px);
+    padding: 5px;
+
 }
 
 .npc-card.danger {
@@ -48,26 +61,64 @@
     background-blend-mode: overlay;
     background-repeat: repeat;
     backdrop-filter: blur(8px);
+    padding: 5px;
+
 }
 
+.card-extra-info {
+    background-color: rgba(255, 255, 255, 0.616);
+    padding: 5px;
+    border: 2px solid black;
+    border-radius: 8px;
+    backdrop-filter: blur(8px);
+    margin: 5px;
+}
 
+.card-text {
+    background-color: rgba(255, 255, 255, 0.616);
+    padding: 2px;
+    border: 2px solid black;
+    border-radius: 8px;
+    backdrop-filter: blur(8px);
+}
 
-.card {
-    border-radius: 1rem !important;
-    padding: 10px;
+.ac-block h4 {
+    margin: 0;
+}
+
+.ac-block {
+    background-color: rgba(255, 255, 255, 0.616);
+    padding: 5px;
+    border: 2px solid black;
+    border-radius: 8px;
+    backdrop-filter: blur(8px);
+    height: 100%;
 }
 
 .card-container {
-    height: 94vh;
+    height: 91.5vh;
     overflow-y: auto !important;
     flex-direction: column;
     display: flex;
+    border: 5px solid black;
+    border-radius: 20px;
+    backdrop-filter: blur(8px);
 }
 
 .input-window {
     background-color: #ffffffb8;
+    backdrop-filter: blur(8px);
     border-radius: 10px;
-    padding: 7px;
+    padding: 10px;
+    margin-right: 5px;
+}
+
+.input-window p {
+    margin: 0;
+}
+
+.input-window h5 {
+    margin: 0;
 }
 
 .manual-add {
@@ -76,19 +127,55 @@
     justify-content: center;
 }
 
+.combat-control {
+    background-color: #ffffffb8;
+    backdrop-filter: blur(8px);
+    border-radius: 10px;
+    padding: 10px;
+    margin-right: 5px;
+    margin-top: 5px;
+    width: 100%;
+    z-index: 1;
+}
+
 .side-by-side {
     display: flex;
-    gap: 10px;
+    gap: 7px;
     align-items: center;
     text-align: center;
     height: auto;
     width: 100%
+}
+.side-by-side h1 {
+    margin: 0px;
+}
+.side-by-side h2 {
+    margin: 0px;
+}
+.side-by-side h3 {
+    margin: 0px;
+}
+.side-by-side h4 {
+    margin: 0px;
+}
+.side-by-side h5 {
+    margin: 0px;
+}
+.side-by-side p {
+    margin: 0px;
 }
 
 .page {
     height: rem;
     width: rem;
     padding: 5px;
+    overflow-x: hidden; /* Blocks horizontal scrolling */
+    overflow-y: hidden;
+}
+
+hr {
+    border: 2px solid #000000 !important;
+    width: 100% !important;
 }
 
 p {
@@ -98,8 +185,9 @@ p {
 table {
     margin: 3px;
     background: #ffffffad;
-    border-radius: 5px;
+    border: 2px solid #000000 !important;
     width: 100%;
+    backdrop-filter: blur(8px);
 }
 
 td {

@@ -1,6 +1,6 @@
 // Modules ------------------------------------------------------------------
 import * as bootstrap from 'bootstrap';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 
 // Custom -------------------------------------------------------------------
@@ -27,10 +27,10 @@ function getModifier(stat) {
 
 function ModifierText({ modifier }) {
     if (modifier[1] === "+") {
-        return (<p style={{ color: 'green', textAlign: 'center' }}>{modifier}</p>)
+        return (<p style={{ color: 'green', textAlign: 'center', margin: '0px' }}>{modifier}</p>)
     }
     else {
-        return (<p style={{ color: 'red', textAlign: 'center' }}>{modifier}</p>)
+        return (<p style={{ color: 'red', textAlign: 'center', margin: '0px' }}>{modifier}</p>)
     }
 }
 
@@ -83,37 +83,87 @@ function CreatureImg({ img }) {
     if (img === 'player') {
         return (
             <div className="col-md-4 card-img-player" style={{ alignContent: 'center', justifyContent: 'center', padding: '0px' }}>
-                <img src={player_character} className="img-fluid rounded" />
+                <img src={player_character} className="img-fluid rounded" style={{ maxHeight: '270px' }} />
             </div>
         )
     }
     else if (img === 'npc') {
         return (
             <div className="col-md-4 card-img-npc" style={{ alignContent: 'center', justifyContent: 'center', padding: '0px' }}>
-                <img src={NPC_img} className="img-fluid rounded" />
+                <img src={NPC_img} className="img-fluid rounded" style={{ maxHeight: '270px' }} />
             </div>
         )
     }
     else {
         return (
             <div className="col-md-4 card-img-monster" style={{ alignContent: 'center', justifyContent: 'center', padding: '0px' }}>
-                <img src={img} className="img-fluid rounded" />
+                <img src={img} className="img-fluid rounded" style={{ maxHeight: '270px' }} />
             </div>
         )
     }
 }
 
-function CreatureCard({ data = null, index, onChange }) {
+function CreatureActions({ data = null }) {
+    const infoToDisplay = [
+        'Actions',
+        'Legendary Actions',
+        'Speed',
+        'Saving Throws',
+        'Senses'
+    ];
+
+    const content = [];
+
+    for (const key of infoToDisplay) {
+        if (key === 'Actions') {
+            if (data?.[key]) {
+                content.push(
+                    <div key={key} className=''>
+                        <h5>{key}:</h5>
+                        <div dangerouslySetInnerHTML={{ __html: data[key] }} />
+                        <hr style={{ marginRight: '5px' }} />
+                    </div>
+                );
+            }
+        }
+        else if (key === 'Legendary Actions') {
+            if (data?.[key]) {
+                content.push(
+                    <div key={key} className=''>
+                        <h5>{key}:</h5>
+                        <div dangerouslySetInnerHTML={{ __html: data[key] }} />
+                        <hr style={{ marginRight: '5px' }} />
+                    </div>
+                );
+            }
+        }
+        else {
+            content.push(
+                <div key={key} className='side-by-side'>
+                    {key}: {data?.[key] ?? 'N/A'}
+                </div>
+            );
+        }
+    }
+
+    return (
+        <div className='creature-info'>
+            {content}
+        </div>
+    );
+}
+
+function CreatureCard({ data = null, index, onChange, isActive }) {
 
     const handleHPChange = (mod) => {
         if (data?.rolledHP !== undefined) {
             // Working with rolledHP
-            const newValue = mod === '+' ? data.rolledHP + 1 : data.rolledHP - 1;
+            const newValue = mod === '+' ? parseInt(data.rolledHP) + 1 : parseInt(data.rolledHP) - 1;
             onChange(data.id, 'rolledHP', newValue); // Prevent negative HP
         } else {
             // Working with regular hp
             const currentHP = data.hp || 0;
-            const newValue = mod === '+' ? currentHP + 1 : currentHP - 1;
+            const newValue = mod === '+' ? parseInt(currentHP) + 1 : parseInt(currentHP) - 1;
             onChange(data.id, 'hp', newValue);
         }
     }
@@ -124,12 +174,12 @@ function CreatureCard({ data = null, index, onChange }) {
                 data?.isNPC ? 'npc-card' : //npc cards style
                     'monster-card' //default (monster) style
         ) + (
-                index === 1 ? ' active' : //Active combatant
+                isActive ? ' active' : //Active combatant
                     ' inactive' //Nonactive combatant
             ) + (
                 data?.rolledHP <= 0 ? ' danger' : //HP <=0, bg changes to warning
-                data.hp <= 0 ? ' danger' : //HP <=0, bg changes to warning
-                ''
+                    data.hp <= 0 ? ' danger' : //HP <=0, bg changes to warning
+                        ''
             )
         }>
             <div className="row g-0">
@@ -138,7 +188,7 @@ function CreatureCard({ data = null, index, onChange }) {
                         data?.isNPC ? <CreatureImg img='npc' /> : //npc img
                             <CreatureImg img={data.img_url} /> //default img
                 }
-                <div className="col-md-8" style={{padding: '5px'}}>
+                <div className="col-md-8" style={{ padding: '5px' }}>
                     {/* Index. Name */}
                     <div className='side-by-side'>
                         <h1 className="card-title">{index}. {data.name}</h1>
@@ -149,7 +199,7 @@ function CreatureCard({ data = null, index, onChange }) {
                         <div>
                             <HPBlock hp={data?.rolledHP ? data.rolledHP : data.hp} onChange={handleHPChange} />
                         </div>
-                        <div>
+                        <div className='ac-block'>
                             <h4>⛊ AC: {dice.extractNumbersOutsideParentheses(data.ac)}</h4>
                         </div>
                     </div>
@@ -158,22 +208,33 @@ function CreatureCard({ data = null, index, onChange }) {
                 </div>
 
             </div>
-            <p className="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-            <p className="card-text"><small className="text-body-secondary">Last updated 3 mins ago</small></p>
+            <div className='row g-0 mt-2 card-extra-info'>
+                <CreatureActions data={data} />
+            </div>
+            <p className="card-text"><small className="text-body-secondary">{
+                data?.manualAdd ? 'Added manually' :
+                    data?.autoAdd ? 'Added via autocomplete' :
+                        'Unknown add method'
+            }</small></p>
 
         </div>
     )
 
 }
 
-function CardContainer({ combatants, onChange }) {
-    // Sort combatants by initiative in descending order (highest first)
-    const sortedCombatants = [...combatants].sort((a, b) => {
-        // Handle cases where init might be undefined or null
-        const aInit = a.init || 0;
-        const bInit = b.init || 0;
-        return bInit - aInit; // Descending order (highest initiative first)
-    });
+function CardContainer({ combatants, currentCombatant, onChange }) {
+    const cardRefs = useRef([]);
+
+    // Auto-scroll to current combatant when currentCombatant changes
+    useEffect(() => {
+        if (cardRefs.current[currentCombatant]) {
+            cardRefs.current[currentCombatant].scrollIntoView({
+                behavior: 'smooth',
+                block: 'start', // Centers the element vertically in the viewport
+                inline: 'nearest'
+            });
+        }
+    }, [currentCombatant]);
 
     // Passes change to parent CombatManager
     const handleOnChange = (id, key, value) => {
@@ -182,25 +243,31 @@ function CardContainer({ combatants, onChange }) {
 
     return (
         <div className="card-container">
-            {sortedCombatants.map((combatant, index) => (
-                <CreatureCard
+            {combatants.map((combatant, index) => (
+                <div
                     key={combatant.id}
-                    data={combatant}
-                    index={index + 1}
-                    onChange={handleOnChange}
-                />
+                    ref={el => cardRefs.current[index] = el}
+                >
+                    <CreatureCard
+                        data={combatant}
+                        index={index + 1}
+                        onChange={handleOnChange}
+                        isActive={index === currentCombatant ? true : false}
+                    />
+                </div>
             ))}
         </div>
     );
 }
 
-function InputWindow({ value, onTestPopulate, onAutocompleteAdd, onManualAdd }) {
+function InputWindow({onTestPopulate, onAutocompleteAdd, onManualAdd, onClear }) {
     const [suggestions, setSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
 
     // Auto
     const [autoAdvSelected, setAutoAdvSelected] = useState('');
     const [autoValue, setAutoValue] = useState('');
+    const [numToAdd, setNumToAdd] = useState('1');
 
     // Manual
     const [manualName, setManualName] = useState('');
@@ -240,10 +307,13 @@ function InputWindow({ value, onTestPopulate, onAutocompleteAdd, onManualAdd }) 
     };
 
     const handleAutoAdd = () => {
-        if (autoValue.trim()) {
-            onAutocompleteAdd(autoValue, autoAdvSelected); // Pass data to parent
-            setAutoValue(''); // Optional: Clear input after submission
+        const numOfMonster = parseInt(numToAdd);
+        for (let i = 0; i < numOfMonster; i++) {
+            if (autoValue.trim()) {
+                onAutocompleteAdd(autoValue, autoAdvSelected); // Pass data to parent
+            }
         }
+        setAutoValue(''); // Optional: Clear input after submission
     };
 
     const handleManualAdd = () => {
@@ -296,6 +366,10 @@ function InputWindow({ value, onTestPopulate, onAutocompleteAdd, onManualAdd }) 
 
     const handleManualInitChange = (e) => {
         setManualInit(e.target.value);
+    }
+
+    const handleNumToAddChange = (e) => {
+        setNumToAdd(e.target.value);
     }
 
 
@@ -357,6 +431,15 @@ function InputWindow({ value, onTestPopulate, onAutocompleteAdd, onManualAdd }) 
                             </div>
                         )}
                     </div>
+                    <input
+                        type="number"
+                        min='1'
+                        value={numToAdd}
+                        onChange={handleNumToAddChange}
+                        placeholder="#"
+                        className="form-control"
+                        style={{ width: '100px' }}
+                    />
                     <select id="autoAdv" value={autoAdvSelected} onChange={handleAutoAdvChange}>
                         <option value="">No Adv/Disadv</option>
                         <option value="adv">Advantage</option>
@@ -387,7 +470,7 @@ function InputWindow({ value, onTestPopulate, onAutocompleteAdd, onManualAdd }) 
             <div className='manual-add'>
                 <div className='row'>
                     <div className='col side-by-side'>
-                        <p>Combatant name: </p>
+                        <p>Name: </p>
                         <input
                             type="text"
                             value={manualName}
@@ -405,6 +488,7 @@ function InputWindow({ value, onTestPopulate, onAutocompleteAdd, onManualAdd }) 
                             onChange={handleManualHPChange}
                             placeholder="♡"
                             className="form-control"
+                            style={{ width: '100px' }}
                         />
                     </div>
                     <div className='col side-by-side'>
@@ -415,18 +499,20 @@ function InputWindow({ value, onTestPopulate, onAutocompleteAdd, onManualAdd }) 
                             onChange={handleManualACChange}
                             placeholder="⛉"
                             className="form-control"
+                            style={{ width: '100px' }}
                         />
                     </div>
                 </div>
-                <div className='row'>
+                <div className='row mt-1'>
                     <div className='col side-by-side'>
                         <p>Init: </p>
                         <input
                             type="number"
                             value={manualInit}
                             onChange={handleManualInitChange}
-                            placeholder="Start typing..."
+                            placeholder="..."
                             className="form-control"
+                            style={{ width: '100px' }}
                         />
                         <p>Type: </p>
                         <select id="autoAdv" value={manualType} onChange={handleManualTypeChange}>
@@ -458,12 +544,71 @@ function InputWindow({ value, onTestPopulate, onAutocompleteAdd, onManualAdd }) 
                     Test Populate
                 </button>
             </div>
+            <div className="row m-3">
+                <button
+                    onClick={onClear}
+                    className="btn btn-danger"
+                >
+                    Clear Combatants
+                </button>
+            </div>
         </div>
     );
 }
 
+function CombatControl({ onSort, onNext, onPrev, data }) {
+    if (data === null) {
+        data = {
+            name: 'NULL'
+        }
+    }
+    return (
+        <div className='combat-control'>
+            <div className='side-by-side'>
+                <h3>Combat Control</h3>
+                <button
+                    onClick={onSort}
+                    className="btn btn-primary"
+                >
+                    Sort Combatants
+                </button>
+            </div>
+            <hr />
+            <div className='side-by-side' style={{ justifyContent: 'center' }}>
+                <button
+                    onClick={onPrev}
+                    className="btn btn-primary"
+                >
+                    &lt; Prev turn
+                </button>
+                <h4>Current turn: {data.name}</h4>
+                <button
+                    onClick={onNext}
+                    className="btn btn-primary"
+                >
+                    Next Turn &gt;
+                </button>
+            </div>
+
+        </div>
+    )
+}
+
 function CombatManager() {
     const [combatants, setCombatants] = useState([]);
+    const [currentCombatantIndex, setCurrentCombatantIndex] = useState(0);
+
+    // Function to sort combatants by initiative (highest first)
+    const sortCombatantsByInit = () => {
+        setCombatants(prevCombatants => {
+            const sorted = [...prevCombatants].sort((a, b) => {
+                const aInit = a.init || 0;
+                const bInit = b.init || 0;
+                return bInit - aInit; // Descending order (highest initiative first)
+            });
+            return sorted;
+        });
+    };
 
     const addMonsterData = (monsterName, adv = '') => {
         const originalMonster = rawMonstersData.find(item => item.name === monsterName);
@@ -479,8 +624,11 @@ function CombatManager() {
         }
         // Assign Rolled HP
         monsterToAdd.rolledHP = dice.rollDice(monsterToAdd.hp);
-        monsterToAdd.id = Date.now() + Math.random();;
+        monsterToAdd.id = Date.now() + Math.random();
+        monsterToAdd.autoAdd = true;
         setCombatants(prevCombatants => [...prevCombatants, monsterToAdd]);
+        // Sort after adding
+        setTimeout(() => sortCombatantsByInit(), 0);
     }
 
     function testPopulate() {
@@ -500,7 +648,10 @@ function CombatManager() {
     }
 
     function handleManualAdd(manualData) {
+        manualData.manualAdd = true;
         setCombatants(prevCombatants => [...prevCombatants, manualData]);
+        // Sort after adding
+        setTimeout(() => sortCombatantsByInit(), 0);
     }
 
     function handleCardOnChange(id, key, value) {
@@ -514,20 +665,50 @@ function CombatManager() {
         );
     }
 
+    function handleOnPrev() {
+        if (currentCombatantIndex === 0) {
+            setCurrentCombatantIndex(combatants.length - 1);
+        }
+        else {
+            setCurrentCombatantIndex(currentCombatantIndex - 1);
+        }
+    }
+
+    function handleOnNext() {
+        if (currentCombatantIndex === combatants.length - 1) {
+            setCurrentCombatantIndex(0);
+        }
+        else {
+            setCurrentCombatantIndex(currentCombatantIndex + 1);
+        }
+    }
+
+    function handleClear () {
+        setCombatants([]);
+    }
+
     return (
         <div className='page'>
             <div className='row'>
-                <div className='col card-container'>
+                <div className='col'>
                     <CardContainer
-                        combatants={combatants}
+                        combatants={combatants} // Now using the sorted combatants state
                         onChange={handleCardOnChange}
+                        currentCombatant={currentCombatantIndex}
                     />
                 </div>
-                <div className='col'>
+                <div className='col ml-0' style={{ paddingLeft: '0px' }}>
                     <InputWindow
                         onTestPopulate={testPopulate}
                         onAutocompleteAdd={handleAutoAdd}
                         onManualAdd={handleManualAdd}
+                        onClear={handleClear}
+                    />
+                    <CombatControl
+                        data={combatants.length > 0 ? combatants[currentCombatantIndex] : null} // Use the sorted combatants state
+                        onSort={sortCombatantsByInit}
+                        onPrev={handleOnPrev}
+                        onNext={handleOnNext}
                     />
                 </div>
             </div>

@@ -1,0 +1,38 @@
+.character-input {
+    background-color: #ffffffb8;
+    backdrop-filter: blur(8px);
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px;
+
+    z-index: 1;
+}
+
+.basic-container {
+    background-color: rgba(255, 255, 255, 0.616);
+    padding: 5px;
+    border: 2px solid black;
+    border-radius: 8px;
+    backdrop-filter: blur(8px);
+    margin: 5px;
+}
+
+table {
+    margin: 3px;
+    background: #ffffffad;
+    border: 2px solid #000000 !important;
+    width: 100%;
+    backdrop-filter: blur(8px);
+}
+
+td {
+    font-size: 20px;
+    display: grid flex;
+    height: 100%;
+    max-width: 50px;
+    border: 2px solid #000000 !important;
+    text-align: center;
+    justify-content: center;
+    justify-items: center;
+    align-items: center;
+}
