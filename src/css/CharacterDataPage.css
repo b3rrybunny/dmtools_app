@@ -4,8 +4,14 @@
     border-radius: 10px;
     padding: 10px;
     margin: 10px;
-
     z-index: 1;
+}
+
+.custom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    height: 100%;
+    width: 100%;
 }
 
 .basic-container {
@@ -20,6 +26,8 @@
 .saving-throws {
     height: rem !important;
 }
+
+
 
 table {
     margin: 3px;

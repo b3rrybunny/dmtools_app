@@ -1,11 +1,12 @@
 .side-by-side {
-     display: flex; 
-     gap: 10px; 
-     align-items: center; 
-     text-align: center; 
-     height: auto; 
-     width: 100%
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    text-align: center;
+    height: auto;
+    width: fit-content;
 }
+
 .hp-block h4 {
     margin: 0;
 }
@@ -19,6 +20,6 @@
 }
 
 .btn {
-    --bs-btn-padding-y: .25rem; 
+    --bs-btn-padding-y: .25rem;
     --bs-btn-padding-x: .5rem;
 }
