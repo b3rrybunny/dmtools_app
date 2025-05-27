@@ -10,7 +10,7 @@ function SideBySide ({ content, gap=7, fillWidth=false }) {
     
     return (
         <div className='side-by-side' style={{
-            gap: ({gap} + 'px'), 
+            gap: ((gap.toString()) + 'px'), 
             width: widthValue
             }}>
             {content}

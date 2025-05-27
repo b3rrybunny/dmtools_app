@@ -18,8 +18,8 @@ export function prettyLog(obj, title = null) {
   // Log each property with different colors
   for (const [key, value] of Object.entries(obj)) {
     const keyStyle = 'color: #8e2de2; font-weight: bold';
-    const valueStyle = typeof value === 'string' 
-      ? 'color: #4CAF50' 
+    const valueStyle = typeof value === 'string'
+      ? 'color: #4CAF50'
       : 'color: #2196F3';
 
     console.log(`%c${key}:`, keyStyle, `%c${JSON.stringify(value, null, 2)}`, valueStyle);
@@ -31,4 +31,24 @@ export function prettyLog(obj, title = null) {
   console.groupEnd();
 
   console.groupEnd();
+}
+
+export function prettyLogJson(jsonArray, title = '', collapse = true) {
+  if (!Array.isArray(jsonArray)) {
+    console.error('Input must be an array');
+    return;
+  }
+
+  const logMethod = collapse ? console.groupCollapsed : console.group;
+  const groupTitle = title || `JSON Data (${jsonArray.length} items)`;
+
+  logMethod(groupTitle);
+  jsonArray.forEach((item, index) => {
+    console.log(`Item ${index + 1}:`, JSON.parse(JSON.stringify(item, null, 2)));
+  });
+  console.groupEnd();
+}
+
+export function genID() {
+  return Math.floor(Math.random() * 900000) + 100000;
 }

@@ -1,6 +1,7 @@
 // Modules ------------------------------------------------------------------
 import * as bootstrap from 'bootstrap';
 import { useState, useEffect, useRef, memo } from 'react';
+import ReactDOMServer from 'react-dom/server';
 
 
 // Custom -------------------------------------------------------------------
@@ -13,11 +14,21 @@ import * as tools from '../tools';
 import * as dice from '../../scripts/dice';
 // Data
 import rawMonstersData from '../../data/srd_5e_monsters.json';
+import * as SRDapi from '../../scripts/dndSRD5eapi';
+import * as storage from '../../scripts/storage';
 // CSS / Assets
 import '../../css/CharacterDataPage.css';
 import player_character from '../../assets/player_character.png';
 import NPC_img from '../../assets/NPC.png';
 
+
+// Data Init
+const allSpellsData = await (SRDapi.getAllSpells());
+tools.prettyLogJson(allSpellsData);
+const allEquipmentData = await (SRDapi.getAllEquipment());
+tools.prettyLogJson(allEquipmentData);
+const allLanguageData = await (SRDapi.getAllLanguages());
+tools.prettyLogJson(allLanguageData);
 
 function AttackInput({ onAddAttack }) {
     console.log('AttackInput rendering');
@@ -201,7 +212,7 @@ function AttackInput({ onAddAttack }) {
                     />
                 </>
             } />
-            <SideBySide gap={0} content={
+            <SideBySide gap={5} content={
                 <>
                     <h4>Damage: </h4>
                     <input
@@ -263,7 +274,7 @@ function AttackInput({ onAddAttack }) {
             {
                 attackAddlDamage === 'true' ?
                     <>
-                        <SideBySide content={
+                        <SideBySide gap={5} content={
                             <>
                                 <h5>Damage: </h5>
                                 <input
@@ -331,14 +342,337 @@ function OtherActionInput({ onAddAction }) {
     const onActionNameChange = (e) => {
         setActionName(e.target.value);
     }
+    const [actionDesc, setActionDesc] = useState('Exhales fire in a 15-ft cone. Each creature makes a DC 13 DEX check, taking (7d6) fire damage on a failed save, or half on a successful one.'); //Action name
+    const onActionDescChange = (e) => {
+        setActionDesc(e.target.value);
+    }
+
+    function handleActionAdd() {
+        const actionNameEl = (
+            <strong><em>{actionName}. </em></strong>
+        );
+        const actionDescString = (
+            actionDesc
+        );
+        const result = (
+            <>
+                <p>
+                    {actionNameEl}
+                    {actionDescString}
+                </p>
+            </>
+        );
+        onAddAction(result);
+        setActionDesc('');
+        setActionName('');
+    }
+
     return (
         <>
             <SideBySide content={
                 <>
-
+                    <h4>Action name: </h4>
+                    <input
+                        type="text"
+                        value={actionName}
+                        onChange={onActionNameChange}
+                        placeholder="'Fire Breath (Recharge 5-6)'"
+                        className="form-control"
+                        style={{ maxWidth: '300px' }}
+                    />
                 </>
             } />
+            <SideBySide content={
+                <>
+                    <h4>Action Description: </h4>
+                    <textarea
+                        id='actionDescText'
+                        value={actionDesc}
+                        onChange={onActionDescChange}
+                        style={{ width: '100%', minHeight: '150px' }}
+                    >
+                        Exhales fire in a 15-ft cone. Each creature makes a DC 13 DEX check, taking (7d6) fire damage on a failed save, or half on a successful one.
+                    </textarea>
+                </>
+            } />
+            <button
+                className='btn btn-success'
+                onClick={handleActionAdd}
+                style={{ width: '100%' }}
+            >
+                Add Action
+            </button>
         </>
+    );
+}
+
+function SpellInput({ onAddSpell }) {
+    const [spellName, setSpellName] = useState('');
+
+    // Autocomplete
+    const [suggestions, setSuggestions] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const onSpellNameChange = (e) => {
+        const value = e.target.value;
+        setSpellName(value);
+
+        if (!value) {
+            setSuggestions([]);
+            setShowSuggestions(false);
+            return;
+        }
+
+        // Filter suggestions
+        const filtered = allSpellsData.filter(item =>
+            (item.name.toLowerCase().includes(value.toLowerCase()))
+        );
+
+        setSuggestions(filtered);
+        setShowSuggestions(true);
+    }
+    const handleSuggestionClick = (name) => {
+        setSpellName(name);
+        setShowSuggestions(false);
+    };
+    const handleBlur = () => {
+        // Small delay to allow click events to process
+        setTimeout(() => setShowSuggestions(false), 200);
+    };
+
+    async function handleAddSpell() {
+        const spell = allSpellsData.find(item => item.name === spellName);
+        const spellData = await SRDapi.getSingleSpell(spell.index);
+        const spellDataDescCompleteString = () => {
+            let string = '';
+            spellData.desc.forEach(item => {
+                if (string === '') {
+                    string = item;
+                }
+                else {
+                    string = string + ' ' + item;
+                }
+            });
+            return string;
+        }
+        const spellDataAreaOfEffectString = () => {
+            let string = '';
+            string = spellData.area_of_effect.type;
+            string = string + ' ' + spellData.area_of_effect.size.toString() + 'ft.';
+            return string;
+        }
+        const spellDataComponentString = () => {
+            let string = '';
+            spellData.components.forEach(item => {
+                if (string === '') {
+                    string = item;
+                }
+                else {
+                    string = string + ', ' + item;
+                }
+            });
+            return string;
+        }
+        const spellNameEl = (
+            <strong><em>{spellData.name}, Level {spellData.level}. </em></strong>
+        )
+        const spellDescString = (
+            spellDataDescCompleteString() + (spellData?.higher_level ? (' At Higher Levels: ' + spellData.higher_level[0]) : '')
+        )
+        const spellSpecsEl = (
+            <>
+                <em>Range: </em><span>{spellData.range}. </span>
+                <em>Casting time: </em><span>{spellData.casting_time}. </span>
+                <em>Duration: </em><span>{spellData.duration}. </span>
+                {spellData?.concentration ? (<em>Concentration. </em>) : null}
+                {spellData?.ritual ? (<em>Ritual. </em>) : null}
+                {spellData?.area_of_effect ? (<><em>Area of effect: </em><span>{spellDataAreaOfEffectString()}. </span></>) : null}
+                <em>Components: </em><span>{spellDataComponentString()}. </span>
+            </>
+        )
+
+        const result = (
+            <>
+                <p>
+                    {spellNameEl}
+                    {spellSpecsEl}
+                    {spellDescString}
+                </p>
+            </>
+        );
+        onAddSpell(result);
+    }
+
+    return (
+        <>
+            <SideBySide content={
+                <>
+                    <h4>Spell name: </h4>
+                    <div className="autocomplete" style={{ position: 'relative' }}>
+                        <input
+                            type="text"
+                            value={spellName}
+                            onChange={onSpellNameChange}
+                            onFocus={() => spellName && setShowSuggestions(true)}
+                            onBlur={handleBlur}
+                            placeholder="'Acid Arrow'"
+                            className="form-control"
+                        />
+                        {showSuggestions && suggestions.length > 0 && (
+                            <div
+                                className="autocomplete-items"
+                                style={{
+                                    position: 'absolute',
+                                    zIndex: 99,
+                                    top: '100%',
+                                    left: 0,
+                                    right: 0,
+                                    border: '1px solid #d4d4d4',
+                                    borderTop: 'none',
+                                    backgroundColor: 'white'
+                                }}
+                            >
+                                {suggestions.map((item, index) => (
+                                    <div
+                                        key={item.name + index}
+                                        onClick={() => handleSuggestionClick(item.name)}
+                                        style={{
+                                            padding: '10px',
+                                            cursor: 'pointer',
+                                            backgroundColor: '#fff',
+                                            borderBottom: '1px solid #d4d4d4'
+                                        }}
+                                        onMouseEnter={e => e.currentTarget.style.backgroundColor = '#e9e9e9'}
+                                        onMouseLeave={e => e.currentTarget.style.backgroundColor = '#fff'}
+                                    >
+                                        <div>
+                                            <strong>{item.name.substr(0, spellName.length)}</strong>
+                                            {item.name.substr(spellName.length)}
+                                        </div>
+                                        {(
+                                            <div style={{ fontSize: '0.8em', color: '#666', marginTop: '4px' }}>
+                                                Level: {item.level}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    <button className='btn btn-success' onClick={handleAddSpell}>Add Spell</button>
+                </>
+            } />
+
+        </>
+    );
+}
+
+function LanguageInput({ data, onAddLanguage }) {
+    const [language, setLanguage] = useState('');
+
+    // Autocomplete
+    const [suggestions, setSuggestions] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const onLanguageChange = (e) => {
+        const value = e.target.value;
+        setLanguage(value);
+
+        if (!value) {
+            setSuggestions([]);
+            setShowSuggestions(false);
+            return;
+        }
+
+        // Filter suggestions
+        const filtered = allLanguageData.filter(item =>
+            (item.name.toLowerCase().includes(value.toLowerCase()))
+        );
+
+        setSuggestions(filtered);
+        setShowSuggestions(true);
+    }
+    const handleSuggestionClick = (name) => {
+        setLanguage(name);
+        setShowSuggestions(false);
+    };
+    const handleBlur = () => {
+        // Small delay to allow click events to process
+        setTimeout(() => setShowSuggestions(false), 200);
+    };
+
+    function handleAddLanguage() {
+        onAddLanguage(language);
+        setLanguage('');
+    }
+
+    function DisplayLanguages() {
+        return (
+            <div>
+                {data.map((lang, index) => (
+                    <SideBySide key={index} content={<>{index + 1}. {lang}</>} />
+                ))}
+            </div>
+        );
+    }
+
+    return (
+        <div className='basic-container'>
+            <SideBySide content={
+                <>
+                    <h4>Add Language: </h4>
+                    <div className="autocomplete" style={{ position: 'relative' }}>
+                        <input
+                            type="text"
+                            value={language}
+                            onChange={onLanguageChange}
+                            onFocus={() => language && setShowSuggestions(true)}
+                            onBlur={handleBlur}
+                            placeholder="'Common'"
+                            className="form-control"
+                        />
+                        {showSuggestions && suggestions.length > 0 && (
+                            <div
+                                className="autocomplete-items"
+                                style={{
+                                    position: 'absolute',
+                                    zIndex: 9999,
+                                    top: '100%',
+                                    left: 0,
+                                    right: 0,
+                                    border: '1px solid #d4d4d4',
+                                    borderTop: 'none',
+                                    backgroundColor: 'white'
+                                }}
+                            >
+                                {suggestions.map((item, index) => (
+                                    <div
+                                        key={item.name + index}
+                                        onClick={() => handleSuggestionClick(item.name)}
+                                        style={{
+                                            padding: '10px',
+                                            cursor: 'pointer',
+                                            backgroundColor: '#fff',
+                                            borderBottom: '1px solid #d4d4d4'
+                                        }}
+                                        onMouseEnter={e => e.currentTarget.style.backgroundColor = '#e9e9e9'}
+                                        onMouseLeave={e => e.currentTarget.style.backgroundColor = '#fff'}
+                                    >
+                                        <div>
+                                            <strong>{item.name.substr(0, language.length)}</strong>
+                                            {item.name.substr(language.length)}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    <button className='btn btn-success' onClick={handleAddLanguage}>Add Language</button>
+                </>
+            } />
+            {data.length !== 0 ?
+                <DisplayLanguages />
+                : null
+            }
+        </div>
     );
 }
 
@@ -349,7 +683,7 @@ function GeneralInfoinput({ onAddGeneralInfo }) {
         setName(e.target.value);
         handleAddGeneralInfo();
     }
-    const [chrClass, setChrClass] = useState(''); //Class
+    const [chrClass, setChrClass] = useState('Generic'); //Class
     const onChrClassChange = (e) => {
         setChrClass(e.target.value);
         handleAddGeneralInfo();
@@ -411,6 +745,7 @@ function GeneralInfoinput({ onAddGeneralInfo }) {
                     <>
                         <h4>Class: </h4>
                         <select id="class" value={chrClass} onChange={onChrClassChange}>
+                            <option value="Generic">Generic</option>
                             <option value="Barbarian">Barbarian</option>
                             <option value="Bard">Bard</option>
                             <option value="Ceric">Cleric</option>
@@ -458,6 +793,7 @@ function GeneralInfoinput({ onAddGeneralInfo }) {
                     <>
                         <h4>Alignment: </h4>
                         <select id="alignment" value={alignment} onChange={onAlignmentChange}>
+                            <option value="">Choose...</option>
                             <option value="Lawful Good">Lawful Good</option>
                             <option value="Neutral Good">Neutral Good</option>
                             <option value="Chaotic Good">Chaotic Good</option>
@@ -489,7 +825,7 @@ function GeneralInfoinput({ onAddGeneralInfo }) {
     )
 }
 
-function CharacterInput() {
+function CharacterInput({ onReload }) {
     // Stats
     const [profBonus, setProfBonus] = useState('2'); //Proficiency Bonus
     const onProfBonusChange = (e) => {
@@ -559,6 +895,162 @@ function CharacterInput() {
     const onSpeedChange = (e) => {
         setSpeed(e.target.value);
     }
+
+    function StatsInputTable() {
+        return (
+            <>
+                <div className='basic-container'>
+                    <h3>Stats: </h3>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>STR: </td>
+                                <td><input
+                                    type="number"
+                                    min='0'
+                                    max='30'
+                                    value={STR}
+                                    onChange={onSTRChange}
+                                    placeholder="..."
+                                    className="form-control"
+                                    style={{ maxWidth: '100px' }}
+                                /></td>
+                                <td><ModifierText stat={STR} /></td>
+                                <td>DEX: </td>
+                                <td><input
+                                    type="number"
+                                    min='0'
+                                    max='30'
+                                    value={DEX}
+                                    onChange={onDEXChange}
+                                    placeholder="..."
+                                    className="form-control"
+                                    style={{ maxWidth: '100px' }}
+                                /></td>
+                                <td><ModifierText stat={DEX} /></td>
+                            </tr>
+                            <tr>
+                                <td>CON: </td>
+                                <td><input
+                                    type="number"
+                                    min='0'
+                                    max='30'
+                                    value={CON}
+                                    onChange={onCONChange}
+                                    placeholder="..."
+                                    className="form-control"
+                                    style={{ maxWidth: '100px' }}
+                                /></td>
+                                <td><ModifierText stat={CON} /></td>
+                                <td>INT: </td>
+                                <td><input
+                                    type="number"
+                                    min='0'
+                                    max='30'
+                                    value={INT}
+                                    onChange={onINTChange}
+                                    placeholder="..."
+                                    className="form-control"
+                                    style={{ maxWidth: '100px' }}
+                                /></td>
+                                <td><ModifierText stat={INT} /></td>
+                            </tr>
+                            <tr>
+                                <td>WIS: </td>
+                                <td><input
+                                    type="number"
+                                    min='0'
+                                    max='30'
+                                    value={WIS}
+                                    onChange={onWISChange}
+                                    placeholder="..."
+                                    className="form-control"
+                                    style={{ maxWidth: '100px' }}
+                                /></td>
+                                <td><ModifierText stat={WIS} /></td>
+                                <td>CHA: </td>
+                                <td><input
+                                    type="number"
+                                    min='0'
+                                    max='30'
+                                    value={CHA}
+                                    onChange={onCHAChange}
+                                    placeholder="..."
+                                    className="form-control"
+                                    style={{ maxWidth: '100px' }}
+                                /></td>
+                                <td><ModifierText stat={CHA} /></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </>
+        );
+    }
+
+    function CombatInfoInput() {
+        return (
+            <>
+                <div className='basic-container'>
+                    <h3>Combat Info:</h3>
+                    <HPBlock hp={hp} onChange={handleHPChange} />
+                    <ACBlock ac={ac} onChange={handleACChange} />
+                    <div className='basic-container'>
+                        <SideBySide content={
+                            <>
+
+                                <h4>Proficiency Bonus: </h4>
+                                <input
+                                    type="number"
+                                    value={profBonus}
+                                    onChange={onProfBonusChange}
+                                    placeholder="..."
+                                    className="form-control"
+                                    style={{ maxWidth: '100px' }}
+                                />
+
+                            </>
+                        } />
+                    </div>
+                    <div className='basic-container'>
+                        <SideBySide content={
+                            <>
+                                <h4>Init Bonus: </h4>
+                                <input
+                                    type="number"
+                                    value={initBonus}
+                                    onChange={onInitBonusChange}
+                                    placeholder="..."
+                                    className="form-control"
+                                    style={{ maxWidth: '100px' }}
+                                />
+                            </>
+                        } />
+                    </div>
+                    <div className='basic-container'>
+                        <SideBySide content={
+                            <>
+                                <h4>Speed: </h4>
+                                <input
+                                    type="number"
+                                    min='0'
+                                    step='5'
+                                    value={speed}
+                                    onChange={onSpeedChange}
+                                    placeholder="..."
+                                    className="form-control"
+                                    style={{ maxWidth: '100px' }}
+                                />
+                                <h5>ft.</h5>
+                            </>
+                        } />
+                    </div>
+                </div>
+            </>
+        )
+    }
+
+
 
     // Skills
     const [Acrobatics, setAcrobatics] = useState(false); //Acrobatics
@@ -633,302 +1125,6 @@ function CharacterInput() {
     const onSurvivalChange = (e) => {
         setSurvival(e.target.checked);
     };
-
-    // Saving Throws
-    const [STRThrow, setSTRThrow] = useState(false); //Strength Saving Throw
-    const onSTRThrowChange = (e) => {
-        setSTRThrow(e.target.checked);
-    };
-    const [DEXThrow, setDEXThrow] = useState(false); //DexteritySaving Throw
-    const onDEXThrowChange = (e) => {
-        setDEXThrow(e.target.checked);
-    };
-    const [CONThrow, setCONThrow] = useState(false); //Constituion Saving Throw
-    const onCONThrowChange = (e) => {
-        setCONThrow(e.target.checked);
-    };
-    const [INTThrow, setINTThrow] = useState(false); //Intelligence Saving Throw
-    const onINTThrowChange = (e) => {
-        setINTThrow(e.target.checked);
-    };
-    const [WISThrow, setWISThrow] = useState(false); //Wisdom Saving Throw
-    const onWISThrowChange = (e) => {
-        setWISThrow(e.target.checked);
-    };
-    const [CHAThrow, setCHAThrow] = useState(false); //Charisma Saving Throw
-    const onCHAThrowChange = (e) => {
-        setCHAThrow(e.target.checked);
-    };
-
-    // Actions
-    const [actions, setActions] = useState([]); // Array with objects that describe actions
-
-    const [actionType, setActionType] = useState(''); //Action type
-    const onActionTypeChange = (e) => {
-        setActionType(e.target.value);
-    }
-
-
-    // Attacks
-    function onAddAttack(attackData) {
-        setActions(prevActions => [...prevActions, attackData]);
-        // Clear Actions and Attack Fields
-        resetActions();
-    }
-
-    // General Info
-    const [generalInfo, setGeneralInfo] = useState({});
-    function onAddGeneralInfo (infoData) {
-        setGeneralInfo(infoData);
-    }
-
-    const resetActions = () => {
-        // Reset Action fields
-        setActionType('');
-    };
-
-    function ModifierText({ stat, prof = false }) {
-    let modifier;
-
-    const getColor = (mod) => {
-        if (mod > 0) {
-            return ('green');
-        }
-        else if (mod === 0) {
-            return ('black');
-        }
-        else if (mod > 0) {
-            return ('red');
-        }
-    }
-
-    switch (parseInt(stat)) {
-        case 0:
-            modifier = prof ? -5 + parseInt(profBonus) : -5;
-            break;
-        case 1:
-            modifier = prof ? -5 + parseInt(profBonus) : -5;
-            break;
-        case 2:
-            modifier = prof ? -4 + parseInt(profBonus) : -4;
-            break;
-        case 3:
-            modifier = prof ? -4 + parseInt(profBonus) : -4;
-            break;
-        case 4:
-            modifier = prof ? -3 + parseInt(profBonus) : -3;
-            break;
-        case 5:
-            modifier = prof ? -3 + parseInt(profBonus) : -3;
-            break;
-        case 6:
-            modifier = prof ? -2 + parseInt(profBonus) : -2;
-            break;
-        case 7:
-            modifier = prof ? -2 + parseInt(profBonus) : -2;
-            break;
-        case 8:
-            modifier = prof ? -1 + parseInt(profBonus) : -1;
-            break;
-        case 9:
-            modifier = prof ? -1 + parseInt(profBonus) : -1;
-            break;
-        case 10:
-            modifier = prof ? 0 + parseInt(profBonus) : 0;
-            break;
-        case 11:
-            modifier = prof ? 0 + parseInt(profBonus) : 0;
-            break;
-        case 12:
-            modifier = prof ? 1 + parseInt(profBonus) : 1;
-            break;
-        case 13:
-            modifier = prof ? 1 + parseInt(profBonus) : 1;
-            break;
-        case 14:
-            modifier = prof ? 2 + parseInt(profBonus) : 2;
-            break;
-        case 15:
-            modifier = prof ? 2 + parseInt(profBonus) : 2;
-            break;
-        case 16:
-            modifier = prof ? 3 + parseInt(profBonus) : 3;
-            break;
-        case 17:
-            modifier = prof ? 3 + parseInt(profBonus) : 3;
-            break;
-        case 18:
-            modifier = prof ? 4 + parseInt(profBonus) : 4;
-            break;
-        case 19:
-            modifier = prof ? 4 + parseInt(profBonus) : 4;
-            break;
-        case 20:
-            modifier = prof ? 5 + parseInt(profBonus) : 5;
-            break;
-    }
-    return (<p style={{ color: getColor(modifier), textAlign: 'center', margin: '0px' }}>{modifier > 0 ? ('+' + modifier) : modifier === 0 ? modifier : ('-' + modifier)}</p>);
-}
-
-    function DisplayActions() {
-        return (
-            <div>
-                {actions.map((action, index) => (
-                    <SideBySide key={index} content={<>{index + 1}. {action}</>} />
-                ))}
-            </div>
-        );
-    }
-
-    function StatsInputTable() {
-        return (
-            <>
-                <div className='basic-container'>
-                    <h3>Stats: </h3>
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td>STR: </td>
-                                <td><input
-                                    type="number"
-                                    min='0'
-                                    max='20'
-                                    value={STR}
-                                    onChange={onSTRChange}
-                                    placeholder="..."
-                                    className="form-control"
-                                    style={{ maxWidth: '100px' }}
-                                /></td>
-                                <td><ModifierText stat={STR} /></td>
-                                <td>DEX: </td>
-                                <td><input
-                                    type="number"
-                                    min='0'
-                                    max='20'
-                                    value={DEX}
-                                    onChange={onDEXChange}
-                                    placeholder="..."
-                                    className="form-control"
-                                    style={{ maxWidth: '100px' }}
-                                /></td>
-                                <td><ModifierText stat={DEX} /></td>
-                            </tr>
-                            <tr>
-                                <td>CON: </td>
-                                <td><input
-                                    type="number"
-                                    min='0'
-                                    max='20'
-                                    value={CON}
-                                    onChange={onCONChange}
-                                    placeholder="..."
-                                    className="form-control"
-                                    style={{ maxWidth: '100px' }}
-                                /></td>
-                                <td><ModifierText stat={CON} /></td>
-                                <td>INT: </td>
-                                <td><input
-                                    type="number"
-                                    min='0'
-                                    max='20'
-                                    value={INT}
-                                    onChange={onINTChange}
-                                    placeholder="..."
-                                    className="form-control"
-                                    style={{ maxWidth: '100px' }}
-                                /></td>
-                                <td><ModifierText stat={INT} /></td>
-                            </tr>
-                            <tr>
-                                <td>WIS: </td>
-                                <td><input
-                                    type="number"
-                                    min='0'
-                                    max='20'
-                                    value={WIS}
-                                    onChange={onWISChange}
-                                    placeholder="..."
-                                    className="form-control"
-                                    style={{ maxWidth: '100px' }}
-                                /></td>
-                                <td><ModifierText stat={WIS} /></td>
-                                <td>CHA: </td>
-                                <td><input
-                                    type="number"
-                                    min='0'
-                                    max='20'
-                                    value={CHA}
-                                    onChange={onCHAChange}
-                                    placeholder="..."
-                                    className="form-control"
-                                    style={{ maxWidth: '100px' }}
-                                /></td>
-                                <td><ModifierText stat={CHA} /></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </>
-        );
-    }
-
-    function SavingThrowsInput() {
-        return (
-            <div className='basic-container saving-throws'>
-                <h3>Saving Throws: </h3>
-                <div className="btn-group-vertical" data-toggle="buttons">
-                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <input
-                            type="checkbox"
-                            autoComplete="off"
-                            checked={STRThrow}
-                            onChange={onSTRThrowChange}
-                        /> STR <ModifierText stat={STR} prof={STRThrow} />
-                    </label>
-                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <input
-                            type="checkbox"
-                            autoComplete="off"
-                            checked={DEXThrow}
-                            onChange={onDEXThrowChange}
-                        /> DEX <ModifierText stat={DEX} prof={DEXThrow} />
-                    </label>
-                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <input
-                            type="checkbox"
-                            autoComplete="off"
-                            checked={CONThrow}
-                            onChange={onCONThrowChange}
-                        /> CON <ModifierText stat={CON} prof={CONThrow} />
-                    </label>
-                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <input
-                            type="checkbox"
-                            autoComplete="off"
-                            checked={INTThrow}
-                            onChange={onINTThrowChange}
-                        /> INT <ModifierText stat={INT} prof={INTThrow} />
-                    </label>
-                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <input
-                            type="checkbox"
-                            autoComplete="off"
-                            checked={WISThrow}
-                            onChange={onWISThrowChange}
-                        /> WIS <ModifierText stat={WIS} prof={WISThrow} />
-                    </label>
-                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <input
-                            type="checkbox"
-                            autoComplete="off"
-                            checked={CHAThrow}
-                            onChange={onCHAThrowChange}
-                        /> CHA <ModifierText stat={CHA} prof={CHAThrow} />
-                    </label>
-                </div>
-            </div>
-        );
-    }
 
     function SkillsInput() {
         return (
@@ -1101,68 +1297,107 @@ function CharacterInput() {
         );
     }
 
-    function CombatInfoInput() {
+    // Saving Throws
+    const [STRThrow, setSTRThrow] = useState(false); //Strength Saving Throw
+    const onSTRThrowChange = (e) => {
+        setSTRThrow(e.target.checked);
+    };
+    const [DEXThrow, setDEXThrow] = useState(false); //DexteritySaving Throw
+    const onDEXThrowChange = (e) => {
+        setDEXThrow(e.target.checked);
+    };
+    const [CONThrow, setCONThrow] = useState(false); //Constituion Saving Throw
+    const onCONThrowChange = (e) => {
+        setCONThrow(e.target.checked);
+    };
+    const [INTThrow, setINTThrow] = useState(false); //Intelligence Saving Throw
+    const onINTThrowChange = (e) => {
+        setINTThrow(e.target.checked);
+    };
+    const [WISThrow, setWISThrow] = useState(false); //Wisdom Saving Throw
+    const onWISThrowChange = (e) => {
+        setWISThrow(e.target.checked);
+    };
+    const [CHAThrow, setCHAThrow] = useState(false); //Charisma Saving Throw
+    const onCHAThrowChange = (e) => {
+        setCHAThrow(e.target.checked);
+    };
+
+    function SavingThrowsInput() {
         return (
-            <>
-                <div className='basic-container'>
-                    <h3>Combat Info:</h3>
-                    <HPBlock hp={hp} onChange={handleHPChange} />
-                    <ACBlock ac={ac} onChange={handleACChange} />
-                    <SideBySide content={
-                        <>
-                            <h4>Proficiency Bonus: </h4>
-                            <input
-                                type="number"
-                                value={profBonus}
-                                onChange={onProfBonusChange}
-                                placeholder="..."
-                                className="form-control"
-                                style={{ maxWidth: '100px' }}
-                            />
-                        </>
-                    } />
-                    <div className='basic-container'>
-                        <SideBySide content={
-                            <>
-                                <h4>Init Bonus: </h4>
-                                <input
-                                    type="number"
-                                    value={initBonus}
-                                    onChange={onInitBonusChange}
-                                    placeholder="..."
-                                    className="form-control"
-                                    style={{ maxWidth: '100px' }}
-                                />
-                            </>
-                        } />
-                    </div>
-                    <div className='basic-container'>
-                        <SideBySide content={
-                            <>
-                                <h4>Speed: </h4>
-                                <input
-                                    type="number"
-                                    min='0'
-                                    step='5'
-                                    value={speed}
-                                    onChange={onSpeedChange}
-                                    placeholder="..."
-                                    className="form-control"
-                                    style={{ maxWidth: '100px' }}
-                                />
-                            </>
-                        } />
-                    </div>
+            <div className='basic-container saving-throws'>
+                <h3>Saving Throws: </h3>
+                <div className="btn-group-vertical" data-toggle="buttons">
+                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        <input
+                            type="checkbox"
+                            autoComplete="off"
+                            checked={STRThrow}
+                            onChange={onSTRThrowChange}
+                        /> STR <ModifierText stat={STR} prof={STRThrow} />
+                    </label>
+                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        <input
+                            type="checkbox"
+                            autoComplete="off"
+                            checked={DEXThrow}
+                            onChange={onDEXThrowChange}
+                        /> DEX <ModifierText stat={DEX} prof={DEXThrow} />
+                    </label>
+                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        <input
+                            type="checkbox"
+                            autoComplete="off"
+                            checked={CONThrow}
+                            onChange={onCONThrowChange}
+                        /> CON <ModifierText stat={CON} prof={CONThrow} />
+                    </label>
+                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        <input
+                            type="checkbox"
+                            autoComplete="off"
+                            checked={INTThrow}
+                            onChange={onINTThrowChange}
+                        /> INT <ModifierText stat={INT} prof={INTThrow} />
+                    </label>
+                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        <input
+                            type="checkbox"
+                            autoComplete="off"
+                            checked={WISThrow}
+                            onChange={onWISThrowChange}
+                        /> WIS <ModifierText stat={WIS} prof={WISThrow} />
+                    </label>
+                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        <input
+                            type="checkbox"
+                            autoComplete="off"
+                            checked={CHAThrow}
+                            onChange={onCHAThrowChange}
+                        /> CHA <ModifierText stat={CHA} prof={CHAThrow} />
+                    </label>
                 </div>
-            </>
-        )
+            </div>
+        );
+    }
+
+    // Actions
+    const [actions, setActions] = useState([]); // Array with objects that describe actions
+    const [actionType, setActionType] = useState(''); //Action type
+    const onActionTypeChange = (e) => {
+        setActionType(e.target.value);
+    }
+    function onAddAction(actionData) {
+        setActions(prevActions => [...prevActions, actionData]);
+        // Clear Actions Fields
+        resetActions();
     }
 
     function ActionsInput() {
         return (
             <>
                 <div className='basic-container'>
-                    <h3>Actions:</h3>
+                    <h3>Add Actions:</h3>
                     <SideBySide content={
                         <>
                             <h4>Action type:</h4>
@@ -1178,6 +1413,12 @@ function CharacterInput() {
                     {actionType === 'Attack' ? (
                         <AttackInput onAddAttack={onAddAttack} />
                     ) : null}
+                    {actionType === 'Spell' ? (
+                        <SpellInput onAddSpell={onAddSpell} />
+                    ) : null}
+                    {actionType === 'Other' ? (
+                        <OtherActionInput onAddAction={onAddAction} />
+                    ) : null}
 
 
                     {actions.length >= 1 ? (
@@ -1191,11 +1432,352 @@ function CharacterInput() {
         );
     }
 
+    function DisplayActions() {
+        return (
+            <div>
+                {actions.map((action, index) => (
+                    <SideBySide key={index} content={<>{index + 1}. {action}</>} />
+                ))}
+            </div>
+        );
+    }
+
+    // Attacks
+    function onAddAttack(attackData) {
+        setActions(prevActions => [...prevActions, attackData]);
+        // Clear Actions Fields
+        resetActions();
+    }
+
+    // Spells
+    function onAddSpell(spellData) {
+        setActions(prevActions => [...prevActions, spellData]);
+        // Clear Actions Fields
+        resetActions();
+    }
+
+    // General Info
+    const [generalInfo, setGeneralInfo] = useState({});
+    function onAddGeneralInfo(infoData) {
+        setGeneralInfo(infoData);
+    }
+
+    // Languages
+    const [languages, setLanguages] = useState([]);
+    function onAddLanguage(language) {
+        setLanguages(prevLanguages => [...prevLanguages, language]);
+    }
+
+    // Senses
+    const [senseValue, setSenseValue] = useState('');
+    const onSenseValueChange = (e) => {
+        setSenseValue(e.target.value);
+    }
+    const [senseRange, setSenseRange] = useState('');
+    const onSenseRangeChange = (e) => {
+        setSenseRange(e.target.value);
+    }
+    const [senses, setSenses] = useState([]);
+    function onSensesChange() {
+        let senseString = senseValue + ' ' + senseRange;
+        setSenses(prevSenses => [...prevSenses, senseString]);
+        setSenseRange('');
+        setSenseValue('');
+    }
+
+    function DisplaySenses() {
+        return (
+            <div>
+                {senses.map((item, index) => (
+                    <SideBySide key={index} content={<>{index + 1}. {item}</>} />
+                ))}
+            </div>
+        );
+    }
+
+    function SensesInput() {
+        return (
+            <div className='basic-container'>
+                <SideBySide content={
+                    <>
+                        <h4>Add Sense: </h4>
+                        <select id="sense" value={senseValue} onChange={onSenseValueChange}>
+                            <option value="">Choose...</option>
+                            <option value="Blindsight">Blindsight</option>
+                            <option value="Darkvision">Darkvision</option>
+                            <option value="Tremorsense">Tremorsense</option>
+                            <option value="Truesight">Truesight</option>
+                        </select>
+                        <h5>Range: </h5>
+                        <input
+                            type="number"
+                            step='5'
+                            value={senseRange}
+                            onChange={onSenseRangeChange}
+                            placeholder="..."
+                            className="form-control"
+                            style={{ maxWidth: '100px' }}
+                        />
+                        <h5>ft.</h5>
+                        <button className='btn btn-success' onClick={onSensesChange}>Add</button>
+                    </>
+                } />
+                <DisplaySenses />
+            </div>
+        );
+    }
+
+    // Image
+    const [imgUrl, setImgUrl] = useState(''); // Image url
+    const onImgUrlChange = (e) => {
+        setImgUrl(e.target.value);
+    }
+
+    function ImageInput() {
+        return (
+            <div className='basic-container'>
+                <h5>Character Image Url: </h5>
+                <input
+                    type="text"
+                    value={imgUrl}
+                    onChange={onImgUrlChange}
+                    placeholder="Image link"
+                    className="form-control"
+                    style={{ maxWidth: '400px' }}
+                />
+                <p style={{ maxWidth: '250px' }}>Images can only be added via url due to the limitations of browser local storage.</p>
+                <p style={{ maxWidth: '250px' }}>It's easier if you copy/paste.</p>
+                <p style={{ maxWidth: '250px' }}>Preview:</p>
+                {imgUrl !== '' ?
+                    <img src={imgUrl} className='img-fluid rounded' style={{ maxHeight: '270px', maxWidth: '250px' }} />
+                    : <p><em>(none)</em></p>
+                }
+            </div>
+        );
+    }
+
+
+
+    // Util functions
+    function getMod(statNum, bonus = 0) {
+        switch (parseInt(statNum)) {
+            case 0:
+            case 1:
+                return (-5 + bonus);
+            case 2:
+            case 3:
+                return (-4 + bonus);
+            case 4:
+            case 5:
+                return (-3 + bonus);
+            case 6:
+            case 7:
+                return (-2 + bonus);
+            case 8:
+            case 9:
+                return (-1 + bonus);
+            case 10:
+            case 11:
+                return (0 + bonus);
+            case 12:
+            case 13:
+                return (1 + bonus);
+            case 14:
+            case 15:
+                return (2 + bonus);
+            case 16:
+            case 17:
+                return (3 + bonus);
+            case 18:
+            case 19:
+                return (4 + bonus);
+            case 20:
+            case 21:
+                return (5 + bonus);
+            case 22:
+            case 23:
+                return (6 + bonus);
+            case 24:
+            case 25:
+                return (7 + bonus);
+            case 26:
+            case 27:
+                return (8 + bonus);
+            case 28:
+            case 29:
+                return (9 + bonus);
+            case 30:
+            default:
+                return (10 + bonus);
+        }
+    }
+
+    function ModifierText({ stat, prof = false }) {
+        const modifier = getMod(stat, (prof ? parseInt(profBonus) : 0));
+
+        const getColor = (mod) => {
+            if (mod > 0) {
+                return ('green');
+            }
+            else if (mod === 0) {
+                return ('black');
+            }
+            else if (mod < 0) {
+                return ('red');
+            }
+        }
+
+        return (<p style={{ color: getColor(modifier), textAlign: 'center', margin: '0px' }}>{modifier >= 0 ? ('+' + modifier) : (modifier)}</p>);
+    }
+
+    const resetActions = () => {
+        // Reset Action fields
+        setActionType('');
+    };
+
+    function handleReload() {
+        onReload();
+    }
+
+    function saveCharacterData() {
+        const charData = {};
+
+        // General Info
+        charData['name'] = (generalInfo.name);
+        charData['level'] = generalInfo.level;
+        charData['meta'] = (
+            (generalInfo?.race ? (generalInfo.race) : '') +
+            (generalInfo?.class ? (' ' + generalInfo.class) : '') +
+            (generalInfo?.alignment ? (', ' + generalInfo.alignment) : '')
+        );
+        charData['xp'] = generalInfo.xp;
+
+        // Stats
+        charData['STR'] = STR;
+        charData['STR_mod'] = ('(' + (getMod(STR) >= 0 ? ('+' + getMod(STR)) : getMod(STR)) + ')');
+        charData['DEX'] = DEX;
+        charData['DEX_mod'] = ('(' + (getMod(DEX) >= 0 ? ('+' + getMod(DEX)) : getMod(DEX)) + ')');
+        charData['CON'] = CON;
+        charData['CON_mod'] = ('(' + (getMod(CON) >= 0 ? ('+' + getMod(CON)) : getMod(CON)) + ')');
+        charData['INT'] = INT;
+        charData['INT_mod'] = ('(' + (getMod(INT) >= 0 ? ('+' + getMod(INT)) : getMod(INT)) + ')');
+        charData['WIS'] = WIS;
+        charData['WIS_mod'] = ('(' + (getMod(WIS) >= 0 ? ('+' + getMod(WIS)) : getMod(WIS)) + ')');
+        charData['CHA'] = CHA;
+        charData['CHA_mod'] = ('(' + (getMod(CHA) >= 0 ? ('+' + getMod(CHA)) : getMod(CHA)) + ')');
+
+        // Combat
+        charData['profBonus'] = profBonus;
+        charData['hp'] = hp;
+        charData['ac'] = ac;
+        charData['initBonus'] = initBonus;
+        charData['Speed'] = (speed + 'ft.');
+
+        // Skills
+        charData['Skills'] = (
+            (Acrobatics ? ('Acrobatics +(' + getMod(DEX, profBonus).toString() + '), ') : '') +
+            (AnimalHandling ? ('Animal Handling +(' + getMod(WIS, profBonus).toString() + '), ') : '') +
+            (Arcana ? ('Arcana +(' + getMod(INT, profBonus).toString() + '), ') : '') +
+            (Athletics ? ('Athletics +(' + getMod(STR, profBonus).toString() + '), ') : '') +
+            (Deception ? ('Deception +(' + getMod(CHA, profBonus).toString() + '), ') : '') +
+            (History ? ('History +(' + getMod(INT, profBonus).toString() + '), ') : '') +
+            (Insight ? ('Insight +(' + getMod(WIS, profBonus).toString() + '), ') : '') +
+            (Intimidation ? ('Intimidation +(' + getMod(CHA, profBonus).toString() + '), ') : '') +
+            (Investigation ? ('Investigation +(' + getMod(INT, profBonus).toString() + '), ') : '') +
+            (Medicine ? ('Medicine +(' + getMod(WIS, profBonus).toString() + '), ') : '') +
+            (Nature ? ('Nature +(' + getMod(INT, profBonus).toString() + '), ') : '') +
+            (Perception ? ('Perception +(' + getMod(WIS, profBonus).toString() + '), ') : '') +
+            (Persuasion ? ('Persuasion +(' + getMod(CHA, profBonus).toString() + '), ') : '') +
+            (Religion ? ('Religion +(' + getMod(INT, profBonus).toString() + '), ') : '') +
+            (SleightOfHand ? ('Sleight of Hand +(' + getMod(DEX, profBonus).toString() + '), ') : '') +
+            (Stealth ? ('Stealth +(' + getMod(DEX, profBonus).toString() + '), ') : '') +
+            (Survival ? ('Survival +(' + getMod(WIS, profBonus).toString() + ')') : '')
+        );
+
+        // Saving Throws
+        charData["Saving Throws"] = (
+            (STRThrow ? ('STR +(' + getMod(STR, profBonus).toString() + '), ') : '') +
+            (DEXThrow ? ('DEX +(' + getMod(DEX, profBonus).toString() + '), ') : '') +
+            (CONThrow ? ('CON +(' + getMod(CON, profBonus).toString() + '), ') : '') +
+            (INTThrow ? ('INT +(' + getMod(INT, profBonus).toString() + '), ') : '') +
+            (WISThrow ? ('WIS +(' + getMod(WIS, profBonus).toString() + '), ') : '') +
+            (CHAThrow ? ('CHA +(' + getMod(CHA, profBonus).toString() + ')') : '')
+        );
+
+        // Actions
+        charData["Actions"] = actions.map(element => ReactDOMServer.renderToStaticMarkup(element)).join('');
+
+        // Languages
+        let langString = '';
+        const getLangString = () => {
+            languages.forEach(lang => {
+                langString = langString + (lang + ', ');
+            })
+        }
+        getLangString();
+        charData['Languages'] = langString;
+
+        // Senses
+        let sensesString = '';
+        const getSensesString = () => {
+            senses.forEach(item => {
+                sensesString = sensesString + (item + ', ');
+            })
+        }
+        getSensesString();
+        sensesString = sensesString + ', Passive Perception ' + (Perception ? (parseInt(WIS) + parseInt(profBonus)) : WIS);
+        charData["Senses"] = sensesString;
+
+        // Image
+        charData['img_url'] = imgUrl;
+
+        // Save to local storage
+        storage.saveChar(charData);
+        onReload();
+    }
+
+
+
+    // Body
 
     return (
         <div className='character-input'>
+            <div className='row' style={{ display: 'grid', gridTemplateColumns: '1fr auto' }}>
+                <div className='col'>
+                    <SideBySide gap={20} content={
+                        <>
+                            <h2>Add Character</h2>
+                            <h4><strong><em>Make sure all data is correct before adding. You <span style={{ color: 'red' }}>cannot</span> change it later.</em></strong></h4>
+                        </>
+                    } />
+
+                    <SideBySide gap={3} content={
+                        <>
+
+                            <p>All data is added automatically except fields with 'Add' in their title. You muse click the respective 'Add' button to properly add it.</p>
+                            <p>Characters will be stored in your system's local storage.</p>
+                        </>
+                    } />
+
+                </div>
+                <div className='col' style={{ alignContent: 'center' }}>
+                    <button
+                        className='btn btn-success'
+                        style={{ margin: '5px' }}
+                        onClick={saveCharacterData}
+                    >
+                        Add Character
+                    </button>
+                    <button
+                        className='btn btn-danger'
+                        style={{ margin: '5px' }}
+                        onClick={handleReload}
+                    >
+                        Clear All
+                    </button>
+                </div>
+            </div>
             <div className='row'>
-                <h2>Add Character</h2>
                 <HorizLine />
             </div>
 
@@ -1205,6 +1787,8 @@ function CharacterInput() {
                     <div className='col' style={{ margin: '2.5px' }}>
                         <GeneralInfoinput onAddGeneralInfo={onAddGeneralInfo} />
                         <StatsInputTable />
+                        <SensesInput />
+                        <LanguageInput data={languages} onAddLanguage={onAddLanguage} />
                     </div>
                     {/* 2nd column */}
                     <div className='col' style={{ margin: '2.5px' }}>
@@ -1215,10 +1799,13 @@ function CharacterInput() {
                             </>
                         } />
                         <ActionsInput />
+
+
                     </div>
                     {/* 3rd column */}
                     <div className='col' style={{ margin: '2.5px' }}>
                         <SkillsInput />
+                        <ImageInput />
                     </div>
 
 
@@ -1230,9 +1817,30 @@ function CharacterInput() {
 }
 
 function CharacterDataPage() {
+    const [reloadKey, setReloadKey] = useState(0);
+    function handleReload() {
+        setReloadKey(prevKey => prevKey + 1);
+    }
+
+    const chars = (storage.retrieve('charData')).chars;
+
+    function DisplayChars() {
+        return (
+            <div>
+                {chars.map((char, index) => (
+                    <SideBySide key={index} content={} />
+                ))}
+            </div>
+        );
+    }
+
     return (
         <div>
-            <CharacterInput />
+            <CharacterInput onReload={handleReload} key={reloadKey} />
+            {chars !== null ?
+                <DisplayChars />
+                : null
+            }
         </div>
     );
 }
