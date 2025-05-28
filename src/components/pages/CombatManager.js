@@ -6,10 +6,16 @@ import { useState, useEffect, useRef } from 'react';
 // Custom -------------------------------------------------------------------
 // Elements / Scripts
 import HPBlock from '../basic/HPBlock';
+import ACBlock from '../basic/ACBlock';
+import HorizLine from '../basic/HorizontalLine';
+import SideBySide from '../basic/SideBySide';
+import CharacterCard from '../basic/CharacterCard';
 import * as tools from '../tools';
 import * as dice from '../../scripts/dice';
 // Data
 import rawMonstersData from '../../data/srd_5e_monsters.json';
+import * as SRDapi from '../../scripts/dndSRD5eapi';
+import * as storage from '../../scripts/storage';
 // CSS / Assets
 import '../../css/CombatManager.css';
 import player_character from '../../assets/player_character.png';
@@ -200,7 +206,7 @@ function CreatureCard({ data = null, index, onChange, isActive }) {
                             <HPBlock hp={data?.rolledHP ? data.rolledHP : data.hp} onChange={handleHPChange} />
                         </div>
                         <div className='ac-block'>
-                            <h4>⛊ AC: {dice.extractNumbersOutsideParentheses(data.ac)}</h4>
+                            <h4>⛊ AC: {dice.extractNumbersOutsideParentheses(data.ac.toString())}</h4>
                         </div>
                     </div>
                     {/* Stats */}
@@ -260,9 +266,11 @@ function CardContainer({ combatants, currentCombatant, onChange }) {
     );
 }
 
-function InputWindow({onTestPopulate, onAutocompleteAdd, onManualAdd, onClear }) {
+function InputWindow({ onTestPopulate, onAutocompleteAdd, onManualAdd, onClear, onCustomAdd }) {
     const [suggestions, setSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
+    const [customSuggestions, setCustomSuggestions] = useState([]);
+    const [showCustomSuggestions, setCustomShowSuggestions] = useState(false);
 
     // Auto
     const [autoAdvSelected, setAutoAdvSelected] = useState('');
@@ -276,6 +284,50 @@ function InputWindow({onTestPopulate, onAutocompleteAdd, onManualAdd, onClear })
     const [manualAC, setManualAC] = useState('');
     const [manualInit, setManualInit] = useState('');
     const [manualType, setManualType] = useState('player');
+
+    // Custom Characters
+    const chars = (storage.retrieve('charData') ? JSON.parse((storage.retrieve('charData'))).chars : null);
+    console.log('CombatManager.js: charData retrieved. Data: ');
+    tools.prettyLogJson(chars);
+    const [customName, setCustomName] = useState('');
+    const [customInit, setCustomInit] = useState('');
+    const handleCustomInitChange = (e) => {
+        setCustomInit(e.target.value);
+    }
+    const handleCustomNameChange = (e) => {
+        const value = e.target.value;
+        setCustomName(value);
+
+        if (!value) {
+            setCustomSuggestions([]);
+            setCustomShowSuggestions(false);
+            return;
+        }
+
+        // Filter suggestions
+        const filtered = chars.filter(item =>
+            (item.name.toLowerCase().includes(value.toLowerCase()))
+        );
+
+        setCustomSuggestions(filtered);
+        setCustomShowSuggestions(true);
+    }
+    const handleCustomSuggestionClick = (name) => {
+        setCustomName(name);
+        setCustomShowSuggestions(false);
+    };
+    const handleCustomBlur = () => {
+        // Small delay to allow click events to process
+        setTimeout(() => setCustomShowSuggestions(false), 200);
+    };
+    const handleCustomAdd = () => {
+        const charData = chars.find(char => char.name === customName);
+        charData['init'] = customInit;
+        onCustomAdd(charData); // Pass data to parent
+
+        setCustomName(''); // Optional: Clear input after submission
+    };
+
 
     const handleInputChange = (e) => {
         const value = e.target.value;
@@ -452,7 +504,8 @@ function InputWindow({onTestPopulate, onAutocompleteAdd, onManualAdd, onClear })
                         Add Monster
                     </button>
                 </div>
-                <div className='side-by-side'>
+                <SideBySide content={
+                    <>
                     <hr style={{
                         border: "2px solid #000000",
                         margin: "20px 0",
@@ -464,7 +517,10 @@ function InputWindow({onTestPopulate, onAutocompleteAdd, onManualAdd, onClear })
                         margin: "20px 0",
                         width: '100%'
                     }} />
-                </div>
+                    </>
+                } />
+                    
+                
             </div>
 
             <div className='manual-add'>
@@ -530,6 +586,75 @@ function InputWindow({onTestPopulate, onAutocompleteAdd, onManualAdd, onClear })
                     </div>
                 </div>
             </div>
+            <HorizLine />
+            <SideBySide content={
+                <>
+                    <h5>Custom Character from storage: </h5>
+                    <div className="autocomplete" style={{ position: 'relative' }}>
+                        <input
+                            type="text"
+                            value={customName}
+                            onChange={handleCustomNameChange}
+                            onFocus={() => customName && setCustomShowSuggestions(true)}
+                            onBlur={handleCustomBlur}
+                            placeholder="Start typing..."
+                            className="form-control"
+                        />
+                        {showCustomSuggestions && customSuggestions.length > 0 && (
+                            <div
+                                className="autocomplete-items"
+                                style={{
+                                    position: 'absolute',
+                                    zIndex: 99,
+                                    top: '100%',
+                                    left: 0,
+                                    right: 0,
+                                    border: '1px solid #d4d4d4',
+                                    borderTop: 'none',
+                                    backgroundColor: 'white'
+                                }}
+                            >
+                                {customSuggestions.map((item, index) => (
+                                    <div
+                                        key={item.name + index}
+                                        onClick={() => handleCustomSuggestionClick(item.name)}
+                                        style={{
+                                            padding: '10px',
+                                            cursor: 'pointer',
+                                            backgroundColor: '#fff',
+                                            borderBottom: '1px solid #d4d4d4'
+                                        }}
+                                        onMouseEnter={e => e.currentTarget.style.backgroundColor = '#e9e9e9'}
+                                        onMouseLeave={e => e.currentTarget.style.backgroundColor = '#fff'}
+                                    >
+                                        <div>
+                                            <strong>{item.name.substr(0, customName.length)}</strong>
+                                            {item.name.substr(customName.length)}
+                                        </div>
+                                        {/* Add Challenge text below the name */}
+                                        {item.meta && (
+                                            <div style={{ fontSize: '0.8em', color: '#666', marginTop: '4px' }}>
+                                                {item.meta}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    <h5>Init: </h5>
+                    <input
+                            type="number"
+                            value={customInit}
+                            onChange={handleCustomInitChange}
+                            placeholder="..."
+                            className="form-control"
+                            style={{ width: '100px' }}
+                        />
+                    <button className='btn btn-success' onClick={handleCustomAdd}>Add Custom Character</button>
+                </>
+            } />
+
 
             <hr style={{
                 border: "2px solid #000000",
@@ -654,6 +779,12 @@ function CombatManager() {
         setTimeout(() => sortCombatantsByInit(), 0);
     }
 
+    function handleCustomAdd(charData) {
+        setCombatants(prevCombatants => [...prevCombatants, charData]);
+        // Sort after adding
+        setTimeout(() => sortCombatantsByInit(), 0);
+    }
+
     function handleCardOnChange(id, key, value) {
         console.log(`Updating combatant ${id}, ${key} changed to: ${value}`);
         setCombatants(prevCombatants =>
@@ -683,7 +814,7 @@ function CombatManager() {
         }
     }
 
-    function handleClear () {
+    function handleClear() {
         setCombatants([]);
     }
 
@@ -702,6 +833,7 @@ function CombatManager() {
                         onTestPopulate={testPopulate}
                         onAutocompleteAdd={handleAutoAdd}
                         onManualAdd={handleManualAdd}
+                        onCustomAdd={handleCustomAdd}
                         onClear={handleClear}
                     />
                     <CombatControl

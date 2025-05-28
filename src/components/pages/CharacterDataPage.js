@@ -10,6 +10,7 @@ import HPBlock from '../basic/HPBlock';
 import ACBlock from '../basic/ACBlock';
 import HorizLine from '../basic/HorizontalLine';
 import SideBySide from '../basic/SideBySide';
+import CharacterCard from '../basic/CharacterCard';
 import * as tools from '../tools';
 import * as dice from '../../scripts/dice';
 // Data
@@ -708,6 +709,11 @@ function GeneralInfoinput({ onAddGeneralInfo }) {
         setXp(e.target.value);
         handleAddGeneralInfo();
     }
+    const [type, setType] = useState(''); //Character type
+    const onTypeChange = (e) => {
+        setType(e.target.value);
+        handleAddGeneralInfo();
+    }
 
     function compileData() {
         return ({
@@ -716,7 +722,9 @@ function GeneralInfoinput({ onAddGeneralInfo }) {
             'level': level,
             'race': race,
             'alignment': alignment,
-            'xp': xp
+            'xp': xp,
+            'isPlayer': (type === 'player' ? true : false),
+            'isNPC': (type === 'npc' ? true : false)
         });
     }
 
@@ -818,6 +826,16 @@ function GeneralInfoinput({ onAddGeneralInfo }) {
                             className="form-control"
                             style={{ maxWidth: '100px' }}
                         />
+                    </>
+                } />
+                <SideBySide content={
+                    <>
+                        <h4>Type: </h4>
+                        <select id="type" value={type} onChange={onTypeChange}>
+                            <option value="">Monster/Generic</option>
+                            <option value='player'>Player</option>
+                            <option value='npc'>NPC</option>
+                        </select>
                     </>
                 } />
             </div>
@@ -1651,6 +1669,8 @@ function CharacterInput({ onReload }) {
             (generalInfo?.alignment ? (', ' + generalInfo.alignment) : '')
         );
         charData['xp'] = generalInfo.xp;
+        charData['isPlayer'] = generalInfo.isPlayer;
+        charData['isNPC'] = generalInfo.isNPC;
 
         // Stats
         charData['STR'] = STR;
@@ -1822,13 +1842,17 @@ function CharacterDataPage() {
         setReloadKey(prevKey => prevKey + 1);
     }
 
-    const chars = (storage.retrieve('charData')).chars;
+    const chars = (storage.retrieve('charData') ? JSON.parse((storage.retrieve('charData'))).chars : null);
+    console.log('CharacterDataPage.js: charData retrieved. Data: ');
+    tools.prettyLogJson(chars)
 
     function DisplayChars() {
         return (
             <div>
                 {chars.map((char, index) => (
-                    <SideBySide key={index} content={} />
+                    <SideBySide key={index} content={
+                            <CharacterCard data={char} />
+                    } />
                 ))}
             </div>
         );

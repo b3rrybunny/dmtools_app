@@ -19,7 +19,15 @@ import * as tools from '../components/tools';
 
 
 export function retrieve (dataToRetrieve) {
-    return(localStorage.getItem(dataToRetrieve) || null);
+    const result = localStorage.getItem(dataToRetrieve) || null;
+    if (result !== null) {
+        console.log('Retrieved data ' + dataToRetrieve + '.');
+    }
+    else {
+        console.warn('No data to retrieve @ item ' + dataToRetrieve + '.');
+    }
+    
+    return(result);
 }
 
 //export function save (dataToSave, storageItem) {}

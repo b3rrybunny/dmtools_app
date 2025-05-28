@@ -87,37 +87,98 @@ function CharacterCard({ data }) {
     }
 
     return (
-        <BasicCon content={
-            <>
-                {/* Header */}
-                <div className='row'>
-                    {/* Name, race, class, alignment */}
-                    <div className='col'>
-                        <SideBySide content={
-                            <>
-                                <h2>{data.name}</h2>
-                                <h2>{data.level}</h2>
-                                <h4>{data.meta}</h4>
-                            </>
-                        } />
+        <div className='character-card'>
+            <BasicCon content={
+                <>
+                    {/* Header */}
+                    <div className='row' style={{ width: '100%', display: 'grid', gridTemplateColumns: '1fr auto' }}>
+                        {/* Name, race, class, alignment */}
+                        <div className='col'>
+                            <SideBySide content={
+                                <>
+                                    <h2>{data.name}</h2>
+                                    <h4>(Lvl. {data.level})</h4>
+                                    <h4>{data.meta}</h4>
+                                </>
+                            } />
+                        </div>
+                        {/* Buttons */}
+                        <div className='col'>
+
+                        </div>
                     </div>
-                    {/* Buttons */}
-                    <div className='col'>
+                    <HorizLine />
+                    {/* Body */}
+                    <div className='row' style={{ width: '100%', display: 'grid', gridTemplateColumns: 'auto 1fr 1fr' }}>
+                        <div className='col' style={{ alignContent: 'center' }}>
+                            <img src={data.img_url} className='img-fluid rounded' style={{ maxWidth: '250px', border: '2px solid black' }} />
+                        </div>
+                        <div className='col'>
+                            <SideBySide content={
+                                <>
+                                    <BasicCon content={
+                                        <h4>❤ HP: {data.hp}</h4>
+                                    } />
+                                    <BasicCon content={
+                                        <h4>⛊ AC: {data.ac}</h4>
+                                    } />
+
+                                </>
+                            } />
+                            <StatsTable data={data} />
+                            <SideBySide content={
+                                <>
+                                    <BasicCon content={
+                                        <h5>Speed: {data.Speed}</h5>
+                                    } />
+                                    <BasicCon content={
+                                        <h5>Proficiency Bonus: +{data.profBonus}</h5>
+                                    } />
+                                    <BasicCon content={
+                                        <h5>Initiative Bonus: +{data.initBonus}</h5>
+                                    } />
+                                </>
+                            } />
+                            <SideBySide content={
+                                <BasicCon content={
+                                    <h5>Saving Throws: {data['Saving Throws']}</h5>
+                                } />
+                            } />
+                            <SideBySide content={
+                                <BasicCon content={
+                                    <h5>Skills: {data.Skills}</h5>
+                                } />
+                            } />
+                            <SideBySide content={
+                                <BasicCon content={
+                                    <h5>Senses: {data.Senses}</h5>
+                                } />
+                            } />
+                            <SideBySide content={
+                                <BasicCon content={
+                                    <h5>Languages: {data.Languages}</h5>
+                                } />
+                            } />
+
+                            
+                        </div>
+                        <div className='col'>
+                            <BasicCon content={
+                                <>
+                                    <h5>Actions:</h5>
+                                    <div
+                                        dangerouslySetInnerHTML={{ __html: data['Actions'] }}
+                                        style={{ justifyContent: 'left', textAlign: 'left' }}
+                                    />
+                                </>
+                            } />
+                        </div>
 
                     </div>
-                </div>
-                <HorizLine />
-                {/* Body */}
-                <div className='row'>
-                    <div className='col'>
-                        <StatsTable data={data} />
-                    </div>
-                    <div className='col'>
-                        
-                    </div>
-
-                </div>
-            </>
-        } />
+                </>
+            } />
+        </div>
     );
 }
+
+export default CharacterCard;
