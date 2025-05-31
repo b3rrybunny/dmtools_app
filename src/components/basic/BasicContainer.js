@@ -1,8 +1,8 @@
 import '../../css/BasicCon.css';
 
-function BasicCon ({content}) {
+function BasicCon ({content, width='auto', height='auto' }) {
     return (
-        <div className="basic-container">
+        <div className="basic-container" style={{width: (width), height: (height)}}>
             {content}
         </div>
     );

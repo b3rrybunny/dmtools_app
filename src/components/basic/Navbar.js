@@ -13,9 +13,13 @@ function Navbar() {
         {/* Rest of links */}
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav">
-            {/* CombatManager */}
+            {/* Combat Manager */}
             <li className="nav-item">
-              <Link className="nav-link" to="/CombatManager">CombatManager</Link>
+              <Link className="nav-link" to="/CombatManager">Combat Manager</Link>
+            </li>
+            {/* Travel Manager */}
+            <li className="nav-item">
+              <Link className="nav-link" to="/TravelManager">Travel Manager</Link>
             </li>
             {/* Character Data */}
             <li className="nav-item">

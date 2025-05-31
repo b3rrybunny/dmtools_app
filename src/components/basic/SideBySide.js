@@ -1,5 +1,5 @@
 import '../../css/SideBySide.css';
-function SideBySide ({ content, gap=7, fillWidth=false }) {
+function SideBySide ({ content, gap=7, fillWidth=false, justify='auto' }) {
     let widthValue;
     if (fillWidth === true) {
         widthValue = '100%'
@@ -11,7 +11,8 @@ function SideBySide ({ content, gap=7, fillWidth=false }) {
     return (
         <div className='side-by-side' style={{
             gap: ((gap.toString()) + 'px'), 
-            width: widthValue
+            width: widthValue,
+            justifyContent: justify
             }}>
             {content}
         </div>

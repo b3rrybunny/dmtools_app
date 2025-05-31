@@ -1837,6 +1837,11 @@ function CharacterInput({ onReload }) {
 }
 
 function CharacterDataPage() {
+    // Page Title
+    useEffect(() => {
+        document.title = "dmT: Character Data";
+    }, []);
+
     const [reloadKey, setReloadKey] = useState(0);
     function handleReload() {
         setReloadKey(prevKey => prevKey + 1);
@@ -1851,7 +1856,7 @@ function CharacterDataPage() {
             <div>
                 {chars.map((char, index) => (
                     <SideBySide key={index} content={
-                            <CharacterCard data={char} />
+                        <CharacterCard data={char} />
                     } />
                 ))}
             </div>
@@ -1859,7 +1864,7 @@ function CharacterDataPage() {
     }
 
     return (
-        <div>
+        <div className='character-data-page'>
             <CharacterInput onReload={handleReload} key={reloadKey} />
             {chars !== null ?
                 <DisplayChars />

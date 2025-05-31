@@ -27,6 +27,11 @@
     height: rem !important;
 }
 
+.character-data-page {
+    overflow-y: auto !important;
+    height: 92.5vh;
+}
+
 
 
 table {

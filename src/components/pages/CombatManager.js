@@ -1,6 +1,7 @@
 // Modules ------------------------------------------------------------------
 import * as bootstrap from 'bootstrap';
 import { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 
 // Custom -------------------------------------------------------------------
@@ -347,12 +348,10 @@ function InputWindow({ onTestPopulate, onAutocompleteAdd, onManualAdd, onClear, 
         setSuggestions(filtered);
         setShowSuggestions(true);
     };
-
     const handleSuggestionClick = (name) => {
         setAutoValue(name);
         setShowSuggestions(false);
     };
-
     const handleBlur = () => {
         // Small delay to allow click events to process
         setTimeout(() => setShowSuggestions(false), 200);
@@ -506,21 +505,21 @@ function InputWindow({ onTestPopulate, onAutocompleteAdd, onManualAdd, onClear, 
                 </div>
                 <SideBySide content={
                     <>
-                    <hr style={{
-                        border: "2px solid #000000",
-                        margin: "20px 0",
-                        width: '100%'
-                    }} />
-                    <h5 style={{ margin: 0 }}>OR</h5>
-                    <hr style={{
-                        border: "2px solid #000000",
-                        margin: "20px 0",
-                        width: '100%'
-                    }} />
+                        <hr style={{
+                            border: "2px solid #000000",
+                            margin: "20px 0",
+                            width: '100%'
+                        }} />
+                        <h5 style={{ margin: 0 }}>OR</h5>
+                        <hr style={{
+                            border: "2px solid #000000",
+                            margin: "20px 0",
+                            width: '100%'
+                        }} />
                     </>
                 } />
-                    
-                
+
+
             </div>
 
             <div className='manual-add'>
@@ -644,13 +643,13 @@ function InputWindow({ onTestPopulate, onAutocompleteAdd, onManualAdd, onClear, 
                     </div>
                     <h5>Init: </h5>
                     <input
-                            type="number"
-                            value={customInit}
-                            onChange={handleCustomInitChange}
-                            placeholder="..."
-                            className="form-control"
-                            style={{ width: '100px' }}
-                        />
+                        type="number"
+                        value={customInit}
+                        onChange={handleCustomInitChange}
+                        placeholder="..."
+                        className="form-control"
+                        style={{ width: '100px' }}
+                    />
                     <button className='btn btn-success' onClick={handleCustomAdd}>Add Custom Character</button>
                 </>
             } />
@@ -720,21 +719,16 @@ function CombatControl({ onSort, onNext, onPrev, data }) {
 }
 
 function CombatManager() {
+    // Page Title
+    useEffect(() => {
+        document.title = "dmT: Combat Manager";
+    }, []);
+
+    // Data
     const [combatants, setCombatants] = useState([]);
     const [currentCombatantIndex, setCurrentCombatantIndex] = useState(0);
 
-    // Function to sort combatants by initiative (highest first)
-    const sortCombatantsByInit = () => {
-        setCombatants(prevCombatants => {
-            const sorted = [...prevCombatants].sort((a, b) => {
-                const aInit = a.init || 0;
-                const bInit = b.init || 0;
-                return bInit - aInit; // Descending order (highest initiative first)
-            });
-            return sorted;
-        });
-    };
-
+    // Add Funcs
     const addMonsterData = (monsterName, adv = '') => {
         const originalMonster = rawMonstersData.find(item => item.name === monsterName);
 
@@ -756,18 +750,6 @@ function CombatManager() {
         setTimeout(() => sortCombatantsByInit(), 0);
     }
 
-    function testPopulate() {
-        const dataLength = rawMonstersData.length;
-        const selections = [];
-        for (let i = 0; i < 4; i++) {
-            selections.push(Math.floor(Math.random() * (dataLength + 1)));
-        }
-        selections.forEach(index => {
-            const monsterName = rawMonstersData[index].name;
-            addMonsterData(monsterName);
-        })
-    }
-
     function handleAutoAdd(monsterName, advantage) {
         addMonsterData(monsterName, advantage);
     }
@@ -785,17 +767,42 @@ function CombatManager() {
         setTimeout(() => sortCombatantsByInit(), 0);
     }
 
-    function handleCardOnChange(id, key, value) {
-        console.log(`Updating combatant ${id}, ${key} changed to: ${value}`);
-        setCombatants(prevCombatants =>
-            prevCombatants.map(combatant =>
-                combatant.id === id
-                    ? { ...combatant, [key]: value }
-                    : combatant
-            )
-        );
+    function testPopulate() {
+        const dataLength = rawMonstersData.length;
+        const selections = [];
+        for (let i = 0; i < 4; i++) {
+            selections.push(Math.floor(Math.random() * (dataLength + 1)));
+        }
+        selections.forEach(index => {
+            const monsterName = rawMonstersData[index].name;
+            addMonsterData(monsterName);
+        })
     }
 
+    // Imported data from Travel Manager
+    const [searchParams] = useSearchParams();
+    const [hasProcessedParams, setHasProcessedParams] = useState(false);
+
+    useEffect(() => {
+        if (searchParams.toString() !== '' && !hasProcessedParams) {
+            const queryParams = Object.fromEntries(searchParams.entries());
+            const num = parseInt(queryParams.num);
+            const name = queryParams.name;
+            const type = queryParams.type;
+
+            if (type === 'monster') {
+                // Clear existing combatants first
+                setCombatants([]);
+                for (let i = 0; i < num; i++) {
+                    addMonsterData(name, (queryParams?.mod ? queryParams.mod : ''));
+                }
+            }
+
+            setHasProcessedParams(true);
+        }
+    }, [searchParams, hasProcessedParams]); // Dependencies ensure this only runs when needed
+
+    // Combat flow control
     function handleOnPrev() {
         if (currentCombatantIndex === 0) {
             setCurrentCombatantIndex(combatants.length - 1);
@@ -812,6 +819,29 @@ function CombatManager() {
         else {
             setCurrentCombatantIndex(currentCombatantIndex + 1);
         }
+    }
+
+    // Util
+    const sortCombatantsByInit = () => {
+        setCombatants(prevCombatants => {
+            const sorted = [...prevCombatants].sort((a, b) => {
+                const aInit = a.init || 0;
+                const bInit = b.init || 0;
+                return bInit - aInit; // Descending order (highest initiative first)
+            });
+            return sorted;
+        });
+    };
+
+    function handleCardOnChange(id, key, value) {
+        console.log(`Updating combatant ${id}, ${key} changed to: ${value}`);
+        setCombatants(prevCombatants =>
+            prevCombatants.map(combatant =>
+                combatant.id === id
+                    ? { ...combatant, [key]: value }
+                    : combatant
+            )
+        );
     }
 
     function handleClear() {
