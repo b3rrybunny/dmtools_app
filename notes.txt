@@ -4,3 +4,4 @@ Todo:
     >Implement JSON Combat data import/export
     >Implement Combat data saving to local storage
     >Implement Travel data saving to local storage
+    >Add some usage info? Like when local storage gets cleared, etc
