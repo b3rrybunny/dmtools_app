@@ -1,4 +1,4 @@
-import * as tools from '../components/tools';
+import * as tools from './tools';
 
 
 /* charData = {
@@ -19,15 +19,16 @@ import * as tools from '../components/tools';
 
 
 export function retrieve (dataToRetrieve) {
-    const result = localStorage.getItem(dataToRetrieve) || null;
+    const result = localStorage.getItem(dataToRetrieve);
     if (result !== null) {
-        console.log('Retrieved data ' + dataToRetrieve + '.');
+        console.log("Retrieved data '" + dataToRetrieve + "'.");
     }
     else {
-        console.warn('No data to retrieve @ item ' + dataToRetrieve + '.');
+        console.warn("No data to retrieve @ item '" + dataToRetrieve + "'.");
+        return;
     }
     
-    return(result);
+    return(JSON.parse(result));
 }
 
 //export function save (dataToSave, storageItem) {}
@@ -48,7 +49,7 @@ export function erase (storageItem=null) {
     }
     else {
         localStorage.removeItem(storageItem);
-        console.log('Removed item ' + storageItem + ' from local memory.')
+        console.log("Removed item '" + storageItem + "' from local memory.")
     }
 }
 
@@ -62,12 +63,12 @@ export function saveChar (data) {
         else {
             data['ID'] = tools.genID();
         }
-        const charData = JSON.parse(retrieve('charData'));
+        const charData = retrieve('charData');
         charData['count'] = charData['count']++;
-        charData['chars'] = (prevChars => [...prevChars, data]);
+        charData['chars'] = [...charData['chars'], data];
         localStorage.setItem('charData', JSON.stringify(charData));
         console.log('Saved charData in local storage. Data:');
-        tools.prettyLog(charData);
+        tools.prettyLog(charData, 'Character Data');
     }
     else {
         if (data?.['ID']) {
@@ -86,20 +87,20 @@ export function saveChar (data) {
         };
         localStorage.setItem('charData', JSON.stringify(charData));
         console.log('Created and saved charData in local storage. Data:');
-        tools.prettyLog(charData);
+        tools.prettyLog(charData, 'Character Data');
     }
 }
 
 export function eraseChar (charID) {
     if (check('charData')) {
-        const charData = JSON.parse(retrieve('charData'));
+        const charData = retrieve('charData');
         const newCharDataArray = charData['chars'].filter(item => item['ID'] !== charID);
         charData['chars'] = newCharDataArray;
         localStorage.setItem('charData', JSON.stringify(charData));
-        console.log('Removed character @ ID: ' + charID + '. New charData:');
-        tools.prettyLog(charData);
+        console.log("Removed character @ ID: " + charID + ". New charData:");
+        tools.prettyLog(charData, 'Character Data');
     }
     else {
-        console.warn('No character data in local storage. Cannot erase.');
+        console.warn('No character data @ ID ' + charID + ' in local storage. Cannot erase.');
     }
 }

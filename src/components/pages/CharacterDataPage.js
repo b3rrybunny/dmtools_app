@@ -2,6 +2,7 @@
 import * as bootstrap from 'bootstrap';
 import { useState, useEffect, useRef, memo } from 'react';
 import ReactDOMServer from 'react-dom/server';
+import { createPortal } from 'react-dom';
 
 
 // Custom -------------------------------------------------------------------
@@ -11,7 +12,8 @@ import ACBlock from '../basic/ACBlock';
 import HorizLine from '../basic/HorizontalLine';
 import SideBySide from '../basic/SideBySide';
 import CharacterCard from '../basic/CharacterCard';
-import * as tools from '../tools';
+import BasicCon from '../basic/BasicContainer';
+import * as tools from '../../scripts/tools';
 import * as dice from '../../scripts/dice';
 // Data
 import rawMonstersData from '../../data/srd_5e_monsters.json';
@@ -25,14 +27,182 @@ import NPC_img from '../../assets/NPC.png';
 
 // Data Init
 const allSpellsData = await (SRDapi.getAllSpells());
-tools.prettyLogJson(allSpellsData);
 const allEquipmentData = await (SRDapi.getAllEquipment());
-tools.prettyLogJson(allEquipmentData);
 const allLanguageData = await (SRDapi.getAllLanguages());
-tools.prettyLogJson(allLanguageData);
+
+
+// Subcomponents ------------------------------------------------------------
+function GeneralInfoinput({ onAddGeneralInfo }) {
+    // General Info
+    const [name, setName] = useState(''); //Name
+    const onNameChange = (e) => {
+        setName(e.target.value);
+        handleAddGeneralInfo();
+    }
+    const [chrClass, setChrClass] = useState('Generic'); //Class
+    const onChrClassChange = (e) => {
+        setChrClass(e.target.value);
+        handleAddGeneralInfo();
+    }
+    const [level, setLevel] = useState('1'); //Level
+    const onLevelChange = (e) => {
+        setLevel(e.target.value);
+        handleAddGeneralInfo();
+    }
+    const [race, setRace] = useState(''); //Race
+    const onRaceChange = (e) => {
+        setRace(e.target.value);
+        handleAddGeneralInfo();
+    }
+    const [alignment, setAlignment] = useState(''); //Alignment
+    const onAlignmentChange = (e) => {
+        setAlignment(e.target.value);
+        handleAddGeneralInfo();
+    }
+    const [xp, setXp] = useState('0'); //Experience Points
+    const onXpChange = (e) => {
+        setXp(e.target.value);
+        handleAddGeneralInfo();
+    }
+    const [type, setType] = useState(''); //Character type
+    const onTypeChange = (e) => {
+        setType(e.target.value);
+        handleAddGeneralInfo();
+    }
+
+    function compileData() {
+        return ({
+            'name': name,
+            'class': chrClass,
+            'level': level,
+            'race': race,
+            'alignment': alignment,
+            'xp': xp,
+            'isPlayer': (type === 'player' ? true : false),
+            'isNPC': (type === 'npc' ? true : false)
+        });
+    }
+
+    function handleAddGeneralInfo() {
+        onAddGeneralInfo(compileData());
+    }
+
+    return (
+        <>
+            <BasicCon margin={2.5} content={
+                <>
+                    <h3>General Info:</h3>
+                    <SideBySide content={
+                        <>
+                            <h4>Name: </h4>
+                            <input
+                                type="text"
+                                value={name}
+                                onChange={onNameChange}
+                                placeholder="'Izalith the Stinky'"
+                                className="form-control"
+                                style={{ maxWidth: '300px' }}
+                            />
+                        </>
+                    } />
+                    <SideBySide content={
+                        <>
+                            <h4>Class: </h4>
+                            <select id="class" value={chrClass} onChange={onChrClassChange}>
+                                <option value="Generic">Generic</option>
+                                <option value="Barbarian">Barbarian</option>
+                                <option value="Bard">Bard</option>
+                                <option value="Ceric">Cleric</option>
+                                <option value="Druid">Druid</option>
+                                <option value="Fighter">Fighter</option>
+                                <option value="Monk">Monk</option>
+                                <option value="Paladin">Paladin</option>
+                                <option value="Ranger">Ranger</option>
+                                <option value="Rogue">Rogue</option>
+                                <option value="Sorcerer">Sorcerer</option>
+                                <option value="Warlock">Warlock</option>
+                                <option value="Wizard">Wizard</option>
+                                <option value="Artificer">Artificer</option>
+                            </select>
+                        </>
+                    } />
+                    <SideBySide content={
+                        <>
+                            <h4>Level: </h4>
+                            <input
+                                type="number"
+                                min='1'
+                                value={level}
+                                onChange={onLevelChange}
+                                placeholder="..."
+                                className="form-control"
+                                style={{ maxWidth: '75px' }}
+                            />
+                        </>
+                    } />
+                    <SideBySide content={
+                        <>
+                            <h4>Race: </h4>
+                            <input
+                                type="text"
+                                value={race}
+                                onChange={onRaceChange}
+                                placeholder="'Wood Elf'"
+                                className="form-control"
+                                style={{ maxWidth: '200px' }}
+                            />
+                        </>
+                    } />
+                    <SideBySide content={
+                        <>
+                            <h4>Alignment: </h4>
+                            <select id="alignment" value={alignment} onChange={onAlignmentChange}>
+                                <option value="">Choose...</option>
+                                <option value="Lawful Good">Lawful Good</option>
+                                <option value="Neutral Good">Neutral Good</option>
+                                <option value="Chaotic Good">Chaotic Good</option>
+                                <option value="Lawful Neutral">Lawful Neutral</option>
+                                <option value="True Neutral">True Neutral</option>
+                                <option value="Chaotic Neutral">Chaotic Neutral</option>
+                                <option value="Lawful Evil">Lawful Evil</option>
+                                <option value="Neutral Evil">Neutral Evil</option>
+                                <option value="Chaotic Evil">Chaotic Evil</option>
+                            </select>
+                        </>
+                    } />
+                    <SideBySide content={
+                        <>
+                            <h4>XP: </h4>
+                            <input
+                                type="number"
+                                step='10'
+                                min='0'
+                                value={xp}
+                                onChange={onXpChange}
+                                placeholder="..."
+                                className="form-control"
+                                style={{ maxWidth: '75px' }}
+                            />
+                        </>
+                    } />
+                    <SideBySide content={
+                        <>
+                            <h4>Type: </h4>
+                            <select id="type" value={type} onChange={onTypeChange}>
+                                <option value="">Monster/Generic</option>
+                                <option value='player'>Player</option>
+                                <option value='npc'>NPC</option>
+                            </select>
+                        </>
+                    } />
+                </>
+            } />
+        </>
+    )
+}
 
 function AttackInput({ onAddAttack }) {
-    console.log('AttackInput rendering');
+    // Variables
     const [attackType, setAttackType] = useState(''); //Attack type
     const onAttackTypeChange = (e) => {
         setAttackType(e.target.value);
@@ -90,6 +260,7 @@ function AttackInput({ onAddAttack }) {
         setAttackAddlDamageMod(e.target.value);
     }
 
+    // Functions
     function handleAddAttack() {
         const AttackNameEl = (
             <em><strong>{attackDesc}. </strong></em>
@@ -151,6 +322,8 @@ function AttackInput({ onAddAttack }) {
         setAttackAddlDamageType('');
         setAttackAddlDamageMod('0');
     }
+
+    // Component body
     return (
         <>
             <SideBySide content={
@@ -184,7 +357,7 @@ function AttackInput({ onAddAttack }) {
                         onChange={onAttackRangeChange}
                         placeholder="..."
                         className="form-control"
-                        style={{ maxWidth: '100px' }}
+                        style={{ maxWidth: '75px' }}
                     />
                     <h5>ft.</h5>
                 </>
@@ -199,7 +372,7 @@ function AttackInput({ onAddAttack }) {
                         onChange={onAttackToHitChange}
                         placeholder="..."
                         className="form-control"
-                        style={{ maxWidth: '100px' }}
+                        style={{ maxWidth: '75px' }}
                     />
                     <h4># of targets: </h4>
                     <input
@@ -209,7 +382,7 @@ function AttackInput({ onAddAttack }) {
                         onChange={onAttackTargetsChange}
                         placeholder="..."
                         className="form-control"
-                        style={{ maxWidth: '100px' }}
+                        style={{ maxWidth: '75px' }}
                     />
                 </>
             } />
@@ -223,7 +396,7 @@ function AttackInput({ onAddAttack }) {
                         onChange={onAttackNumOfDiceChange}
                         placeholder="..."
                         className="form-control"
-                        style={{ maxWidth: '100px' }}
+                        style={{ maxWidth: '75px' }}
                     />
                     <h5>d</h5>
                     <input
@@ -233,7 +406,7 @@ function AttackInput({ onAddAttack }) {
                         onChange={onAttackDiceChange}
                         placeholder="..."
                         className="form-control"
-                        style={{ maxWidth: '100px' }}
+                        style={{ maxWidth: '75px' }}
                     />
                     <h5>{attackDamageMod < 0 ? '-' : '+'}</h5>
                     <input
@@ -242,7 +415,7 @@ function AttackInput({ onAddAttack }) {
                         onChange={onAttackDamageModChange}
                         placeholder="..."
                         className="form-control"
-                        style={{ maxWidth: '100px' }}
+                        style={{ maxWidth: '75px' }}
                     />
                     <h4> Type: </h4>
                     <select id="attackDamageType" value={attackDamageType} onChange={onAttackDamageTypeChange} style={{ maxWidth: '90px' }}>
@@ -285,7 +458,7 @@ function AttackInput({ onAddAttack }) {
                                     onChange={onAttackAddlNumOfDiceChange}
                                     placeholder="..."
                                     className="form-control"
-                                    style={{ maxWidth: '100px' }}
+                                    style={{ maxWidth: '75px' }}
                                 />
                                 <h5>d</h5>
                                 <input
@@ -295,7 +468,7 @@ function AttackInput({ onAddAttack }) {
                                     onChange={onAttackAddlDiceChange}
                                     placeholder="..."
                                     className="form-control"
-                                    style={{ maxWidth: '100px' }}
+                                    style={{ maxWidth: '75px' }}
                                 />
                                 <h5>{attackAddlDamageMod < 0 ? '' : '+'}</h5>
                                 <input
@@ -304,7 +477,7 @@ function AttackInput({ onAddAttack }) {
                                     onChange={onAttackAddlDamageModChange}
                                     placeholder="..."
                                     className="form-control"
-                                    style={{ maxWidth: '100px' }}
+                                    style={{ maxWidth: '75px' }}
                                 />
                                 <h5> Type: </h5>
                                 <select id="attackAddlDamageType" value={attackAddlDamageType} onChange={onAttackAddlDamageTypeChange}>
@@ -338,99 +511,41 @@ function AttackInput({ onAddAttack }) {
     );
 }
 
-function OtherActionInput({ onAddAction }) {
-    const [actionName, setActionName] = useState(''); //Action name
-    const onActionNameChange = (e) => {
-        setActionName(e.target.value);
-    }
-    const [actionDesc, setActionDesc] = useState('Exhales fire in a 15-ft cone. Each creature makes a DC 13 DEX check, taking (7d6) fire damage on a failed save, or half on a successful one.'); //Action name
-    const onActionDescChange = (e) => {
-        setActionDesc(e.target.value);
-    }
-
-    function handleActionAdd() {
-        const actionNameEl = (
-            <strong><em>{actionName}. </em></strong>
-        );
-        const actionDescString = (
-            actionDesc
-        );
-        const result = (
-            <>
-                <p>
-                    {actionNameEl}
-                    {actionDescString}
-                </p>
-            </>
-        );
-        onAddAction(result);
-        setActionDesc('');
-        setActionName('');
-    }
-
-    return (
-        <>
-            <SideBySide content={
-                <>
-                    <h4>Action name: </h4>
-                    <input
-                        type="text"
-                        value={actionName}
-                        onChange={onActionNameChange}
-                        placeholder="'Fire Breath (Recharge 5-6)'"
-                        className="form-control"
-                        style={{ maxWidth: '300px' }}
-                    />
-                </>
-            } />
-            <SideBySide content={
-                <>
-                    <h4>Action Description: </h4>
-                    <textarea
-                        id='actionDescText'
-                        value={actionDesc}
-                        onChange={onActionDescChange}
-                        style={{ width: '100%', minHeight: '150px' }}
-                    >
-                        Exhales fire in a 15-ft cone. Each creature makes a DC 13 DEX check, taking (7d6) fire damage on a failed save, or half on a successful one.
-                    </textarea>
-                </>
-            } />
-            <button
-                className='btn btn-success'
-                onClick={handleActionAdd}
-                style={{ width: '100%' }}
-            >
-                Add Action
-            </button>
-        </>
-    );
-}
-
 function SpellInput({ onAddSpell }) {
+    // Variables
     const [spellName, setSpellName] = useState('');
-
-    // Autocomplete
     const [suggestions, setSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
+    const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+    const inputRef = useRef(null);
+
+    // Autocomplete functions
     const onSpellNameChange = (e) => {
         const value = e.target.value;
         setSpellName(value);
-
         if (!value) {
             setSuggestions([]);
             setShowSuggestions(false);
             return;
         }
-
         // Filter suggestions
         const filtered = allSpellsData.filter(item =>
             (item.name.toLowerCase().includes(value.toLowerCase()))
         );
-
         setSuggestions(filtered);
         setShowSuggestions(true);
-    }
+        updateDropdownPosition();
+    };
+    const updateDropdownPosition = () => {
+        if (inputRef.current) {
+            const rect = inputRef.current.getBoundingClientRect();
+            setDropdownPosition({
+                top: rect.bottom + window.scrollY,
+                left: rect.left + window.scrollX,
+                width: rect.width
+            });
+        }
+    };
     const handleSuggestionClick = (name) => {
         setSpellName(name);
         setShowSuggestions(false);
@@ -439,7 +554,81 @@ function SpellInput({ onAddSpell }) {
         // Small delay to allow click events to process
         setTimeout(() => setShowSuggestions(false), 200);
     };
+    const handleFocus = () => {
+        if (spellName) {
+            setShowSuggestions(true);
+            updateDropdownPosition();
+        }
+    };
+    useEffect(() => {
+        const handleScroll = () => {
+            if (showSuggestions) {
+                updateDropdownPosition();
+            }
+        };
 
+        const handleResize = () => {
+            if (showSuggestions) {
+                updateDropdownPosition();
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll, true);
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll, true);
+            window.removeEventListener('resize', handleResize);
+        };
+    }, [showSuggestions]);
+    const renderDropdown = () => {
+        if (!showSuggestions || suggestions.length === 0) return null;
+
+        return createPortal(
+            <div
+                className="autocomplete-items"
+                style={{
+                    position: 'absolute',
+                    zIndex: 999999,
+                    top: dropdownPosition.top,
+                    left: dropdownPosition.left,
+                    width: dropdownPosition.width,
+                    border: '1px solid #d4d4d4',
+                    borderTop: 'none',
+                    backgroundColor: 'white',
+                    maxHeight: '200px',
+                    overflowY: 'auto',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                }}
+            >
+                {suggestions.map((item, index) => (
+                    <div
+                        key={item.name + index}
+                        onClick={() => handleSuggestionClick(item.name)}
+                        style={{
+                            padding: '10px',
+                            cursor: 'pointer',
+                            backgroundColor: '#fff',
+                            borderBottom: '1px solid #d4d4d4'
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.backgroundColor = '#e9e9e9'}
+                        onMouseLeave={e => e.currentTarget.style.backgroundColor = '#fff'}
+                    >
+                        <div>
+                            <strong>{item.name.substr(0, spellName.length)}</strong>
+                            {item.name.substr(spellName.length)}
+                        </div>
+                        <div style={{ fontSize: '0.8em', color: '#666', marginTop: '4px' }}>
+                            Level: {item.level}
+                        </div>
+                    </div>
+                ))}
+            </div>,
+            document.body
+        );
+    };
+
+    // Add functions
     async function handleAddSpell() {
         const spell = allSpellsData.find(item => item.name === spellName);
         const spellData = await SRDapi.getSingleSpell(spell.index);
@@ -490,7 +679,6 @@ function SpellInput({ onAddSpell }) {
                 <em>Components: </em><span>{spellDataComponentString()}. </span>
             </>
         )
-
         const result = (
             <>
                 <p>
@@ -503,6 +691,7 @@ function SpellInput({ onAddSpell }) {
         onAddSpell(result);
     }
 
+    // Component body
     return (
         <>
             <SideBySide content={
@@ -510,87 +699,131 @@ function SpellInput({ onAddSpell }) {
                     <h4>Spell name: </h4>
                     <div className="autocomplete" style={{ position: 'relative' }}>
                         <input
+                            ref={inputRef}
                             type="text"
                             value={spellName}
                             onChange={onSpellNameChange}
-                            onFocus={() => spellName && setShowSuggestions(true)}
+                            onFocus={handleFocus}
                             onBlur={handleBlur}
                             placeholder="'Acid Arrow'"
                             className="form-control"
                         />
-                        {showSuggestions && suggestions.length > 0 && (
-                            <div
-                                className="autocomplete-items"
-                                style={{
-                                    position: 'absolute',
-                                    zIndex: 99,
-                                    top: '100%',
-                                    left: 0,
-                                    right: 0,
-                                    border: '1px solid #d4d4d4',
-                                    borderTop: 'none',
-                                    backgroundColor: 'white'
-                                }}
-                            >
-                                {suggestions.map((item, index) => (
-                                    <div
-                                        key={item.name + index}
-                                        onClick={() => handleSuggestionClick(item.name)}
-                                        style={{
-                                            padding: '10px',
-                                            cursor: 'pointer',
-                                            backgroundColor: '#fff',
-                                            borderBottom: '1px solid #d4d4d4'
-                                        }}
-                                        onMouseEnter={e => e.currentTarget.style.backgroundColor = '#e9e9e9'}
-                                        onMouseLeave={e => e.currentTarget.style.backgroundColor = '#fff'}
-                                    >
-                                        <div>
-                                            <strong>{item.name.substr(0, spellName.length)}</strong>
-                                            {item.name.substr(spellName.length)}
-                                        </div>
-                                        {(
-                                            <div style={{ fontSize: '0.8em', color: '#666', marginTop: '4px' }}>
-                                                Level: {item.level}
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+                        {renderDropdown()}
                     </div>
                     <button className='btn btn-success' onClick={handleAddSpell}>Add Spell</button>
                 </>
             } />
+        </>
+    );
+}
 
+function OtherActionInput({ onAddAction }) {
+    // Variables
+    const [actionName, setActionName] = useState('');
+    const onActionNameChange = (e) => {
+        setActionName(e.target.value);
+    }
+    const [actionDesc, setActionDesc] = useState('Exhales fire in a 15-ft cone. Each creature makes a DC 13 DEX check, taking (7d6) fire damage on a failed save, or half on a successful one.'); //Action name
+    const onActionDescChange = (e) => {
+        setActionDesc(e.target.value);
+    }
+
+    // Add functions
+    function handleActionAdd() {
+        const actionNameEl = (
+            <strong><em>{actionName}. </em></strong>
+        );
+        const actionDescString = (
+            actionDesc
+        );
+        const result = (
+            <>
+                <p>
+                    {actionNameEl}
+                    {actionDescString}
+                </p>
+            </>
+        );
+        onAddAction(result);
+        setActionDesc('');
+        setActionName('');
+    }
+
+    // Component body
+    return (
+        <>
+            <SideBySide content={
+                <>
+                    <h4>Action name: </h4>
+                    <input
+                        type="text"
+                        value={actionName}
+                        onChange={onActionNameChange}
+                        placeholder="'Fire Breath (Recharge 5-6)'"
+                        className="form-control"
+                        style={{ maxWidth: '300px' }}
+                    />
+                </>
+            } />
+            <SideBySide content={
+                <>
+                    <h4>Action Description: </h4>
+                    <textarea
+                        id='actionDescText'
+                        value={actionDesc}
+                        onChange={onActionDescChange}
+                        style={{ width: '100%', minHeight: '150px' }}
+                    >
+                        Exhales fire in a 15-ft cone. Each creature makes a DC 13 DEX check, taking (7d6) fire damage on a failed save, or half on a successful one.
+                    </textarea>
+                </>
+            } />
+            <button
+                className='btn btn-success'
+                onClick={handleActionAdd}
+                style={{ width: '100%' }}
+            >
+                Add Action
+            </button>
         </>
     );
 }
 
 function LanguageInput({ data, onAddLanguage }) {
+    // Variables
     const [language, setLanguage] = useState('');
-
-    // Autocomplete
     const [suggestions, setSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
+    const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+    const inputRef = useRef(null);
+
+    // Autocomplete functions
     const onLanguageChange = (e) => {
         const value = e.target.value;
         setLanguage(value);
-
         if (!value) {
             setSuggestions([]);
             setShowSuggestions(false);
             return;
         }
-
         // Filter suggestions
         const filtered = allLanguageData.filter(item =>
             (item.name.toLowerCase().includes(value.toLowerCase()))
         );
-
         setSuggestions(filtered);
         setShowSuggestions(true);
-    }
+        updateDropdownPosition();
+    };
+    const updateDropdownPosition = () => {
+        if (inputRef.current) {
+            const rect = inputRef.current.getBoundingClientRect();
+            setDropdownPosition({
+                top: rect.bottom + window.scrollY,
+                left: rect.left + window.scrollX,
+                width: rect.width
+            });
+        }
+    };
     const handleSuggestionClick = (name) => {
         setLanguage(name);
         setShowSuggestions(false);
@@ -599,12 +832,84 @@ function LanguageInput({ data, onAddLanguage }) {
         // Small delay to allow click events to process
         setTimeout(() => setShowSuggestions(false), 200);
     };
+    const handleFocus = () => {
+        if (language) {
+            setShowSuggestions(true);
+            updateDropdownPosition();
+        }
+    };
+    useEffect(() => {
+        const handleScroll = () => {
+            if (showSuggestions) {
+                updateDropdownPosition();
+            }
+        };
 
+        const handleResize = () => {
+            if (showSuggestions) {
+                updateDropdownPosition();
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll, true);
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll, true);
+            window.removeEventListener('resize', handleResize);
+        };
+    }, [showSuggestions]);
+    const renderDropdown = () => {
+        if (!showSuggestions || suggestions.length === 0) return null;
+
+        return createPortal(
+            <div
+                className="autocomplete-items"
+                style={{
+                    position: 'absolute',
+                    zIndex: 999999,
+                    top: dropdownPosition.top,
+                    left: dropdownPosition.left,
+                    width: dropdownPosition.width,
+                    border: '1px solid #d4d4d4',
+                    borderTop: 'none',
+                    backgroundColor: 'white',
+                    maxHeight: '200px',
+                    overflowY: 'auto',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                }}
+            >
+                {suggestions.map((item, index) => (
+                    <div
+                        key={item.name + index}
+                        onClick={() => handleSuggestionClick(item.name)}
+                        style={{
+                            padding: '10px',
+                            cursor: 'pointer',
+                            backgroundColor: '#fff',
+                            borderBottom: '1px solid #d4d4d4'
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.backgroundColor = '#e9e9e9'}
+                        onMouseLeave={e => e.currentTarget.style.backgroundColor = '#fff'}
+                    >
+                        <div>
+                            <strong>{item.name.substr(0, language.length)}</strong>
+                            {item.name.substr(language.length)}
+                        </div>
+                    </div>
+                ))}
+            </div>,
+            document.body
+        );
+    };
+
+    // Add functions
     function handleAddLanguage() {
         onAddLanguage(language);
         setLanguage('');
     }
 
+    // Subcomponents
     function DisplayLanguages() {
         return (
             <div>
@@ -615,268 +920,203 @@ function LanguageInput({ data, onAddLanguage }) {
         );
     }
 
+    // Component body
     return (
-        <div className='basic-container'>
-            <SideBySide content={
+        <BasicCon margin={2.5} content={
+            <>
+                <SideBySide content={
+                    <>
+                        <h4>Add Language: </h4>
+                        <div className="autocomplete" style={{ position: 'relative' }}>
+                            <input
+                                ref={inputRef}
+                                type="text"
+                                value={language}
+                                onChange={onLanguageChange}
+                                onFocus={handleFocus}
+                                onBlur={handleBlur}
+                                placeholder="'Common'"
+                                className="form-control"
+                            />
+                            {renderDropdown()}
+                        </div>
+                        <button className='btn btn-success' onClick={handleAddLanguage}>Add Language</button>
+                    </>
+                } />
+                {data.length !== 0 ?
+                    <DisplayLanguages />
+                    : null
+                }
+            </>
+        } />
+    );
+}
+
+function NoteInput({ value, onChange }) {
+    return (
+        <>
+            <BasicCon margin={2.5} content={
                 <>
-                    <h4>Add Language: </h4>
-                    <div className="autocomplete" style={{ position: 'relative' }}>
-                        <input
-                            type="text"
-                            value={language}
-                            onChange={onLanguageChange}
-                            onFocus={() => language && setShowSuggestions(true)}
-                            onBlur={handleBlur}
-                            placeholder="'Common'"
-                            className="form-control"
-                        />
-                        {showSuggestions && suggestions.length > 0 && (
-                            <div
-                                className="autocomplete-items"
-                                style={{
-                                    position: 'absolute',
-                                    zIndex: 9999,
-                                    top: '100%',
-                                    left: 0,
-                                    right: 0,
-                                    border: '1px solid #d4d4d4',
-                                    borderTop: 'none',
-                                    backgroundColor: 'white'
-                                }}
-                            >
-                                {suggestions.map((item, index) => (
-                                    <div
-                                        key={item.name + index}
-                                        onClick={() => handleSuggestionClick(item.name)}
-                                        style={{
-                                            padding: '10px',
-                                            cursor: 'pointer',
-                                            backgroundColor: '#fff',
-                                            borderBottom: '1px solid #d4d4d4'
-                                        }}
-                                        onMouseEnter={e => e.currentTarget.style.backgroundColor = '#e9e9e9'}
-                                        onMouseLeave={e => e.currentTarget.style.backgroundColor = '#fff'}
-                                    >
-                                        <div>
-                                            <strong>{item.name.substr(0, language.length)}</strong>
-                                            {item.name.substr(language.length)}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                    <button className='btn btn-success' onClick={handleAddLanguage}>Add Language</button>
+                    <h4>Note:</h4>
+                    <textarea
+                        value={value}
+                        onChange={(e) => onChange(e.target.value)}
+                        style={{ minHeight: '75px', width: '100%' }}
+                        placeholder='Izalith is particularly fond of apples and comes from a long line of apple farmers.'
+                    />
                 </>
             } />
-            {data.length !== 0 ?
-                <DisplayLanguages />
-                : null
-            }
+        </>
+    );
+}
+
+function JsonInput({ value, onChange, onAdd }) {
+    return (
+        <div style={{ padding: '10px' }}>
+            <h5>Input via JSON</h5>
+            <p>If you have a character you've created previously, but they aren't showing up (likely because your local storage was cleared), you can add them here via JSON if you have them saved.</p>
+            <textarea
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                placeholder='JSON text here'
+                style={{ margin: '5px', width: '98%' }}
+            />
+            <button className='btn btn-success' onClick={onAdd} style={{ width: '100%' }}>Add input JSON</button>
         </div>
     );
 }
 
-function GeneralInfoinput({ onAddGeneralInfo }) {
-    // General Info
-    const [name, setName] = useState(''); //Name
-    const onNameChange = (e) => {
-        setName(e.target.value);
-        handleAddGeneralInfo();
-    }
-    const [chrClass, setChrClass] = useState('Generic'); //Class
-    const onChrClassChange = (e) => {
-        setChrClass(e.target.value);
-        handleAddGeneralInfo();
-    }
-    const [level, setLevel] = useState('1'); //Level
-    const onLevelChange = (e) => {
-        setLevel(e.target.value);
-        handleAddGeneralInfo();
-    }
-    const [race, setRace] = useState(''); //Race
-    const onRaceChange = (e) => {
-        setRace(e.target.value);
-        handleAddGeneralInfo();
-    }
-    const [alignment, setAlignment] = useState(''); //Alignment
-    const onAlignmentChange = (e) => {
-        setAlignment(e.target.value);
-        handleAddGeneralInfo();
-    }
-    const [xp, setXp] = useState(''); //Experience Points
-    const onXpChange = (e) => {
-        setXp(e.target.value);
-        handleAddGeneralInfo();
-    }
-    const [type, setType] = useState(''); //Character type
-    const onTypeChange = (e) => {
-        setType(e.target.value);
-        handleAddGeneralInfo();
-    }
 
-    function compileData() {
-        return ({
-            'name': name,
-            'class': chrClass,
-            'level': level,
-            'race': race,
-            'alignment': alignment,
-            'xp': xp,
-            'isPlayer': (type === 'player' ? true : false),
-            'isNPC': (type === 'npc' ? true : false)
-        });
-    }
-
-    function handleAddGeneralInfo() {
-        onAddGeneralInfo(compileData());
-    }
-
-    return (
-        <>
-            <div className='basic-container'>
-                <h3>General Info:</h3>
-                <SideBySide content={
-                    <>
-                        <h4>Name: </h4>
-                        <input
-                            type="text"
-                            value={name}
-                            onChange={onNameChange}
-                            placeholder="'Izalith the Stinky'"
-                            className="form-control"
-                            style={{ maxWidth: '300px' }}
-                        />
-                    </>
-                } />
-                <SideBySide content={
-                    <>
-                        <h4>Class: </h4>
-                        <select id="class" value={chrClass} onChange={onChrClassChange}>
-                            <option value="Generic">Generic</option>
-                            <option value="Barbarian">Barbarian</option>
-                            <option value="Bard">Bard</option>
-                            <option value="Ceric">Cleric</option>
-                            <option value="Druid">Druid</option>
-                            <option value="Fighter">Fighter</option>
-                            <option value="Monk">Monk</option>
-                            <option value="Paladin">Paladin</option>
-                            <option value="Ranger">Ranger</option>
-                            <option value="Rogue">Rogue</option>
-                            <option value="Sorcerer">Sorcerer</option>
-                            <option value="Warlock">Warlock</option>
-                            <option value="Wizard">Wizard</option>
-                            <option value="Artificer">Artificer</option>
-                        </select>
-                    </>
-                } />
-                <SideBySide content={
-                    <>
-                        <h4>Level: </h4>
-                        <input
-                            type="number"
-                            min='1'
-                            value={level}
-                            onChange={onLevelChange}
-                            placeholder="..."
-                            className="form-control"
-                            style={{ maxWidth: '100px' }}
-                        />
-                    </>
-                } />
-                <SideBySide content={
-                    <>
-                        <h4>Race: </h4>
-                        <input
-                            type="text"
-                            value={race}
-                            onChange={onRaceChange}
-                            placeholder="'Wood Elf'"
-                            className="form-control"
-                            style={{ maxWidth: '200px' }}
-                        />
-                    </>
-                } />
-                <SideBySide content={
-                    <>
-                        <h4>Alignment: </h4>
-                        <select id="alignment" value={alignment} onChange={onAlignmentChange}>
-                            <option value="">Choose...</option>
-                            <option value="Lawful Good">Lawful Good</option>
-                            <option value="Neutral Good">Neutral Good</option>
-                            <option value="Chaotic Good">Chaotic Good</option>
-                            <option value="Lawful Neutral">Lawful Neutral</option>
-                            <option value="True Neutral">True Neutral</option>
-                            <option value="Chaotic Neutral">Chaotic Neutral</option>
-                            <option value="Lawful Evil">Lawful Evil</option>
-                            <option value="Neutral Evil">Neutral Evil</option>
-                            <option value="Chaotic Evil">Chaotic Evil</option>
-                        </select>
-                    </>
-                } />
-                <SideBySide content={
-                    <>
-                        <h4>XP: </h4>
-                        <input
-                            type="number"
-                            step='10'
-                            value={xp}
-                            onChange={onXpChange}
-                            placeholder="..."
-                            className="form-control"
-                            style={{ maxWidth: '100px' }}
-                        />
-                    </>
-                } />
-                <SideBySide content={
-                    <>
-                        <h4>Type: </h4>
-                        <select id="type" value={type} onChange={onTypeChange}>
-                            <option value="">Monster/Generic</option>
-                            <option value='player'>Player</option>
-                            <option value='npc'>NPC</option>
-                        </select>
-                    </>
-                } />
-            </div>
-        </>
-    )
-}
-
+// Main components ---------------------------------------------------------
 function CharacterInput({ onReload }) {
     // Stats
     const [profBonus, setProfBonus] = useState('2'); //Proficiency Bonus
     const onProfBonusChange = (e) => {
         setProfBonus(e.target.value);
-    }
+    };
     const [STR, setSTR] = useState('10'); //STR
     const onSTRChange = (e) => {
         setSTR(e.target.value);
-    }
+    };
     const [DEX, setDEX] = useState('10'); //DEX
     const onDEXChange = (e) => {
         setDEX(e.target.value);
-    }
+    };
     const [CON, setCON] = useState('10'); //CON
     const onCONChange = (e) => {
         setCON(e.target.value);
-    }
+    };
     const [INT, setINT] = useState('10'); //INT
     const onINTChange = (e) => {
         setINT(e.target.value);
-    }
+    };
     const [WIS, setWIS] = useState('10'); //WIS
     const onWISChange = (e) => {
         setWIS(e.target.value);
-    }
+    };
     const [CHA, setCHA] = useState('10'); //CHA
     const onCHAChange = (e) => {
         setCHA(e.target.value);
+    };
+    function StatsInputTable() {
+        return (
+            <>
+                <BasicCon margin={2.5} content={
+                    <>
+                        <h3>Stats: </h3>
+                        <table style={{ margin: '0px' }}>
+                            <tbody>
+                                <tr>
+                                    <td>STR: </td>
+                                    <td><input
+                                        type="number"
+                                        min='0'
+                                        max='30'
+                                        value={STR}
+                                        onChange={onSTRChange}
+                                        placeholder="..."
+                                        className="form-control"
+                                        style={{ maxWidth: '75px' }}
+                                    /></td>
+                                    <td><ModifierText stat={STR} /></td>
+                                    <td>DEX: </td>
+                                    <td><input
+                                        type="number"
+                                        min='0'
+                                        max='30'
+                                        value={DEX}
+                                        onChange={onDEXChange}
+                                        placeholder="..."
+                                        className="form-control"
+                                        style={{ maxWidth: '75px' }}
+                                    /></td>
+                                    <td><ModifierText stat={DEX} /></td>
+                                </tr>
+                                <tr>
+                                    <td>CON: </td>
+                                    <td><input
+                                        type="number"
+                                        min='0'
+                                        max='30'
+                                        value={CON}
+                                        onChange={onCONChange}
+                                        placeholder="..."
+                                        className="form-control"
+                                        style={{ maxWidth: '75px' }}
+                                    /></td>
+                                    <td><ModifierText stat={CON} /></td>
+                                    <td>INT: </td>
+                                    <td><input
+                                        type="number"
+                                        min='0'
+                                        max='30'
+                                        value={INT}
+                                        onChange={onINTChange}
+                                        placeholder="..."
+                                        className="form-control"
+                                        style={{ maxWidth: '75px' }}
+                                    /></td>
+                                    <td><ModifierText stat={INT} /></td>
+                                </tr>
+                                <tr>
+                                    <td>WIS: </td>
+                                    <td><input
+                                        type="number"
+                                        min='0'
+                                        max='30'
+                                        value={WIS}
+                                        onChange={onWISChange}
+                                        placeholder="..."
+                                        className="form-control"
+                                        style={{ maxWidth: '75px' }}
+                                    /></td>
+                                    <td><ModifierText stat={WIS} /></td>
+                                    <td>CHA: </td>
+                                    <td><input
+                                        type="number"
+                                        min='0'
+                                        max='30'
+                                        value={CHA}
+                                        onChange={onCHAChange}
+                                        placeholder="..."
+                                        className="form-control"
+                                        style={{ maxWidth: '75px' }}
+                                    /></td>
+                                    <td><ModifierText stat={CHA} /></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </>
+                } />
+            </>
+        );
     }
+
+    // Combat stats
     const [hp, setHp] = useState('10'); //Hit Points
     const onHpChange = (e) => {
         setHp(e.target.value);
-    }
+    };
     const handleHPChange = (mod) => {
         switch (mod) {
             case '+':
@@ -886,11 +1126,11 @@ function CharacterInput({ onReload }) {
                 setHp(parseInt(hp) - 1);
                 break;
         }
-    }
+    };
     const [ac, setAc] = useState('10'); //Armor Class
     const onAcChange = (e) => {
         setAc(e.target.value);
-    }
+    };
     const handleACChange = (mod) => {
         switch (mod) {
             case '+':
@@ -900,175 +1140,82 @@ function CharacterInput({ onReload }) {
                 setAc(parseInt(ac) - 1);
                 break;
         }
-    }
+    };
     const [initBonus, setInitBonus] = useState('0'); //Initiative Bonus
     const onInitBonusChange = (e) => {
         setInitBonus(e.target.value);
-    }
+    };
     const [insp, setInsp] = useState('0'); //Inspiration
     const onInspChange = (e) => {
         setInsp(e.target.value);
-    }
+    };
     const [speed, setSpeed] = useState('30'); //Speed
     const onSpeedChange = (e) => {
         setSpeed(e.target.value);
-    }
-
-    function StatsInputTable() {
-        return (
-            <>
-                <div className='basic-container'>
-                    <h3>Stats: </h3>
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td>STR: </td>
-                                <td><input
-                                    type="number"
-                                    min='0'
-                                    max='30'
-                                    value={STR}
-                                    onChange={onSTRChange}
-                                    placeholder="..."
-                                    className="form-control"
-                                    style={{ maxWidth: '100px' }}
-                                /></td>
-                                <td><ModifierText stat={STR} /></td>
-                                <td>DEX: </td>
-                                <td><input
-                                    type="number"
-                                    min='0'
-                                    max='30'
-                                    value={DEX}
-                                    onChange={onDEXChange}
-                                    placeholder="..."
-                                    className="form-control"
-                                    style={{ maxWidth: '100px' }}
-                                /></td>
-                                <td><ModifierText stat={DEX} /></td>
-                            </tr>
-                            <tr>
-                                <td>CON: </td>
-                                <td><input
-                                    type="number"
-                                    min='0'
-                                    max='30'
-                                    value={CON}
-                                    onChange={onCONChange}
-                                    placeholder="..."
-                                    className="form-control"
-                                    style={{ maxWidth: '100px' }}
-                                /></td>
-                                <td><ModifierText stat={CON} /></td>
-                                <td>INT: </td>
-                                <td><input
-                                    type="number"
-                                    min='0'
-                                    max='30'
-                                    value={INT}
-                                    onChange={onINTChange}
-                                    placeholder="..."
-                                    className="form-control"
-                                    style={{ maxWidth: '100px' }}
-                                /></td>
-                                <td><ModifierText stat={INT} /></td>
-                            </tr>
-                            <tr>
-                                <td>WIS: </td>
-                                <td><input
-                                    type="number"
-                                    min='0'
-                                    max='30'
-                                    value={WIS}
-                                    onChange={onWISChange}
-                                    placeholder="..."
-                                    className="form-control"
-                                    style={{ maxWidth: '100px' }}
-                                /></td>
-                                <td><ModifierText stat={WIS} /></td>
-                                <td>CHA: </td>
-                                <td><input
-                                    type="number"
-                                    min='0'
-                                    max='30'
-                                    value={CHA}
-                                    onChange={onCHAChange}
-                                    placeholder="..."
-                                    className="form-control"
-                                    style={{ maxWidth: '100px' }}
-                                /></td>
-                                <td><ModifierText stat={CHA} /></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </>
-        );
-    }
-
+    };
     function CombatInfoInput() {
         return (
             <>
-                <div className='basic-container'>
-                    <h3>Combat Info:</h3>
-                    <HPBlock hp={hp} onChange={handleHPChange} />
-                    <ACBlock ac={ac} onChange={handleACChange} />
-                    <div className='basic-container'>
-                        <SideBySide content={
-                            <>
+                <BasicCon margin={2.5} content={
+                    <>
+                        <h3>Combat Info:</h3>
+                        <HPBlock hp={hp} onChange={handleHPChange} />
+                        <ACBlock ac={ac} onChange={handleACChange} />
+                        <div className='basic-container'>
+                            <SideBySide content={
+                                <>
 
-                                <h4>Proficiency Bonus: </h4>
-                                <input
-                                    type="number"
-                                    value={profBonus}
-                                    onChange={onProfBonusChange}
-                                    placeholder="..."
-                                    className="form-control"
-                                    style={{ maxWidth: '100px' }}
-                                />
+                                    <h4>Proficiency Bonus: </h4>
+                                    <input
+                                        type="number"
+                                        value={profBonus}
+                                        onChange={onProfBonusChange}
+                                        placeholder="..."
+                                        className="form-control"
+                                        style={{ maxWidth: '75px' }}
+                                    />
 
-                            </>
-                        } />
-                    </div>
-                    <div className='basic-container'>
-                        <SideBySide content={
-                            <>
-                                <h4>Init Bonus: </h4>
-                                <input
-                                    type="number"
-                                    value={initBonus}
-                                    onChange={onInitBonusChange}
-                                    placeholder="..."
-                                    className="form-control"
-                                    style={{ maxWidth: '100px' }}
-                                />
-                            </>
-                        } />
-                    </div>
-                    <div className='basic-container'>
-                        <SideBySide content={
-                            <>
-                                <h4>Speed: </h4>
-                                <input
-                                    type="number"
-                                    min='0'
-                                    step='5'
-                                    value={speed}
-                                    onChange={onSpeedChange}
-                                    placeholder="..."
-                                    className="form-control"
-                                    style={{ maxWidth: '100px' }}
-                                />
-                                <h5>ft.</h5>
-                            </>
-                        } />
-                    </div>
-                </div>
+                                </>
+                            } />
+                        </div>
+                        <div className='basic-container'>
+                            <SideBySide content={
+                                <>
+                                    <h4>Init Bonus: </h4>
+                                    <input
+                                        type="number"
+                                        value={initBonus}
+                                        onChange={onInitBonusChange}
+                                        placeholder="..."
+                                        className="form-control"
+                                        style={{ maxWidth: '75px' }}
+                                    />
+                                </>
+                            } />
+                        </div>
+                        <div className='basic-container'>
+                            <SideBySide content={
+                                <>
+                                    <h4>Speed: </h4>
+                                    <input
+                                        type="number"
+                                        min='0'
+                                        step='5'
+                                        value={speed}
+                                        onChange={onSpeedChange}
+                                        placeholder="..."
+                                        className="form-control"
+                                        style={{ maxWidth: '75px' }}
+                                    />
+                                    <h5>ft.</h5>
+                                </>
+                            } />
+                        </div>
+                    </>
+                } />
             </>
-        )
+        );
     }
-
-
 
     // Skills
     const [Acrobatics, setAcrobatics] = useState(false); //Acrobatics
@@ -1143,175 +1290,176 @@ function CharacterInput({ onReload }) {
     const onSurvivalChange = (e) => {
         setSurvival(e.target.checked);
     };
-
     function SkillsInput() {
         return (
-            <div className='basic-container'>
-                <h3>Skills: </h3>
-                <div className="btn-group-vertical" data-toggle="buttons">
-                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <input
-                            type="checkbox"
-                            autoComplete="off"
-                            checked={Acrobatics}
-                            onChange={onAcrobaticsChange}
-                        /> Acrobatics (DEX)<ModifierText stat={DEX} prof={Acrobatics} />
-                    </label>
+            <BasicCon margin={2.5} content={
+                <>
+                    <h3>Skills: </h3>
+                    <div className="btn-group-vertical" data-toggle="buttons" style={{ width: '100%' }}>
+                        <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <input
+                                type="checkbox"
+                                autoComplete="off"
+                                checked={Acrobatics}
+                                onChange={onAcrobaticsChange}
+                            /> Acrobatics (DEX)<ModifierText stat={DEX} prof={Acrobatics} />
+                        </label>
 
-                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <input
-                            type="checkbox"
-                            autoComplete="off"
-                            checked={AnimalHandling}
-                            onChange={onAnimalHandlingChange}
-                        /> Animal Handling (WIS)<ModifierText stat={WIS} prof={AnimalHandling} />
-                    </label>
+                        <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <input
+                                type="checkbox"
+                                autoComplete="off"
+                                checked={AnimalHandling}
+                                onChange={onAnimalHandlingChange}
+                            /> Animal Handling (WIS)<ModifierText stat={WIS} prof={AnimalHandling} />
+                        </label>
 
-                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <input
-                            type="checkbox"
-                            autoComplete="off"
-                            checked={Arcana}
-                            onChange={onArcanaChange}
-                        /> Arcana (INT)<ModifierText stat={INT} prof={Arcana} />
-                    </label>
+                        <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <input
+                                type="checkbox"
+                                autoComplete="off"
+                                checked={Arcana}
+                                onChange={onArcanaChange}
+                            /> Arcana (INT)<ModifierText stat={INT} prof={Arcana} />
+                        </label>
 
-                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <input
-                            type="checkbox"
-                            autoComplete="off"
-                            checked={Athletics}
-                            onChange={onAthleticsChange}
-                        /> Athletics (STR)<ModifierText stat={STR} prof={Athletics} />
-                    </label>
+                        <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <input
+                                type="checkbox"
+                                autoComplete="off"
+                                checked={Athletics}
+                                onChange={onAthleticsChange}
+                            /> Athletics (STR)<ModifierText stat={STR} prof={Athletics} />
+                        </label>
 
-                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <input
-                            type="checkbox"
-                            autoComplete="off"
-                            checked={Deception}
-                            onChange={onDeceptionChange}
-                        /> Deception (CHA)<ModifierText stat={CHA} prof={Deception} />
-                    </label>
+                        <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <input
+                                type="checkbox"
+                                autoComplete="off"
+                                checked={Deception}
+                                onChange={onDeceptionChange}
+                            /> Deception (CHA)<ModifierText stat={CHA} prof={Deception} />
+                        </label>
 
-                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <input
-                            type="checkbox"
-                            autoComplete="off"
-                            checked={History}
-                            onChange={onHistoryChange}
-                        /> History (INT)<ModifierText stat={INT} prof={History} />
-                    </label>
+                        <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <input
+                                type="checkbox"
+                                autoComplete="off"
+                                checked={History}
+                                onChange={onHistoryChange}
+                            /> History (INT)<ModifierText stat={INT} prof={History} />
+                        </label>
 
-                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <input
-                            type="checkbox"
-                            autoComplete="off"
-                            checked={Insight}
-                            onChange={onInsightChange}
-                        /> Insight (WIS)<ModifierText stat={WIS} prof={Insight} />
-                    </label>
+                        <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <input
+                                type="checkbox"
+                                autoComplete="off"
+                                checked={Insight}
+                                onChange={onInsightChange}
+                            /> Insight (WIS)<ModifierText stat={WIS} prof={Insight} />
+                        </label>
 
-                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <input
-                            type="checkbox"
-                            autoComplete="off"
-                            checked={Intimidation}
-                            onChange={onIntimidationChange}
-                        /> Intimidation (CHA)<ModifierText stat={CHA} prof={Intimidation} />
-                    </label>
+                        <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <input
+                                type="checkbox"
+                                autoComplete="off"
+                                checked={Intimidation}
+                                onChange={onIntimidationChange}
+                            /> Intimidation (CHA)<ModifierText stat={CHA} prof={Intimidation} />
+                        </label>
 
-                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <input
-                            type="checkbox"
-                            autoComplete="off"
-                            checked={Investigation}
-                            onChange={onInvestigationChange}
-                        /> Investigation (INT)<ModifierText stat={INT} prof={Investigation} />
-                    </label>
+                        <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <input
+                                type="checkbox"
+                                autoComplete="off"
+                                checked={Investigation}
+                                onChange={onInvestigationChange}
+                            /> Investigation (INT)<ModifierText stat={INT} prof={Investigation} />
+                        </label>
 
-                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <input
-                            type="checkbox"
-                            autoComplete="off"
-                            checked={Medicine}
-                            onChange={onMedicineChange}
-                        /> Medicine (WIS)<ModifierText stat={WIS} prof={Medicine} />
-                    </label>
+                        <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <input
+                                type="checkbox"
+                                autoComplete="off"
+                                checked={Medicine}
+                                onChange={onMedicineChange}
+                            /> Medicine (WIS)<ModifierText stat={WIS} prof={Medicine} />
+                        </label>
 
-                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <input
-                            type="checkbox"
-                            autoComplete="off"
-                            checked={Nature}
-                            onChange={onNatureChange}
-                        /> Nature (INT)<ModifierText stat={INT} prof={Nature} />
-                    </label>
+                        <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <input
+                                type="checkbox"
+                                autoComplete="off"
+                                checked={Nature}
+                                onChange={onNatureChange}
+                            /> Nature (INT)<ModifierText stat={INT} prof={Nature} />
+                        </label>
 
-                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <input
-                            type="checkbox"
-                            autoComplete="off"
-                            checked={Perception}
-                            onChange={onPerceptionChange}
-                        /> Perception (WIS)<ModifierText stat={WIS} prof={Perception} />
-                    </label>
+                        <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <input
+                                type="checkbox"
+                                autoComplete="off"
+                                checked={Perception}
+                                onChange={onPerceptionChange}
+                            /> Perception (WIS)<ModifierText stat={WIS} prof={Perception} />
+                        </label>
 
-                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <input
-                            type="checkbox"
-                            autoComplete="off"
-                            checked={Performance}
-                            onChange={onPerformanceChange}
-                        /> Performance (CHA)<ModifierText stat={CHA} prof={Performance} />
-                    </label>
+                        <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <input
+                                type="checkbox"
+                                autoComplete="off"
+                                checked={Performance}
+                                onChange={onPerformanceChange}
+                            /> Performance (CHA)<ModifierText stat={CHA} prof={Performance} />
+                        </label>
 
-                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <input
-                            type="checkbox"
-                            autoComplete="off"
-                            checked={Persuasion}
-                            onChange={onPersuasionChange}
-                        /> Persuasion (CHA)<ModifierText stat={CHA} prof={Persuasion} />
-                    </label>
+                        <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <input
+                                type="checkbox"
+                                autoComplete="off"
+                                checked={Persuasion}
+                                onChange={onPersuasionChange}
+                            /> Persuasion (CHA)<ModifierText stat={CHA} prof={Persuasion} />
+                        </label>
 
-                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <input
-                            type="checkbox"
-                            autoComplete="off"
-                            checked={Religion}
-                            onChange={onReligionChange}
-                        /> Religion (INT)<ModifierText stat={INT} prof={Religion} />
-                    </label>
+                        <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <input
+                                type="checkbox"
+                                autoComplete="off"
+                                checked={Religion}
+                                onChange={onReligionChange}
+                            /> Religion (INT)<ModifierText stat={INT} prof={Religion} />
+                        </label>
 
-                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <input
-                            type="checkbox"
-                            autoComplete="off"
-                            checked={SleightOfHand}
-                            onChange={onSleightOfHandChange}
-                        /> Sleight of Hand (DEX)<ModifierText stat={DEX} prof={SleightOfHand} />
-                    </label>
+                        <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <input
+                                type="checkbox"
+                                autoComplete="off"
+                                checked={SleightOfHand}
+                                onChange={onSleightOfHandChange}
+                            /> Sleight of Hand (DEX)<ModifierText stat={DEX} prof={SleightOfHand} />
+                        </label>
 
-                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <input
-                            type="checkbox"
-                            autoComplete="off"
-                            checked={Stealth}
-                            onChange={onStealthChange}
-                        /> Stealth (DEX)<ModifierText stat={DEX} prof={Stealth} />
-                    </label>
+                        <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <input
+                                type="checkbox"
+                                autoComplete="off"
+                                checked={Stealth}
+                                onChange={onStealthChange}
+                            /> Stealth (DEX)<ModifierText stat={DEX} prof={Stealth} />
+                        </label>
 
-                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <input
-                            type="checkbox"
-                            autoComplete="off"
-                            checked={Survival}
-                            onChange={onSurvivalChange}
-                        /> Survival (WIS)<ModifierText stat={WIS} prof={Survival} />
-                    </label>
-                </div>
-            </div>
+                        <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <input
+                                type="checkbox"
+                                autoComplete="off"
+                                checked={Survival}
+                                onChange={onSurvivalChange}
+                            /> Survival (WIS)<ModifierText stat={WIS} prof={Survival} />
+                        </label>
+                    </div>
+                </>
+            } />
         );
     }
 
@@ -1340,62 +1488,63 @@ function CharacterInput({ onReload }) {
     const onCHAThrowChange = (e) => {
         setCHAThrow(e.target.checked);
     };
-
     function SavingThrowsInput() {
         return (
-            <div className='basic-container saving-throws'>
-                <h3>Saving Throws: </h3>
-                <div className="btn-group-vertical" data-toggle="buttons">
-                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <input
-                            type="checkbox"
-                            autoComplete="off"
-                            checked={STRThrow}
-                            onChange={onSTRThrowChange}
-                        /> STR <ModifierText stat={STR} prof={STRThrow} />
-                    </label>
-                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <input
-                            type="checkbox"
-                            autoComplete="off"
-                            checked={DEXThrow}
-                            onChange={onDEXThrowChange}
-                        /> DEX <ModifierText stat={DEX} prof={DEXThrow} />
-                    </label>
-                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <input
-                            type="checkbox"
-                            autoComplete="off"
-                            checked={CONThrow}
-                            onChange={onCONThrowChange}
-                        /> CON <ModifierText stat={CON} prof={CONThrow} />
-                    </label>
-                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <input
-                            type="checkbox"
-                            autoComplete="off"
-                            checked={INTThrow}
-                            onChange={onINTThrowChange}
-                        /> INT <ModifierText stat={INT} prof={INTThrow} />
-                    </label>
-                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <input
-                            type="checkbox"
-                            autoComplete="off"
-                            checked={WISThrow}
-                            onChange={onWISThrowChange}
-                        /> WIS <ModifierText stat={WIS} prof={WISThrow} />
-                    </label>
-                    <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <input
-                            type="checkbox"
-                            autoComplete="off"
-                            checked={CHAThrow}
-                            onChange={onCHAThrowChange}
-                        /> CHA <ModifierText stat={CHA} prof={CHAThrow} />
-                    </label>
-                </div>
-            </div>
+            <BasicCon margin={2.5} content={
+                <>
+                    <h3>Saving Throws: </h3>
+                    <div className="btn-group-vertical" data-toggle="buttons" style={{ width: '100%' }}>
+                        <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <input
+                                type="checkbox"
+                                autoComplete="off"
+                                checked={STRThrow}
+                                onChange={onSTRThrowChange}
+                            /> STR <ModifierText stat={STR} prof={STRThrow} />
+                        </label>
+                        <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <input
+                                type="checkbox"
+                                autoComplete="off"
+                                checked={DEXThrow}
+                                onChange={onDEXThrowChange}
+                            /> DEX <ModifierText stat={DEX} prof={DEXThrow} />
+                        </label>
+                        <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <input
+                                type="checkbox"
+                                autoComplete="off"
+                                checked={CONThrow}
+                                onChange={onCONThrowChange}
+                            /> CON <ModifierText stat={CON} prof={CONThrow} />
+                        </label>
+                        <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <input
+                                type="checkbox"
+                                autoComplete="off"
+                                checked={INTThrow}
+                                onChange={onINTThrowChange}
+                            /> INT <ModifierText stat={INT} prof={INTThrow} />
+                        </label>
+                        <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <input
+                                type="checkbox"
+                                autoComplete="off"
+                                checked={WISThrow}
+                                onChange={onWISThrowChange}
+                            /> WIS <ModifierText stat={WIS} prof={WISThrow} />
+                        </label>
+                        <label className='btn btn-outline-dark' style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <input
+                                type="checkbox"
+                                autoComplete="off"
+                                checked={CHAThrow}
+                                onChange={onCHAThrowChange}
+                            /> CHA <ModifierText stat={CHA} prof={CHAThrow} />
+                        </label>
+                    </div>
+                </>
+            } />
         );
     }
 
@@ -1410,46 +1559,46 @@ function CharacterInput({ onReload }) {
         // Clear Actions Fields
         resetActions();
     }
-
     function ActionsInput() {
         return (
             <>
-                <div className='basic-container'>
-                    <h3>Add Actions:</h3>
-                    <SideBySide content={
-                        <>
-                            <h4>Action type:</h4>
-                            <select id="actionType" value={actionType} onChange={onActionTypeChange}>
-                                <option value="">Choose...</option>
-                                <option value="Attack">Attack</option>
-                                <option value="Spell">Spell</option>
-                                <option value="Legendary">Legendary</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </>
-                    } />
-                    {actionType === 'Attack' ? (
-                        <AttackInput onAddAttack={onAddAttack} />
-                    ) : null}
-                    {actionType === 'Spell' ? (
-                        <SpellInput onAddSpell={onAddSpell} />
-                    ) : null}
-                    {actionType === 'Other' ? (
-                        <OtherActionInput onAddAction={onAddAction} />
-                    ) : null}
+                <BasicCon margin={2.5} content={
+                    <>
+                        <h3>Add Actions:</h3>
+                        <SideBySide content={
+                            <>
+                                <h4>Action type:</h4>
+                                <select id="actionType" value={actionType} onChange={onActionTypeChange}>
+                                    <option value="">Choose...</option>
+                                    <option value="Attack">Attack</option>
+                                    <option value="Spell">Spell</option>
+                                    <option value="Legendary">Legendary</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </>
+                        } />
+                        {actionType === 'Attack' ? (
+                            <AttackInput onAddAttack={onAddAttack} />
+                        ) : null}
+                        {actionType === 'Spell' ? (
+                            <SpellInput onAddSpell={onAddSpell} />
+                        ) : null}
+                        {actionType === 'Other' ? (
+                            <OtherActionInput onAddAction={onAddAction} />
+                        ) : null}
 
 
-                    {actions.length >= 1 ? (
-                        <>
-                            <HorizLine />
-                            <DisplayActions />
-                        </>
-                    ) : (<></>)}
-                </div>
+                        {actions.length >= 1 ? (
+                            <>
+                                <HorizLine />
+                                <DisplayActions />
+                            </>
+                        ) : (<></>)}
+                    </>
+                } />
             </>
         );
     }
-
     function DisplayActions() {
         return (
             <div>
@@ -1491,7 +1640,7 @@ function CharacterInput({ onReload }) {
     const onSenseValueChange = (e) => {
         setSenseValue(e.target.value);
     }
-    const [senseRange, setSenseRange] = useState('');
+    const [senseRange, setSenseRange] = useState('5');
     const onSenseRangeChange = (e) => {
         setSenseRange(e.target.value);
     }
@@ -1502,7 +1651,6 @@ function CharacterInput({ onReload }) {
         setSenseRange('');
         setSenseValue('');
     }
-
     function DisplaySenses() {
         return (
             <div>
@@ -1512,36 +1660,38 @@ function CharacterInput({ onReload }) {
             </div>
         );
     }
-
     function SensesInput() {
         return (
-            <div className='basic-container'>
-                <SideBySide content={
-                    <>
-                        <h4>Add Sense: </h4>
-                        <select id="sense" value={senseValue} onChange={onSenseValueChange}>
-                            <option value="">Choose...</option>
-                            <option value="Blindsight">Blindsight</option>
-                            <option value="Darkvision">Darkvision</option>
-                            <option value="Tremorsense">Tremorsense</option>
-                            <option value="Truesight">Truesight</option>
-                        </select>
-                        <h5>Range: </h5>
-                        <input
-                            type="number"
-                            step='5'
-                            value={senseRange}
-                            onChange={onSenseRangeChange}
-                            placeholder="..."
-                            className="form-control"
-                            style={{ maxWidth: '100px' }}
-                        />
-                        <h5>ft.</h5>
-                        <button className='btn btn-success' onClick={onSensesChange}>Add</button>
-                    </>
-                } />
-                <DisplaySenses />
-            </div>
+            <BasicCon margin={2.5} content={
+                <>
+                    <SideBySide content={
+                        <>
+                            <h4>Add Sense: </h4>
+                            <select id="sense" value={senseValue} onChange={onSenseValueChange}>
+                                <option value="">Choose...</option>
+                                <option value="Blindsight">Blindsight</option>
+                                <option value="Darkvision">Darkvision</option>
+                                <option value="Tremorsense">Tremorsense</option>
+                                <option value="Truesight">Truesight</option>
+                            </select>
+                            <h5>Range: </h5>
+                            <input
+                                type="number"
+                                step='5'
+                                min='5'
+                                value={senseRange}
+                                onChange={onSenseRangeChange}
+                                placeholder="..."
+                                className="form-control"
+                                style={{ maxWidth: '75px' }}
+                            />
+                            <h5>ft.</h5>
+                            <button className='btn btn-success' onClick={onSensesChange}>Add</button>
+                        </>
+                    } />
+                    <DisplaySenses />
+                </>
+            } />
         );
     }
 
@@ -1550,31 +1700,40 @@ function CharacterInput({ onReload }) {
     const onImgUrlChange = (e) => {
         setImgUrl(e.target.value);
     }
-
     function ImageInput() {
         return (
-            <div className='basic-container'>
-                <h5>Character Image Url: </h5>
-                <input
-                    type="text"
-                    value={imgUrl}
-                    onChange={onImgUrlChange}
-                    placeholder="Image link"
-                    className="form-control"
-                    style={{ maxWidth: '400px' }}
-                />
-                <p style={{ maxWidth: '250px' }}>Images can only be added via url due to the limitations of browser local storage.</p>
-                <p style={{ maxWidth: '250px' }}>It's easier if you copy/paste.</p>
-                <p style={{ maxWidth: '250px' }}>Preview:</p>
-                {imgUrl !== '' ?
-                    <img src={imgUrl} className='img-fluid rounded' style={{ maxHeight: '270px', maxWidth: '250px' }} />
-                    : <p><em>(none)</em></p>
-                }
-            </div>
+            <BasicCon margin={2.5} content={
+                <>
+                    <h5>Character Image Url: </h5>
+                    <input
+                        type="text"
+                        value={imgUrl}
+                        onChange={onImgUrlChange}
+                        placeholder="Image link"
+                        className="form-control"
+                        style={{ maxWidth: '400px' }}
+                    />
+                    <p style={{ maxWidth: '250px' }}>Images can only be added via url due to the limitations of browser local storage.</p>
+                    <p style={{ maxWidth: '250px' }}>It's easier if you copy/paste.</p>
+                    <p style={{ maxWidth: '250px' }}>Preview:</p>
+                    {imgUrl !== '' ?
+                        <img src={imgUrl !== '' ? imgUrl : null} className='img-fluid rounded' style={{ maxHeight: '270px', maxWidth: '250px' }} />
+                        : <p><em>(none)</em></p>
+                    }
+                </>
+            } />
         );
     }
 
+    // Note
+    const [note, setNote] = useState('');
 
+    // JSON Input
+    const [jsonInput, setJsonInput] = useState('');
+    function onJsonAdd() {
+        const data = JSON.parse(jsonInput);
+        saveCharacterData(data);
+    }
 
     // Util functions
     function getMod(statNum, bonus = 0) {
@@ -1657,11 +1816,98 @@ function CharacterInput({ onReload }) {
         onReload();
     }
 
-    function saveCharacterData() {
+    function saveCharacterData(data = null) {
         const charData = {};
 
+        if (data) {
+
+            // General Info
+            charData['name'] = (data.name);
+            charData['level'] = data.level;
+            charData['meta'] = (
+                (data?.race ? (data.race) : '') +
+                (data?.class ? (' ' + data.class) : '') +
+                (data?.alignment ? (', ' + data.alignment) : '')
+            );
+            charData['xp'] = data.xp;
+            charData['isPlayer'] = data.isPlayer;
+            charData['isNPC'] = data.isNPC;
+
+            // Stats
+            charData['STR'] = data.STR;
+            charData['STR_mod'] = ('(' + (getMod(data.STR) >= 0 ? ('+' + getMod(data.STR)) : getMod(data.STR)) + ')');
+            charData['DEX'] = data.DEX;
+            charData['DEX_mod'] = ('(' + (getMod(data.DEX) >= 0 ? ('+' + getMod(data.DEX)) : getMod(data.DEX)) + ')');
+            charData['CON'] = data.CON;
+            charData['CON_mod'] = ('(' + (getMod(data.CON) >= 0 ? ('+' + getMod(data.CON)) : getMod(data.CON)) + ')');
+            charData['INT'] = data.INT;
+            charData['INT_mod'] = ('(' + (getMod(data.INT) >= 0 ? ('+' + getMod(data.INT)) : getMod(data.INT)) + ')');
+            charData['WIS'] = data.WIS;
+            charData['WIS_mod'] = ('(' + (getMod(data.WIS) >= 0 ? ('+' + getMod(data.WIS)) : getMod(data.WIS)) + ')');
+            charData['CHA'] = data.CHA;
+            charData['CHA_mod'] = ('(' + (getMod(data.CHA) >= 0 ? ('+' + getMod(data.CHA)) : getMod(data.CHA)) + ')');
+
+            // Combat
+            charData['profBonus'] = data.profBonus;
+            charData['hp'] = data.hp;
+            charData['ac'] = data.ac;
+            charData['initBonus'] = data.initBonus;
+            charData['Speed'] = (data.speed + 'ft.');
+
+            // Skills
+            charData['Skills'] = (
+                (Acrobatics ? ('Acrobatics +(' + getMod(data.DEX, data.profBonus).toString() + '), ') : '') +
+                (AnimalHandling ? ('Animal Handling +(' + getMod(data.WIS, data.profBonus).toString() + '), ') : '') +
+                (Arcana ? ('Arcana +(' + getMod(data.INT, data.profBonus).toString() + '), ') : '') +
+                (Athletics ? ('Athletics +(' + getMod(data.STR, data.profBonus).toString() + '), ') : '') +
+                (Deception ? ('Deception +(' + getMod(data.CHA, data.profBonus).toString() + '), ') : '') +
+                (History ? ('History +(' + getMod(data.INT, data.profBonus).toString() + '), ') : '') +
+                (Insight ? ('Insight +(' + getMod(data.WIS, data.profBonus).toString() + '), ') : '') +
+                (Intimidation ? ('Intimidation +(' + getMod(data.CHA, data.profBonus).toString() + '), ') : '') +
+                (Investigation ? ('Investigation +(' + getMod(data.INT, data.profBonus).toString() + '), ') : '') +
+                (Medicine ? ('Medicine +(' + getMod(data.WIS, data.profBonus).toString() + '), ') : '') +
+                (Nature ? ('Nature +(' + getMod(data.INT, data.profBonus).toString() + '), ') : '') +
+                (Perception ? ('Perception +(' + getMod(data.WIS, data.profBonus).toString() + '), ') : '') +
+                (Persuasion ? ('Persuasion +(' + getMod(data.CHA, data.profBonus).toString() + '), ') : '') +
+                (Religion ? ('Religion +(' + getMod(data.INT, data.profBonus).toString() + '), ') : '') +
+                (SleightOfHand ? ('Sleight of Hand +(' + getMod(data.DEX, data.profBonus).toString() + '), ') : '') +
+                (Stealth ? ('Stealth +(' + getMod(data.DEX, data.profBonus).toString() + '), ') : '') +
+                (Survival ? ('Survival +(' + getMod(data.WIS, data.profBonus).toString() + ')') : '')
+            );
+
+            // Saving Throws
+            charData["Saving Throws"] = (
+                (STRThrow ? ('STR +(' + getMod(data.STR, data.profBonus).toString() + '), ') : '') +
+                (DEXThrow ? ('DEX +(' + getMod(data.DEX, data.profBonus).toString() + '), ') : '') +
+                (CONThrow ? ('CON +(' + getMod(data.CON, data.profBonus).toString() + '), ') : '') +
+                (INTThrow ? ('INT +(' + getMod(data.INT, data.profBonus).toString() + '), ') : '') +
+                (WISThrow ? ('WIS +(' + getMod(data.WIS, data.profBonus).toString() + '), ') : '') +
+                (CHAThrow ? ('CHA +(' + getMod(data.CHA, data.profBonus).toString() + ')') : '')
+            );
+
+            // Actions
+            charData["Actions"] = data.actions
+
+            // Languages
+            charData['Languages'] = data.Languages;
+
+            // Senses
+            charData["Senses"] = data.Senses;
+
+            // Image
+            charData['img_url'] = data['img_url'];
+
+            // Note
+            charData['note'] = data.note;
+
+            // Save to local storage
+            storage.saveChar(charData);
+            onReload();
+        }
+
+
         // General Info
-        charData['name'] = (generalInfo.name);
+        charData['name'] = generalInfo.name;
         charData['level'] = generalInfo.level;
         charData['meta'] = (
             (generalInfo?.race ? (generalInfo.race) : '') +
@@ -1751,18 +1997,20 @@ function CharacterInput({ onReload }) {
         // Image
         charData['img_url'] = imgUrl;
 
+        // Note
+        charData['note'] = note;
+
         // Save to local storage
         storage.saveChar(charData);
         onReload();
+
     }
 
-
-
     // Body
-
     return (
         <div className='character-input'>
             <div className='row' style={{ display: 'grid', gridTemplateColumns: '1fr auto' }}>
+
                 <div className='col'>
                     <SideBySide gap={20} content={
                         <>
@@ -1778,8 +2026,8 @@ function CharacterInput({ onReload }) {
                             <p>Characters will be stored in your system's local storage.</p>
                         </>
                     } />
-
                 </div>
+
                 <div className='col' style={{ alignContent: 'center' }}>
                     <button
                         className='btn btn-success'
@@ -1796,7 +2044,9 @@ function CharacterInput({ onReload }) {
                         Clear All
                     </button>
                 </div>
+
             </div>
+
             <div className='row'>
                 <HorizLine />
             </div>
@@ -1807,8 +2057,8 @@ function CharacterInput({ onReload }) {
                     <div className='col' style={{ margin: '2.5px' }}>
                         <GeneralInfoinput onAddGeneralInfo={onAddGeneralInfo} />
                         <StatsInputTable />
-                        <SensesInput />
                         <LanguageInput data={languages} onAddLanguage={onAddLanguage} />
+                        <NoteInput value={note} onChange={setNote} />
                     </div>
                     {/* 2nd column */}
                     <div className='col' style={{ margin: '2.5px' }}>
@@ -1819,17 +2069,17 @@ function CharacterInput({ onReload }) {
                             </>
                         } />
                         <ActionsInput />
-
-
+                        <SensesInput />
+                        <div style={{ margin: '10px' }}>
+                            <HorizLine thickness={5} />
+                        </div>
+                        <JsonInput value={jsonInput} onChange={setJsonInput} onAdd={onJsonAdd} />
                     </div>
                     {/* 3rd column */}
                     <div className='col' style={{ margin: '2.5px' }}>
                         <SkillsInput />
                         <ImageInput />
                     </div>
-
-
-
                 </div>
             </div>
         </div>
@@ -1842,14 +2092,25 @@ function CharacterDataPage() {
         document.title = "dmT: Character Data";
     }, []);
 
+    // Page reload
     const [reloadKey, setReloadKey] = useState(0);
     function handleReload() {
         setReloadKey(prevKey => prevKey + 1);
     }
 
-    const chars = (storage.retrieve('charData') ? JSON.parse((storage.retrieve('charData'))).chars : null);
-    console.log('CharacterDataPage.js: charData retrieved. Data: ');
-    tools.prettyLogJson(chars)
+    // Data Retrieval 
+    const [chars, setChars] = useState(null);
+    // Sync with localStorage on mount/reload
+    useEffect(() => {
+        const data = storage.retrieve('charData');
+        if (data) {
+            setChars(data.chars);
+            console.log("CharacterDataPage.js: 'charData' retrieved. Data: ");
+            tools.prettyLog(chars, 'Character Data');
+        }
+        else setChars(null);
+    }, [reloadKey]); // Re-run when reloadKey changes
+
 
     function DisplayChars() {
         return (

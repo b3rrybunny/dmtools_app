@@ -1,4 +1,4 @@
-import * as tools from '../components/tools';
+import * as tools from './tools';
 
 const BASE_URL = "https://www.dnd5eapi.co";
 

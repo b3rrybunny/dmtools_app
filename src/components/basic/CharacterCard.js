@@ -11,7 +11,7 @@ import ACBlock from '../basic/ACBlock';
 import HorizLine from '../basic/HorizontalLine';
 import SideBySide from '../basic/SideBySide';
 import BasicCon from '../basic/BasicContainer';
-import * as tools from '../tools';
+import * as tools from '../../scripts/tools';
 import * as dice from '../../scripts/dice';
 // Data
 import rawMonstersData from '../../data/srd_5e_monsters.json';
@@ -86,6 +86,22 @@ function CharacterCard({ data }) {
         }
     }
 
+    const [isCopied, setIsCopied] = useState(false);
+    function copyJson(){
+        const string = JSON.stringify(data);
+        const copyToClipboard = () => {
+            navigator.clipboard.writeText(string)
+                .then(() => {
+                    setIsCopied(true);
+                    setTimeout(() => setIsCopied(false), 5000); // Reset after 5 seconds
+                })
+                .catch(err => {
+                    console.error('Failed to copy text: ', err);
+                });
+        };
+        copyToClipboard();
+    }
+
     return (
         <div className='character-card'>
             <BasicCon content={
@@ -104,14 +120,14 @@ function CharacterCard({ data }) {
                         </div>
                         {/* Buttons */}
                         <div className='col'>
-
+                            <button className='btn btn-primary' onClick={copyJson}>{isCopied ? 'Copied!' : 'Copy character JSON to clipboard'}</button>
                         </div>
                     </div>
                     <HorizLine />
                     {/* Body */}
                     <div className='row' style={{ width: '100%', display: 'grid', gridTemplateColumns: 'auto 1fr 1fr' }}>
                         <div className='col' style={{ alignContent: 'center' }}>
-                            <img src={data.img_url} className='img-fluid rounded' style={{ maxWidth: '250px', border: '2px solid black' }} />
+                            <img src={data.img_url !== '' ? data.img_url : null} className='img-fluid rounded' style={{ maxWidth: '250px', border: '2px solid black' }} />
                         </div>
                         <div className='col'>
                             <SideBySide content={
@@ -159,7 +175,7 @@ function CharacterCard({ data }) {
                                     <h5>Languages: {data.Languages}</h5>
                                 } />
                             } />
-
+                            <p style={{textAlign: 'left'}}><strong>Note:</strong> {data.note}</p>
                             
                         </div>
                         <div className='col'>

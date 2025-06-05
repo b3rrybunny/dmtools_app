@@ -4,7 +4,7 @@
     align-items: center;
     text-align: center;
     height: auto;
-    width: fit-content;
+    width: auto;
 }
 
 .hp-block h4 {

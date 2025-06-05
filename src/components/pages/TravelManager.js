@@ -575,51 +575,48 @@ function TravelManager() {
 
     function TravelControl() {
         return (
-            <>
-                <div className='row' style={{ justifyContent: 'center' }}>
-                    <BasicCon content={
+            <SideBySide justify='space-between' content={
+                <>
+                    <button className='btn btn-danger btn-lg' onClick={onGoBack}>&lt; Go back</button>
+
+                    <SideBySide content={
                         <>
-                            <SideBySide justify='center' content={
-                                <>
-                                    <button className='btn btn-danger btn-lg' onClick={onGoBack}>&lt; Go back</button>
-                                    <button className='btn btn-success btn-lg' onClick={onAdvance}>Advance &gt;</button>
-                                </>
-                            } />
-                            <SideBySide content={
-                                <>
-                                    <h4>Distance to travel: </h4>
-                                    <input
-                                        type='number'
-                                        min='1'
-                                        value={maxDist}
-                                        onChange={onMaxDistChange}
-                                        className='form-control'
-                                        style={{ maxWidth: '75px' }}
-                                    />
-                                    <h4>miles</h4>
-                                </>
-                            } />
-                            <SideBySide content={
-                                <>
-                                    <h4>Set pace: </h4>
-                                    <select id="pace" value={pace} onChange={onPaceChange}>
-                                        <option value={2}>Slow (2 mph)</option>
-                                        <option value={3}>Normal (3 mph)</option>
-                                        <option value={4}>Fast (4 mph)</option>
-                                    </select>
-                                    {/* Pace text */}
-                                    {
-                                        pace === 4 ? <p>-5 penalty to Passive Perception</p> :
-                                            pace === 3 ? null :
-                                                pace === 2 ? <p>Able to use Stealth</p> :
-                                                    null
-                                    }
-                                </>
-                            } />
+                            <h4>Distance to travel: </h4>
+                            <input
+                                type='number'
+                                min='1'
+                                value={maxDist}
+                                onChange={onMaxDistChange}
+                                className='form-control'
+                                style={{ maxWidth: '75px' }}
+                            />
+                            <h4>miles</h4>
                         </>
                     } />
-                </div>
-            </>
+                    <SideBySide content={
+                        <>
+                            <h4>Set pace: </h4>
+                            <select id="pace" value={pace} onChange={onPaceChange}>
+                                <option value={2}>Slow (2 mph)</option>
+                                <option value={3}>Normal (3 mph)</option>
+                                <option value={4}>Fast (4 mph)</option>
+                            </select>
+                            {/* Pace text */}
+                            {
+                                pace === 4 ? <p>-5 penalty to Passive Perception</p> :
+                                    pace === 3 ? null :
+                                        pace === 2 ? <p>Able to use Stealth</p> :
+                                            null
+                            }
+                        </>
+                    } />
+
+                    <button className='btn btn-success btn-lg' onClick={onAdvance}>Advance &gt;</button>
+                </>
+            } />
+
+
+
         );
     }
 
@@ -729,7 +726,7 @@ function TravelManager() {
     }
 
     // JSON Add
-    function onAddJsonData (jsonData) {
+    function onAddJsonData(jsonData) {
         const data = JSON.parse(jsonData);
         setDistTraveled(data.distTraveled);
         setMaxDist(data.maxDist);
@@ -743,19 +740,21 @@ function TravelManager() {
         <div className='travel-manager'>
             <div className='justify-content-center mb-2'>
                 <BasicCon content={
-                    <ProgressBar
-                        value={distTraveled}
-                        max={maxDist}
-                        height={20}
-                        fillColor="#2196F3"
-                        animated={true}
-                        showRemainingDistance={true}
-                        unit=" miles"
-                    />
+                    <>
+                        <ProgressBar
+                            value={distTraveled}
+                            max={maxDist}
+                            height={20}
+                            fillColor="#2196F3"
+                            animated={true}
+                            showRemainingDistance={true}
+                            unit=" miles"
+                        />
+                        <TravelControl />
+                    </>
                 } />
             </div>
             <div className='row' style={{ display: 'grid', gridTemplateColumns: '1fr auto' }}>
-
                 <div className='col' style={{ height: '100%' }}>
                     <BasicCon height='100%' content={
                         <>
@@ -780,7 +779,6 @@ function TravelManager() {
                 </div>
 
                 <div className='col'>
-                    <TravelControl />
                     <EncounterInput
                         onAddEncounter={onAddEncounter}
                         onAddJsonData={onAddJsonData}

@@ -35,21 +35,15 @@
 
 
 table {
-    margin: 3px;
     background: #ffffffad;
     border: 2px solid #000000 !important;
-    width: 100%;
     backdrop-filter: blur(8px);
 }
 
 td {
     font-size: 20px;
     display: grid flex;
-    height: 100%;
     max-width: 50px;
-    border: 2px solid #000000 !important;
     text-align: center;
     justify-content: center;
-    justify-items: center;
-    align-items: center;
 }

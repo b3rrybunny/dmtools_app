@@ -11,6 +11,7 @@ import ACBlock from '../basic/ACBlock';
 import HorizLine from '../basic/HorizontalLine';
 import SideBySide from '../basic/SideBySide';
 import CharacterCard from '../basic/CharacterCard';
+import BasicCon from '../basic/BasicContainer';
 import * as tools from '../tools';
 import * as dice from '../../scripts/dice';
 // Data
@@ -423,260 +424,261 @@ function InputWindow({ onTestPopulate, onAutocompleteAdd, onManualAdd, onClear, 
         setNumToAdd(e.target.value);
     }
 
-
-
     return (
-        <div className="input-window" style={{ width: '100%' }}>
-            <div className='autocomplete-monster'>
-                <div className='side-by-side'>
-                    <h5 style={{ margin: '0' }}>Monster name: </h5>
-                    <div className="autocomplete" style={{ position: 'relative' }}>
-                        <input
-                            type="text"
-                            value={autoValue}
-                            onChange={handleInputChange}
-                            onFocus={() => autoValue && setShowSuggestions(true)}
-                            onBlur={handleBlur}
-                            placeholder="Start typing..."
-                            className="form-control"
-                        />
-                        {showSuggestions && suggestions.length > 0 && (
-                            <div
-                                className="autocomplete-items"
-                                style={{
-                                    position: 'absolute',
-                                    zIndex: 99,
-                                    top: '100%',
-                                    left: 0,
-                                    right: 0,
-                                    border: '1px solid #d4d4d4',
-                                    borderTop: 'none',
-                                    backgroundColor: 'white'
-                                }}
-                            >
-                                {suggestions.map((item, index) => (
-                                    <div
-                                        key={item.name + index}
-                                        onClick={() => handleSuggestionClick(item.name)}
-                                        style={{
-                                            padding: '10px',
-                                            cursor: 'pointer',
-                                            backgroundColor: '#fff',
-                                            borderBottom: '1px solid #d4d4d4'
-                                        }}
-                                        onMouseEnter={e => e.currentTarget.style.backgroundColor = '#e9e9e9'}
-                                        onMouseLeave={e => e.currentTarget.style.backgroundColor = '#fff'}
-                                    >
-                                        <div>
-                                            <strong>{item.name.substr(0, autoValue.length)}</strong>
-                                            {item.name.substr(autoValue.length)}
-                                        </div>
-                                        {/* Add Challenge text below the name */}
-                                        {item.Challenge && (
-                                            <div style={{ fontSize: '0.8em', color: '#666', marginTop: '4px' }}>
-                                                CR: {item.Challenge}
+        <BasicCon margin='2.5' content={
+            <>
+                <div className='autocomplete-monster'>
+                    <div className='side-by-side'>
+                        <h5 style={{ margin: '0' }}>Monster name: </h5>
+                        <div className="autocomplete" style={{ position: 'relative' }}>
+                            <input
+                                type="text"
+                                value={autoValue}
+                                onChange={handleInputChange}
+                                onFocus={() => autoValue && setShowSuggestions(true)}
+                                onBlur={handleBlur}
+                                placeholder="Start typing..."
+                                className="form-control"
+                            />
+                            {showSuggestions && suggestions.length > 0 && (
+                                <div
+                                    className="autocomplete-items"
+                                    style={{
+                                        position: 'absolute',
+                                        zIndex: 99,
+                                        top: '100%',
+                                        left: 0,
+                                        right: 0,
+                                        border: '1px solid #d4d4d4',
+                                        borderTop: 'none',
+                                        backgroundColor: 'white'
+                                    }}
+                                >
+                                    {suggestions.map((item, index) => (
+                                        <div
+                                            key={item.name + index}
+                                            onClick={() => handleSuggestionClick(item.name)}
+                                            style={{
+                                                padding: '10px',
+                                                cursor: 'pointer',
+                                                backgroundColor: '#fff',
+                                                borderBottom: '1px solid #d4d4d4'
+                                            }}
+                                            onMouseEnter={e => e.currentTarget.style.backgroundColor = '#e9e9e9'}
+                                            onMouseLeave={e => e.currentTarget.style.backgroundColor = '#fff'}
+                                        >
+                                            <div>
+                                                <strong>{item.name.substr(0, autoValue.length)}</strong>
+                                                {item.name.substr(autoValue.length)}
                                             </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+                                            {/* Add Challenge text below the name */}
+                                            {item.Challenge && (
+                                                <div style={{ fontSize: '0.8em', color: '#666', marginTop: '4px' }}>
+                                                    CR: {item.Challenge}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                        <input
+                            type="number"
+                            min='1'
+                            value={numToAdd}
+                            onChange={handleNumToAddChange}
+                            placeholder="#"
+                            className="form-control"
+                            style={{ width: '100px' }}
+                        />
+                        <select id="autoAdv" value={autoAdvSelected} onChange={handleAutoAdvChange}>
+                            <option value="">No Adv/Disadv</option>
+                            <option value="adv">Advantage</option>
+                            <option value="disadv">Disadvantage</option>
+                        </select>
+                        <button
+                            onClick={handleAutoAdd}
+                            className="btn btn-success"
+                        >
+                            Add Monster
+                        </button>
                     </div>
-                    <input
-                        type="number"
-                        min='1'
-                        value={numToAdd}
-                        onChange={handleNumToAddChange}
-                        placeholder="#"
-                        className="form-control"
-                        style={{ width: '100px' }}
-                    />
-                    <select id="autoAdv" value={autoAdvSelected} onChange={handleAutoAdvChange}>
-                        <option value="">No Adv/Disadv</option>
-                        <option value="adv">Advantage</option>
-                        <option value="disadv">Disadvantage</option>
-                    </select>
-                    <button
-                        onClick={handleAutoAdd}
-                        className="btn btn-success"
-                    >
-                        Add Monster
-                    </button>
+                    <SideBySide content={
+                        <>
+                            <hr style={{
+                                border: "2px solid #000000",
+                                margin: "20px 0",
+                                width: '100%'
+                            }} />
+                            <h5 style={{ margin: 0 }}>OR</h5>
+                            <hr style={{
+                                border: "2px solid #000000",
+                                margin: "20px 0",
+                                width: '100%'
+                            }} />
+                        </>
+                    } />
+
+
                 </div>
+
+                <div className='manual-add'>
+                    <div className='row'>
+                        <div className='col side-by-side'>
+                            <p>Name: </p>
+                            <input
+                                type="text"
+                                value={manualName}
+                                onChange={handleManualNameChange}
+                                placeholder="Start typing..."
+                                className="form-control"
+                            />
+                        </div>
+                        <div className='col side-by-side'>
+                            <p>❤ HP: </p>
+                            <input
+                                type="number"
+                                min='0'
+                                value={manualHP}
+                                onChange={handleManualHPChange}
+                                placeholder="♡"
+                                className="form-control"
+                                style={{ width: '100px' }}
+                            />
+                        </div>
+                        <div className='col side-by-side'>
+                            <p>⛊ AC: </p>
+                            <input
+                                type="number"
+                                value={manualAC}
+                                onChange={handleManualACChange}
+                                placeholder="⛉"
+                                className="form-control"
+                                style={{ width: '100px' }}
+                            />
+                        </div>
+                    </div>
+                    <div className='row mt-1'>
+                        <div className='col side-by-side'>
+                            <p>Init: </p>
+                            <input
+                                type="number"
+                                value={manualInit}
+                                onChange={handleManualInitChange}
+                                placeholder="..."
+                                className="form-control"
+                                style={{ width: '100px' }}
+                            />
+                            <p>Type: </p>
+                            <select id="autoAdv" value={manualType} onChange={handleManualTypeChange}>
+                                <option value="player">Player</option>
+                                <option value="NPC">NPC</option>
+                            </select>
+                        </div>
+                        <div className='col'>
+                            <button
+                                onClick={handleManualAdd}
+                                className="btn btn-success"
+                            >
+                                Add Combatant
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <HorizLine />
                 <SideBySide content={
                     <>
-                        <hr style={{
-                            border: "2px solid #000000",
-                            margin: "20px 0",
-                            width: '100%'
-                        }} />
-                        <h5 style={{ margin: 0 }}>OR</h5>
-                        <hr style={{
-                            border: "2px solid #000000",
-                            margin: "20px 0",
-                            width: '100%'
-                        }} />
-                    </>
-                } />
-
-
-            </div>
-
-            <div className='manual-add'>
-                <div className='row'>
-                    <div className='col side-by-side'>
-                        <p>Name: </p>
-                        <input
-                            type="text"
-                            value={manualName}
-                            onChange={handleManualNameChange}
-                            placeholder="Start typing..."
-                            className="form-control"
-                        />
-                    </div>
-                    <div className='col side-by-side'>
-                        <p>❤ HP: </p>
-                        <input
-                            type="number"
-                            min='0'
-                            value={manualHP}
-                            onChange={handleManualHPChange}
-                            placeholder="♡"
-                            className="form-control"
-                            style={{ width: '100px' }}
-                        />
-                    </div>
-                    <div className='col side-by-side'>
-                        <p>⛊ AC: </p>
-                        <input
-                            type="number"
-                            value={manualAC}
-                            onChange={handleManualACChange}
-                            placeholder="⛉"
-                            className="form-control"
-                            style={{ width: '100px' }}
-                        />
-                    </div>
-                </div>
-                <div className='row mt-1'>
-                    <div className='col side-by-side'>
-                        <p>Init: </p>
+                        <h5>Custom Character from storage: </h5>
+                        <div className="autocomplete" style={{ position: 'relative' }}>
+                            <input
+                                type="text"
+                                value={customName}
+                                onChange={handleCustomNameChange}
+                                onFocus={() => customName && setCustomShowSuggestions(true)}
+                                onBlur={handleCustomBlur}
+                                placeholder="Start typing..."
+                                className="form-control"
+                            />
+                            {showCustomSuggestions && customSuggestions.length > 0 && (
+                                <div
+                                    className="autocomplete-items"
+                                    style={{
+                                        position: 'absolute',
+                                        zIndex: 99,
+                                        top: '100%',
+                                        left: 0,
+                                        right: 0,
+                                        border: '1px solid #d4d4d4',
+                                        borderTop: 'none',
+                                        backgroundColor: 'white'
+                                    }}
+                                >
+                                    {customSuggestions.map((item, index) => (
+                                        <div
+                                            key={item.name + index}
+                                            onClick={() => handleCustomSuggestionClick(item.name)}
+                                            style={{
+                                                padding: '10px',
+                                                cursor: 'pointer',
+                                                backgroundColor: '#fff',
+                                                borderBottom: '1px solid #d4d4d4'
+                                            }}
+                                            onMouseEnter={e => e.currentTarget.style.backgroundColor = '#e9e9e9'}
+                                            onMouseLeave={e => e.currentTarget.style.backgroundColor = '#fff'}
+                                        >
+                                            <div>
+                                                <strong>{item.name.substr(0, customName.length)}</strong>
+                                                {item.name.substr(customName.length)}
+                                            </div>
+                                            {/* Add Challenge text below the name */}
+                                            {item.meta && (
+                                                <div style={{ fontSize: '0.8em', color: '#666', marginTop: '4px' }}>
+                                                    {item.meta}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                        <h5>Init: </h5>
                         <input
                             type="number"
-                            value={manualInit}
-                            onChange={handleManualInitChange}
+                            value={customInit}
+                            onChange={handleCustomInitChange}
                             placeholder="..."
                             className="form-control"
                             style={{ width: '100px' }}
                         />
-                        <p>Type: </p>
-                        <select id="autoAdv" value={manualType} onChange={handleManualTypeChange}>
-                            <option value="player">Player</option>
-                            <option value="NPC">NPC</option>
-                        </select>
-                    </div>
-                    <div className='col'>
-                        <button
-                            onClick={handleManualAdd}
-                            className="btn btn-success"
-                        >
-                            Add Combatant
-                        </button>
-                    </div>
+                        <button className='btn btn-success' onClick={handleCustomAdd}>Add Custom Character</button>
+                    </>
+                } />
+
+
+                <hr style={{
+                    border: "2px solid #000000",
+                    margin: "20px 0",
+                    width: '100%'
+                }} />
+                <div className="row m-3">
+                    <button
+                        onClick={onTestPopulate}
+                        className="btn btn-primary"
+                    >
+                        Test Populate
+                    </button>
                 </div>
-            </div>
-            <HorizLine />
-            <SideBySide content={
-                <>
-                    <h5>Custom Character from storage: </h5>
-                    <div className="autocomplete" style={{ position: 'relative' }}>
-                        <input
-                            type="text"
-                            value={customName}
-                            onChange={handleCustomNameChange}
-                            onFocus={() => customName && setCustomShowSuggestions(true)}
-                            onBlur={handleCustomBlur}
-                            placeholder="Start typing..."
-                            className="form-control"
-                        />
-                        {showCustomSuggestions && customSuggestions.length > 0 && (
-                            <div
-                                className="autocomplete-items"
-                                style={{
-                                    position: 'absolute',
-                                    zIndex: 99,
-                                    top: '100%',
-                                    left: 0,
-                                    right: 0,
-                                    border: '1px solid #d4d4d4',
-                                    borderTop: 'none',
-                                    backgroundColor: 'white'
-                                }}
-                            >
-                                {customSuggestions.map((item, index) => (
-                                    <div
-                                        key={item.name + index}
-                                        onClick={() => handleCustomSuggestionClick(item.name)}
-                                        style={{
-                                            padding: '10px',
-                                            cursor: 'pointer',
-                                            backgroundColor: '#fff',
-                                            borderBottom: '1px solid #d4d4d4'
-                                        }}
-                                        onMouseEnter={e => e.currentTarget.style.backgroundColor = '#e9e9e9'}
-                                        onMouseLeave={e => e.currentTarget.style.backgroundColor = '#fff'}
-                                    >
-                                        <div>
-                                            <strong>{item.name.substr(0, customName.length)}</strong>
-                                            {item.name.substr(customName.length)}
-                                        </div>
-                                        {/* Add Challenge text below the name */}
-                                        {item.meta && (
-                                            <div style={{ fontSize: '0.8em', color: '#666', marginTop: '4px' }}>
-                                                {item.meta}
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                    <h5>Init: </h5>
-                    <input
-                        type="number"
-                        value={customInit}
-                        onChange={handleCustomInitChange}
-                        placeholder="..."
-                        className="form-control"
-                        style={{ width: '100px' }}
-                    />
-                    <button className='btn btn-success' onClick={handleCustomAdd}>Add Custom Character</button>
-                </>
-            } />
+                <div className="row m-3">
+                    <button
+                        onClick={onClear}
+                        className="btn btn-danger"
+                    >
+                        Clear Combatants
+                    </button>
+                </div>
+            </>
+        } />
 
-
-            <hr style={{
-                border: "2px solid #000000",
-                margin: "20px 0",
-                width: '100%'
-            }} />
-            <div className="row m-3">
-                <button
-                    onClick={onTestPopulate}
-                    className="btn btn-primary"
-                >
-                    Test Populate
-                </button>
-            </div>
-            <div className="row m-3">
-                <button
-                    onClick={onClear}
-                    className="btn btn-danger"
-                >
-                    Clear Combatants
-                </button>
-            </div>
-        </div>
     );
 }
 
@@ -687,34 +689,36 @@ function CombatControl({ onSort, onNext, onPrev, data }) {
         }
     }
     return (
-        <div className='combat-control'>
-            <div className='side-by-side'>
-                <h3>Combat Control</h3>
-                <button
-                    onClick={onSort}
-                    className="btn btn-primary"
-                >
-                    Sort Combatants
-                </button>
-            </div>
-            <hr />
-            <div className='side-by-side' style={{ justifyContent: 'center' }}>
-                <button
-                    onClick={onPrev}
-                    className="btn btn-primary"
-                >
-                    &lt; Prev turn
-                </button>
-                <h4>Current turn: {data.name}</h4>
-                <button
-                    onClick={onNext}
-                    className="btn btn-primary"
-                >
-                    Next Turn &gt;
-                </button>
-            </div>
+        <BasicCon margin='2.5' content={
+            <>
+                <div className='side-by-side'>
+                    <h3>Combat Control</h3>
+                    <button
+                        onClick={onSort}
+                        className="btn btn-primary"
+                    >
+                        Sort Combatants
+                    </button>
+                </div>
+                <hr />
+                <div className='side-by-side' style={{ justifyContent: 'center' }}>
+                    <button
+                        onClick={onPrev}
+                        className="btn btn-primary"
+                    >
+                        &lt; Prev turn
+                    </button>
+                    <h4>Current turn: {data.name}</h4>
+                    <button
+                        onClick={onNext}
+                        className="btn btn-primary"
+                    >
+                        Next Turn &gt;
+                    </button>
+                </div>
+            </>
+        } />
 
-        </div>
     )
 }
 
@@ -859,18 +863,18 @@ function CombatManager() {
                     />
                 </div>
                 <div className='col ml-0' style={{ paddingLeft: '0px' }}>
+                    <CombatControl
+                        data={combatants.length > 0 ? combatants[currentCombatantIndex] : null} // Use the sorted combatants state
+                        onSort={sortCombatantsByInit}
+                        onPrev={handleOnPrev}
+                        onNext={handleOnNext}
+                    />
                     <InputWindow
                         onTestPopulate={testPopulate}
                         onAutocompleteAdd={handleAutoAdd}
                         onManualAdd={handleManualAdd}
                         onCustomAdd={handleCustomAdd}
                         onClear={handleClear}
-                    />
-                    <CombatControl
-                        data={combatants.length > 0 ? combatants[currentCombatantIndex] : null} // Use the sorted combatants state
-                        onSort={sortCombatantsByInit}
-                        onPrev={handleOnPrev}
-                        onNext={handleOnNext}
                     />
                 </div>
             </div>
