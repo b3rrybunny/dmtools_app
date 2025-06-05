@@ -2086,10 +2086,10 @@ function CharacterInput({ onReload }) {
     );
 }
 
-function CharacterDataPage() {
+function AddCharacter() {
     // Page Title
     useEffect(() => {
-        document.title = "dmT: Character Data";
+        document.title = "Add Character";
     }, []);
 
     // Page reload
@@ -2135,4 +2135,4 @@ function CharacterDataPage() {
     );
 }
 
-export default CharacterDataPage;
+export default AddCharacter;

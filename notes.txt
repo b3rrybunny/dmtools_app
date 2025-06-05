@@ -1,6 +1,6 @@
 Todo:
-    >Move travel controls to below progress bar
-    >Implement JSON Character data import/export
+    >Debug character data add quirks
+    >Add option to character card to delete
     >Implement JSON Combat data import/export
     >Implement Combat data saving to local storage
     >Implement Travel data saving to local storage

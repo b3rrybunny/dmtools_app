@@ -7,16 +7,14 @@ import { useSearchParams } from 'react-router-dom';
 // Custom -------------------------------------------------------------------
 // Elements / Scripts
 import HPBlock from '../basic/HPBlock';
-import ACBlock from '../basic/ACBlock';
 import HorizLine from '../basic/HorizontalLine';
 import SideBySide from '../basic/SideBySide';
 import CharacterCard from '../basic/CharacterCard';
 import BasicCon from '../basic/BasicContainer';
-import * as tools from '../tools';
+import * as tools from '../../scripts/tools';
 import * as dice from '../../scripts/dice';
 // Data
 import rawMonstersData from '../../data/srd_5e_monsters.json';
-import * as SRDapi from '../../scripts/dndSRD5eapi';
 import * as storage from '../../scripts/storage';
 // CSS / Assets
 import '../../css/CombatManager.css';
@@ -725,7 +723,7 @@ function CombatControl({ onSort, onNext, onPrev, data }) {
 function CombatManager() {
     // Page Title
     useEffect(() => {
-        document.title = "dmT: Combat Manager";
+        document.title = "Combat Manager";
     }, []);
 
     // Data

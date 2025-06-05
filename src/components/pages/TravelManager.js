@@ -8,18 +8,14 @@ import isEqual from 'lodash/isEqual';
 
 // Custom -------------------------------------------------------------------
 // Elements / Scripts
-import HPBlock from '../basic/HPBlock';
-import ACBlock from '../basic/ACBlock';
 import HorizLine from '../basic/HorizontalLine';
 import SideBySide from '../basic/SideBySide';
 import CharacterCard from '../basic/CharacterCard';
 import ProgressBar from '../basic/ProgressBar';
 import BasicCon from '../basic/BasicContainer';
-import * as tools from '../tools';
-import * as dice from '../../scripts/dice';
+import * as tools from '../../scripts/tools';
 // Data
 import rawMonstersData from '../../data/srd_5e_monsters.json';
-import * as SRDapi from '../../scripts/dndSRD5eapi';
 import * as storage from '../../scripts/storage';
 // CSS / Assets
 import '../../css/TravelManager.css';
@@ -544,7 +540,7 @@ function EncounterDisplay({ data }) {
 function TravelManager() {
     // Page Title
     useEffect(() => {
-        document.title = "dmT: Travel Manager";
+        document.title = "Travel Manager";
     }, []);
 
     // Trip data
