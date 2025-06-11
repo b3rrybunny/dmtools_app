@@ -2,7 +2,7 @@ import BasicCon from "../basic/BasicContainer";
 
 function About() {
   return (
-    <BasicCon content={
+    <BasicCon margin={5} content={
       <>
         <h1>About Page</h1>
         <h3>Acknowledgements:</h3>

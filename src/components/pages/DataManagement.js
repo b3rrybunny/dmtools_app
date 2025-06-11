@@ -23,6 +23,7 @@ function DataManagement() {
     // Page Title
     useEffect(() => {
         document.title = "Data Management";
+        setProxyJson({ "no data": "to display" });
     }, []);
 
     // Data control
@@ -30,7 +31,10 @@ function DataManagement() {
     const handleDataTypeChange = (e) => {
         const newDataType = e.target.value;
         setDataType(newDataType);
-        if (newDataType !== '') {
+        if (newDataType === '') {
+            setProxyJson({ "no data": "to display" });
+        }
+        else {
             setProxyJson(storage.retrieve(newDataType));
         }
     }
@@ -38,16 +42,15 @@ function DataManagement() {
     const handleJsonChange = (data) => {
         setProxyJson(data);
     }
-
     const [editable, setEditable] = useState(false);
 
+    // Data manipulation
     const saveData = () => {
         storage.saveData(proxyJson, dataType);
         setEditable(false);
         setProxyJson(null);
         setDataType('');
     }
-
     const eraseData = () => {
         storage.erase(dataType);
         setEditable(false);
@@ -56,32 +59,50 @@ function DataManagement() {
     }
 
     return (
-        <>
+        <div style={{overflowY: 'auto !important', height: '92.5vh'}}>
             <BasicCon margin={7} content={
                 <>
                     <h1>Data Management</h1>
-                    <select id="datatype" value={dataType} onChange={handleDataTypeChange}>
-                        <option value="">Choose...</option>
-                        <option value="charData">Character Data</option>
-                        <option value="monsterData">Monster Data</option>
-                    </select>
+                    <SideBySide content={
+                        <>
+                            <h4>Data to view/edit: </h4>
+                            <select id="datatype" value={dataType} onChange={handleDataTypeChange}>
+                                <option value="">Choose...</option>
+                                <option value="charData">Character Data</option>
+                                <option value="monsterData">Monster Data</option>
+                            </select>
+                        </>
+                    } />
                 </>
             } />
             <BasicCon margin={7} content={
                 <>
                     <SideBySide justify='space-between' content={
                         <>
-                            <button className='btn btn-primary' onClick={() => setEditable(!editable)}>
+                            <button
+                                className='btn btn-primary'
+                                onClick={() => setEditable(!editable)}
+                                disabled={dataType !== '' ? false : true}
+                            >
                                 Make Editable
                             </button>
-                            <button className='btn btn-success' onClick={saveData}>
+                            <button
+                                className='btn btn-success'
+                                onClick={saveData}
+                                disabled={dataType !== '' ? false : true}
+                            >
                                 Save data
                             </button>
-                            <button className='btn btn-danger' onClick={eraseData}>
+                            <button
+                                className='btn btn-danger'
+                                onClick={eraseData}
+                                disabled={dataType !== '' ? false : true}
+                            >
                                 Erase all data for this item
                             </button>
                         </>
                     } />
+                    <HorizLine />
                     <JsonDisplay
                         jsonData={proxyJson}
                         editable={editable}
@@ -89,7 +110,7 @@ function DataManagement() {
                     />
                 </>
             } />
-        </>
+        </div>
     );
 }
 
