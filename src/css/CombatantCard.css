@@ -1,0 +1,48 @@
+.monster-card {
+    background-image: linear-gradient(to right top, #3d0606, #fa5f5f98), url('../assets/leaf_texture2.png');
+    background-size: cover;
+    padding: 5px;
+}
+
+
+.player-card {
+    background: linear-gradient(to right top, #0a4419c5, #59ff82a8), url('../assets/leaf_texture2.png');
+    backdrop-filter: blur(8px);
+    padding: 5px;
+
+}
+
+.npc-card {
+    background: linear-gradient(to right top, #08144fcd, #4463fe9c), url('../assets/leaf_texture2.png');
+    backdrop-filter: blur(8px);
+    padding: 5px;
+}
+
+
+
+
+.active {
+    border: 5px solid #00ff33 !important;
+    padding: 10px;
+}
+
+.inactive {
+    filter: grayscale(95%);
+    padding: 10px;
+}
+
+.combatant-img {
+    align-content: center;
+    justify-content: center;
+    padding: 0px;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: 2px solid black;
+}
+
+.square-container {
+    width: 250px;
+    height: 250px;
+    overflow: hidden;
+}

@@ -1,0 +1,49 @@
+.monster-input {
+    background-color: #ffababb8;
+    backdrop-filter: blur(8px);
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px;
+    z-index: 1;
+}
+
+.custom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    height: 100%;
+    width: 100%;
+}
+
+.basic-container {
+    background-color: rgba(255, 255, 255, 0.616);
+    padding: 7px;
+    border: 2px solid black;
+    border-radius: 8px;
+    backdrop-filter: blur(8px);
+    margin: 5px;
+}
+
+.saving-throws {
+    height: rem !important;
+}
+
+.monster-data-page {
+    overflow-y: auto !important;
+    height: 92.5vh;
+}
+
+
+
+table {
+    background: #ffffffad;
+    border: 2px solid #000000 !important;
+    backdrop-filter: blur(8px);
+}
+
+td {
+    font-size: 20px;
+    display: grid flex;
+    max-width: 50px;
+    text-align: center;
+    justify-content: center;
+}

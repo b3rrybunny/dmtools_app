@@ -259,6 +259,7 @@ function AttackInput({ onAddAttack }) {
     const onAttackAddlDamageModChange = (e) => {
         setAttackAddlDamageMod(e.target.value);
     }
+    const [attackNote, setAttackNote] = useState('');
 
     // Functions
     function handleAddAttack() {
@@ -276,7 +277,7 @@ function AttackInput({ onAddAttack }) {
             'reach ' + attackRange + 'ft., '
         );
         const TargetString = (
-            attackTargets + (attackTargets > 1 ? 'targets. ' : 'target. ')
+            attackTargets + (attackTargets > 1 ? ' targets. ' : ' target. ')
         );
         const DamageString = (
             '(' + attackNumOfDice + 'd' + attackDice + ') ' +
@@ -299,6 +300,7 @@ function AttackInput({ onAddAttack }) {
                 <em>Hit: </em>
                 {DamageString}
                 {attackAddlDamage === 'true' ? AddlDamageString : <></>}
+                {' ' + attackNote}
             </p>
         );
         onAddAttack(result);
@@ -501,6 +503,17 @@ function AttackInput({ onAddAttack }) {
                     </>
                     : <></>
             }
+            <SideBySide content={
+                <>
+                    <h4>Note: </h4>
+                    <textarea
+                        value={attackNote}
+                        onChange={(e) => setAttackNote(e.target.value)}
+                        style={{ minHeight: '75px', width: '100%' }}
+                        placeholder='Target must make a DC 11 CON saving throw, taking additional damage on a failed save, or half as much on a successful one.'
+                    />
+                </>
+            } />
             <button
                 className='btn btn-success'
                 onClick={handleAddAttack}
@@ -1646,7 +1659,7 @@ function CharacterInput({ onReload }) {
     }
     const [senses, setSenses] = useState([]);
     function onSensesChange() {
-        let senseString = senseValue + ' ' + senseRange;
+        let senseString = senseValue + ' ' + senseRange + 'ft.';
         setSenses(prevSenses => [...prevSenses, senseString]);
         setSenseRange('');
         setSenseValue('');
@@ -1740,52 +1753,52 @@ function CharacterInput({ onReload }) {
         switch (parseInt(statNum)) {
             case 0:
             case 1:
-                return (-5 + bonus);
+                return (-5 + parseInt(bonus));
             case 2:
             case 3:
-                return (-4 + bonus);
+                return (-4 + parseInt(bonus));
             case 4:
             case 5:
-                return (-3 + bonus);
+                return (-3 + parseInt(bonus));
             case 6:
             case 7:
-                return (-2 + bonus);
+                return (-2 + parseInt(bonus));
             case 8:
             case 9:
-                return (-1 + bonus);
+                return (-1 + parseInt(bonus));
             case 10:
             case 11:
-                return (0 + bonus);
+                return (0 + parseInt(bonus));
             case 12:
             case 13:
-                return (1 + bonus);
+                return (1 + parseInt(bonus));
             case 14:
             case 15:
-                return (2 + bonus);
+                return (2 + parseInt(bonus));
             case 16:
             case 17:
-                return (3 + bonus);
+                return (3 + parseInt(bonus));
             case 18:
             case 19:
-                return (4 + bonus);
+                return (4 + parseInt(bonus));
             case 20:
             case 21:
-                return (5 + bonus);
+                return (5 + parseInt(bonus));
             case 22:
             case 23:
-                return (6 + bonus);
+                return (6 + parseInt(bonus));
             case 24:
             case 25:
-                return (7 + bonus);
+                return (7 + parseInt(bonus));
             case 26:
             case 27:
-                return (8 + bonus);
+                return (8 + parseInt(bonus));
             case 28:
             case 29:
-                return (9 + bonus);
+                return (9 + parseInt(bonus));
             case 30:
             default:
-                return (10 + bonus);
+                return (10 + parseInt(bonus));
         }
     }
 
@@ -1886,7 +1899,7 @@ function CharacterInput({ onReload }) {
             );
 
             // Actions
-            charData["Actions"] = data.actions
+            charData["Actions"] = data.Actions
 
             // Languages
             charData['Languages'] = data.Languages;
@@ -1903,6 +1916,7 @@ function CharacterInput({ onReload }) {
             // Save to local storage
             storage.saveChar(charData);
             onReload();
+            return null;
         }
 
 
@@ -1968,29 +1982,17 @@ function CharacterInput({ onReload }) {
             (INTThrow ? ('INT +(' + getMod(INT, profBonus).toString() + '), ') : '') +
             (WISThrow ? ('WIS +(' + getMod(WIS, profBonus).toString() + '), ') : '') +
             (CHAThrow ? ('CHA +(' + getMod(CHA, profBonus).toString() + ')') : '')
-        );
+        ).replace(/,+$/, "");
 
         // Actions
         charData["Actions"] = actions.map(element => ReactDOMServer.renderToStaticMarkup(element)).join('');
 
         // Languages
-        let langString = '';
-        const getLangString = () => {
-            languages.forEach(lang => {
-                langString = langString + (lang + ', ');
-            })
-        }
-        getLangString();
+        let langString = languages.join(', ');
         charData['Languages'] = langString;
 
         // Senses
-        let sensesString = '';
-        const getSensesString = () => {
-            senses.forEach(item => {
-                sensesString = sensesString + (item + ', ');
-            })
-        }
-        getSensesString();
+        let sensesString = senses.join(', ');
         sensesString = sensesString + ', Passive Perception ' + (Perception ? (parseInt(WIS) + parseInt(profBonus)) : WIS);
         charData["Senses"] = sensesString;
 
@@ -2003,7 +2005,6 @@ function CharacterInput({ onReload }) {
         // Save to local storage
         storage.saveChar(charData);
         onReload();
-
     }
 
     // Body
@@ -2105,7 +2106,6 @@ function AddCharacter() {
         const data = storage.retrieve('charData');
         if (data) {
             setChars(data.chars);
-            console.log("CharacterDataPage.js: 'charData' retrieved. Data: ");
             tools.prettyLog(chars, 'Character Data');
         }
         else setChars(null);

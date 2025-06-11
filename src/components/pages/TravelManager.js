@@ -62,7 +62,16 @@ function EncounterInput({ data, onAddEncounter, onAddJsonData }) {
     }
 
     // Custom Characters
-    const chars = (storage.retrieve('charData') ? JSON.parse((storage.retrieve('charData'))).chars : null);
+    const [chars, setChars] = useState([]);
+    const [customMonsters, setCustomMonsters] = useState([]);
+    useEffect(() => {
+        const charData = storage.retrieve('charData');
+        const monsterData = storage.retrieve('monsterData');
+
+        setChars(charData ? charData.chars : []);
+        setCustomMonsters(monsterData ? monsterData.monsters : []);
+    }, []); // Empty dependency array means this runs once on mount
+    const customPool = [...chars, ...customMonsters];
     const [customName, setCustomName] = useState('');
     const [customNum, setCustomNum] = useState('1');
     const onCustomNumChange = (e) => {
@@ -115,7 +124,7 @@ function EncounterInput({ data, onAddEncounter, onAddJsonData }) {
         }
 
         // Filter suggestions
-        const filtered = chars.filter(item =>
+        const filtered = customPool.filter(item =>
             (item.name.toLowerCase().includes(value.toLowerCase()))
         );
 
@@ -195,6 +204,7 @@ function EncounterInput({ data, onAddEncounter, onAddJsonData }) {
                                 onBlur={handleBlur}
                                 placeholder="Start typing..."
                                 className="form-control"
+                                style={{ maxWidth: '150px' }}
                             />
                             {showSuggestions && suggestions.length > 0 && (
                                 <div
@@ -247,11 +257,6 @@ function EncounterInput({ data, onAddEncounter, onAddJsonData }) {
                             className='form-control'
                             style={{ maxWidth: '75px' }}
                         />
-
-                    </>
-                } />
-                <SideBySide content={
-                    <>
                         <h5>Chance: </h5>
                         <input
                             type='number'
@@ -278,7 +283,7 @@ function EncounterInput({ data, onAddEncounter, onAddJsonData }) {
 
                 <SideBySide content={
                     <>
-                        <h5>Custom Character from storage: </h5>
+                        <h5>Custom character/monster from storage: </h5>
                         <div className="autocomplete" style={{ position: 'relative' }}>
                             <input
                                 type="text"
@@ -363,7 +368,7 @@ function EncounterInput({ data, onAddEncounter, onAddJsonData }) {
                     onClick={handleAddCustomEncounter}
                     style={{ width: '100%' }}
                 >
-                    Add custom character encounter
+                    Add custom creature encounter
                 </button>
 
 
@@ -391,7 +396,42 @@ function EncounterInput({ data, onAddEncounter, onAddJsonData }) {
 
 }
 
-function EncounterDisplay({ data }) {
+function NoteInput({ onAddNote }) {
+    const [noteName, setNoteName] = useState('');
+    const [noteContent, setNoteContent] = useState('');
+    return (
+        <>
+            <BasicCon content={
+                <>
+                    <h4>Add note:</h4>
+                    <HorizLine />
+                    <SideBySide content={
+                        <>
+                            <h5>Note name:</h5>
+                            <input
+                                type="text"
+                                value={noteName}
+                                onChange={(e) => setNoteName(e.target.value)}
+                                placeholder="Note name"
+                                className="form-control"
+                                style={{ maxWidth: '100px' }}
+                            />
+                        </>
+                    } />
+                    <textarea
+                        value={noteContent}
+                        onChange={(e) => setNoteContent(e.target.value)}
+                        style={{ minHeight: '75px', width: '100%' }}
+                        placeholder='Party will encounter an Ouroboros that implores them to seek out an evil Bona Naga they allied with in their past life.'
+                    />
+                    <button className='btn btn-success' onClick={() => onAddNote([noteName, noteContent])} style={{ width: '100%' }}>Add note</button>
+                </>
+            } />
+        </>
+    );
+}
+
+function EncounterDisplay({ data, noteData }) {
 
     function consolidateKeys(obj) {
         // Group keys by their values (using JSON.stringify for deep comparison)
@@ -481,54 +521,76 @@ function EncounterDisplay({ data }) {
         });
 
         return (
-            <div>
-                {sortedEntries.map(([key, value]) => (
-                    <SideBySide key={key} content={
-                        <>
-                            <h4><strong>{key}:</strong></h4>
-                            <h4>{formatValue(value)}</h4>
-                            {isEqual(value, {}) ? null :
-                                <div className="dropdown" style={{ position: 'static' }}>
-                                    <button
-                                        className="btn btn-secondary dropdown-toggle"
-                                        type="button"
-                                        id="dropdownMenuButton1"
-                                        data-bs-toggle="dropdown"
-                                        data-bs-boundary="viewport"
-                                        aria-expanded="false"
-                                    >
-                                        Open in Combat Manager
-                                    </button>
-                                    <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                        <li><a
-                                            className="dropdown-item"
-                                            href={`http://localhost:3000/CombatManager?type=${value['type']}&name=${value['name']}&num=${value['num']}`}
-                                            target='_blank'
-                                        >
-                                            Standard
-                                        </a></li>
-                                        <li><a
-                                            className="dropdown-item"
-                                            href={`http://localhost:3000/CombatManager?type=${value['type']}&name=${value['name']}&num=${value['num']}&mod=adv`}
-                                            target='_blank'
-                                        >
-                                            w/ Advantage
-                                        </a></li>
-                                        <li><a
-                                            className="dropdown-item"
-                                            hhref={`http://localhost:3000/CombatManager?type=${value['type']}&name=${value['name']}&num=${value['num']}&mod=disadv`}
-                                            target='_blank'
-                                        >
-                                            w/ Disadvantage
-                                        </a></li>
-                                    </ul>
-                                </div>
-                            }
+            <>
+                <div className='row'>
+                    <div className='col'>
+                        {sortedEntries.map(([key, value]) => (
+                            <SideBySide key={key} content={
+                                <>
+                                    <h4><strong>{key}:</strong></h4>
+                                    <h4>{formatValue(value)}</h4>
+                                    {isEqual(value, {}) ? null :
+                                        <div className="dropdown" style={{ position: 'static' }}>
+                                            <button
+                                                className="btn btn-secondary dropdown-toggle"
+                                                type="button"
+                                                id="dropdownMenuButton1"
+                                                data-bs-toggle="dropdown"
+                                                data-bs-boundary="viewport"
+                                                aria-expanded="false"
+                                            >
+                                                Open in Combat Manager
+                                            </button>
+                                            <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                                <li><a
+                                                    className="dropdown-item"
+                                                    href={`http://localhost:3000/CombatManager?type=${value['type']}&name=${value['name']}&num=${value['num']}`}
+                                                    target='_blank'
+                                                >
+                                                    Standard
+                                                </a></li>
+                                                <li><a
+                                                    className="dropdown-item"
+                                                    href={`http://localhost:3000/CombatManager?type=${value['type']}&name=${value['name']}&num=${value['num']}&mod=adv`}
+                                                    target='_blank'
+                                                >
+                                                    w/ Advantage
+                                                </a></li>
+                                                <li><a
+                                                    className="dropdown-item"
+                                                    hhref={`http://localhost:3000/CombatManager?type=${value['type']}&name=${value['name']}&num=${value['num']}&mod=disadv`}
+                                                    target='_blank'
+                                                >
+                                                    w/ Disadvantage
+                                                </a></li>
+                                            </ul>
+                                        </div>
+                                    }
 
-                        </>
-                    } />
-                ))}
-            </div>
+                                </>
+                            } />
+                        ))}
+                    </div>
+                    <div className='col'>
+                        <BasicCon content={
+                            <>
+                                <h5>Notes:</h5>
+                                <HorizLine />
+                                {noteData.length !== 0 && noteData.map((note, index) => (
+                                    <SideBySide key={index} content={
+                                        <>
+                                            <h5><strong>{index + 1}. {note.name}: </strong></h5>
+                                            <p>{note.content}</p>
+                                        </>
+                                    } />
+                                ))}
+                            </>
+                        } />
+
+
+                    </div>
+                </div>
+            </>
         );
     }
 
@@ -697,6 +759,14 @@ function TravelManager() {
         }
     }, [unsortedEncounters]);
 
+    // Note Add
+    const [notes, setNotes] = useState([]);
+    function onAddNote(data) {
+        const name = data[0];
+        const content = data[1];
+        setNotes(prevNotes => [...prevNotes, { name: name, content: content }]);
+    }
+
     // Buttons
     const [isCopied, setIsCopied] = useState(false);
     function handleCopyJson() {
@@ -707,6 +777,7 @@ function TravelManager() {
         jsonToCopy['hoursTraveled'] = hoursTraveled;
         jsonToCopy['encounters'] = encounters;
         jsonToCopy['unsortedEncounters'] = unsortedEncounters;
+        jsonToCopy['notes'] = notes;
         const string = JSON.stringify(jsonToCopy);
         const copyToClipboard = () => {
             navigator.clipboard.writeText(string)
@@ -730,6 +801,7 @@ function TravelManager() {
         setTripName(data.tripName);
         setEncounters(data.encounters);
         setUnsortedEncounters(data.unsortedEncounters);
+        setNotes(data.notes);
     }
 
     return (
@@ -750,7 +822,7 @@ function TravelManager() {
                     </>
                 } />
             </div>
-            <div className='row' style={{ display: 'grid', gridTemplateColumns: '1fr auto' }}>
+            <div className='row g-2 page-body'>
                 <div className='col' style={{ height: '100%' }}>
                     <BasicCon height='100%' content={
                         <>
@@ -769,7 +841,7 @@ function TravelManager() {
                                 </>
                             } />
                             <HorizLine />
-                            <EncounterDisplay data={encounters} />
+                            <EncounterDisplay data={encounters} noteData={notes} />
                         </>
                     } />
                 </div>
@@ -779,6 +851,10 @@ function TravelManager() {
                         onAddEncounter={onAddEncounter}
                         onAddJsonData={onAddJsonData}
                         data={encounters}
+                        noteData={notes}
+                    />
+                    <NoteInput
+                        onAddNote={onAddNote}
                     />
                     <BasicCon content={
                         <SideBySide content={

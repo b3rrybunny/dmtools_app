@@ -22,7 +22,49 @@ import '../../css/CharacterCard.css';
 import player_character from '../../assets/player_character.png';
 import NPC_img from '../../assets/NPC.png';
 
+function DeletePopup({ isOpen, onConfirm, onCancel, charName, charID }) {
+    if (!isOpen) return null;
+
+    return (
+        <>
+            <div style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 9999
+            }}>
+                <div style={{
+                    backgroundColor: 'white',
+                    padding: '24px',
+                    borderRadius: '8px',
+                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+                    maxWidth: '500px',
+                    width: '100%',
+                    margin: '0 16px',
+                    alignContent: 'center'
+                }}>
+                    <h5 style={{ color: 'red' }}>Delete {charName ? charName : '[INVALID CHAR NAME]'} @ ID:{charID}?</h5>
+                    <SideBySide content={
+                        <>
+                            <button className='btn btn-danger' onClick={onConfirm}>Confirm</button>
+                            <button className='btn btn-secondary' onClick={onCancel}>Nevermind</button>
+                        </>
+                    } />
+                </div>
+            </div>
+        </>
+    );
+}
+
 function CharacterCard({ data }) {
+    const [isVisible, setIsVisible] = useState(true);
+    const destroySelf = () => setIsVisible(false);
 
     function getModifier(stat) {
         const numericStat = Number(stat); // Converts strings to numbers (e.g., "18" → 18)
@@ -87,7 +129,7 @@ function CharacterCard({ data }) {
     }
 
     const [isCopied, setIsCopied] = useState(false);
-    function copyJson(){
+    function copyJson() {
         const string = JSON.stringify(data);
         const copyToClipboard = () => {
             navigator.clipboard.writeText(string)
@@ -102,6 +144,16 @@ function CharacterCard({ data }) {
         copyToClipboard();
     }
 
+    const [isOpen, setIsOpen] = useState(false);
+    const openDeletePopup = () => setIsOpen(true);
+    const onPopupClosed = () => setIsOpen(false);
+    const onDelete = () => {
+        onPopupClosed();
+        storage.eraseChar(data.ID);
+        destroySelf();
+    };
+
+    if (!isVisible) return null;
     return (
         <div className='character-card'>
             <BasicCon content={
@@ -121,6 +173,7 @@ function CharacterCard({ data }) {
                         {/* Buttons */}
                         <div className='col'>
                             <button className='btn btn-primary' onClick={copyJson}>{isCopied ? 'Copied!' : 'Copy character JSON to clipboard'}</button>
+                            <button className='btn btn-danger' onClick={openDeletePopup}>Delete Character</button>
                         </div>
                     </div>
                     <HorizLine />
@@ -175,8 +228,8 @@ function CharacterCard({ data }) {
                                     <h5>Languages: {data.Languages}</h5>
                                 } />
                             } />
-                            <p style={{textAlign: 'left'}}><strong>Note:</strong> {data.note}</p>
-                            
+                            <p style={{ textAlign: 'left' }}><strong>Note:</strong> {data.note}</p>
+
                         </div>
                         <div className='col'>
                             <BasicCon content={
@@ -189,8 +242,14 @@ function CharacterCard({ data }) {
                                 </>
                             } />
                         </div>
-
                     </div>
+                    <DeletePopup
+                        isOpen={isOpen}
+                        onConfirm={onDelete}
+                        onCancel={onPopupClosed}
+                        charName={data.name}
+                        charID={data.ID}
+                    />
                 </>
             } />
         </div>

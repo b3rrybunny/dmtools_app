@@ -20,6 +20,7 @@ import * as storage from '../../scripts/storage';
 import '../../css/CombatManager.css';
 import player_character from '../../assets/player_character.png';
 import NPC_img from '../../assets/NPC.png';
+import CombatantCard from '../basic/CombatantCard';
 
 
 
@@ -203,10 +204,10 @@ function CreatureCard({ data = null, index, onChange, isActive }) {
                     {/* HP, AC */}
                     <div className="side-by-side">
                         <div>
-                            <HPBlock hp={data?.rolledHP ? data.rolledHP : data.hp} onChange={handleHPChange} />
+                            <HPBlock hp={data?.rolledHP !== undefined ? data.rolledHP : data.hp} onChange={handleHPChange} />
                         </div>
                         <div className='ac-block'>
-                            <h4>⛊ AC: {dice.extractNumbersOutsideParentheses(data.ac.toString())}</h4>
+                            <h4>⛊ AC: {dice.extractNumbersOutsideParentheses(data['ac'].toString())}</h4>
                         </div>
                     </div>
                     {/* Stats */}
@@ -214,6 +215,15 @@ function CreatureCard({ data = null, index, onChange, isActive }) {
                 </div>
 
             </div>
+            <BasicCon margin={3} content={
+                <>
+                    <h5>Traits:</h5>
+                    <div
+                        dangerouslySetInnerHTML={{ __html: data['Traits'] }}
+                        style={{ justifyContent: 'left', textAlign: 'left' }}
+                    />
+                </>
+            } />
             <div className='row g-0 mt-2 card-extra-info'>
                 <CreatureActions data={data} />
             </div>
@@ -242,11 +252,6 @@ function CardContainer({ combatants, currentCombatant, onChange }) {
         }
     }, [currentCombatant]);
 
-    // Passes change to parent CombatManager
-    const handleOnChange = (id, key, value) => {
-        onChange(id, key, value);
-    }
-
     return (
         <div className="card-container">
             {combatants.map((combatant, index) => (
@@ -254,10 +259,9 @@ function CardContainer({ combatants, currentCombatant, onChange }) {
                     key={combatant.id}
                     ref={el => cardRefs.current[index] = el}
                 >
-                    <CreatureCard
+                    <CombatantCard
                         data={combatant}
                         index={index + 1}
-                        onChange={handleOnChange}
                         isActive={index === currentCombatant ? true : false}
                     />
                 </div>
@@ -276,6 +280,12 @@ function InputWindow({ onTestPopulate, onAutocompleteAdd, onManualAdd, onClear, 
     const [autoAdvSelected, setAutoAdvSelected] = useState('');
     const [autoValue, setAutoValue] = useState('');
     const [numToAdd, setNumToAdd] = useState('1');
+    const [customMonsters, setCustomMonsters] = useState([]);
+    useEffect(() => {
+        const monsterData = storage.retrieve('monsterData');
+        setCustomMonsters(monsterData ? monsterData.monsters : []);
+    }, []); // Empty dependency array means this runs once on mount
+    const monsterPool = [...rawMonstersData, ...customMonsters];
 
     // Manual
     const [manualName, setManualName] = useState('');
@@ -286,9 +296,11 @@ function InputWindow({ onTestPopulate, onAutocompleteAdd, onManualAdd, onClear, 
     const [manualType, setManualType] = useState('player');
 
     // Custom Characters
-    const chars = (storage.retrieve('charData') ? JSON.parse((storage.retrieve('charData'))).chars : null);
-    console.log('CombatManager.js: charData retrieved. Data: ');
-    tools.prettyLogJson(chars);
+    const [chars, setChars] = useState([]);
+    useEffect(() => {
+        const charData = storage.retrieve('charData');
+        setChars(charData ? charData.chars : []);
+    }, []); // Empty dependency array means this runs once on mount
     const [customName, setCustomName] = useState('');
     const [customInit, setCustomInit] = useState('');
     const handleCustomInitChange = (e) => {
@@ -340,7 +352,7 @@ function InputWindow({ onTestPopulate, onAutocompleteAdd, onManualAdd, onClear, 
         }
 
         // Filter suggestions
-        const filtered = rawMonstersData.filter(item =>
+        const filtered = monsterPool.filter(item =>
             (item.name.toLowerCase().includes(value.toLowerCase()))
         );
 
@@ -699,7 +711,7 @@ function CombatControl({ onSort, onNext, onPrev, data }) {
                     </button>
                 </div>
                 <hr />
-                <div className='side-by-side' style={{ justifyContent: 'center' }}>
+                <div className='side-by-side' style={{ justifyContent: 'space-between' }}>
                     <button
                         onClick={onPrev}
                         className="btn btn-primary"
@@ -731,8 +743,16 @@ function CombatManager() {
     const [currentCombatantIndex, setCurrentCombatantIndex] = useState(0);
 
     // Add Funcs
+    const [monsterPool, setMonsterPool] = useState([]);
+    useEffect(() => {
+        const monsterData = storage.retrieve('monsterData');
+        const customMonsters = monsterData ? monsterData.monsters : [];
+
+        setMonsterPool([...rawMonstersData, ...customMonsters]);
+    }, []); // Empty dependency array means this runs once on mount
+
     const addMonsterData = (monsterName, adv = '') => {
-        const originalMonster = rawMonstersData.find(item => item.name === monsterName);
+        const originalMonster = monsterPool.find(item => item.name === monsterName);
 
         // Create a copy of the monster object instead of modifying the original
         const monsterToAdd = { ...originalMonster };
@@ -786,7 +806,8 @@ function CombatManager() {
     const [hasProcessedParams, setHasProcessedParams] = useState(false);
 
     useEffect(() => {
-        if (searchParams.toString() !== '' && !hasProcessedParams) {
+        // Only process params if monsterPool is populated AND we haven't processed yet
+        if (searchParams.toString() !== '' && !hasProcessedParams && monsterPool.length > 0) {
             const queryParams = Object.fromEntries(searchParams.entries());
             const num = parseInt(queryParams.num);
             const name = queryParams.name;
@@ -800,9 +821,17 @@ function CombatManager() {
                 }
             }
 
+            else if (type === 'custom') {
+                // Clear existing combatants first
+                setCombatants([]);
+                for (let i = 0; i < num; i++) {
+                    addMonsterData(name, (queryParams?.mod ? queryParams.mod : ''));
+                }
+            }
+
             setHasProcessedParams(true);
         }
-    }, [searchParams, hasProcessedParams]); // Dependencies ensure this only runs when needed
+    }, [searchParams, hasProcessedParams, monsterPool]); // Add monsterPool as dependency
 
     // Combat flow control
     function handleOnPrev() {
@@ -835,16 +864,6 @@ function CombatManager() {
         });
     };
 
-    function handleCardOnChange(id, key, value) {
-        console.log(`Updating combatant ${id}, ${key} changed to: ${value}`);
-        setCombatants(prevCombatants =>
-            prevCombatants.map(combatant =>
-                combatant.id === id
-                    ? { ...combatant, [key]: value }
-                    : combatant
-            )
-        );
-    }
 
     function handleClear() {
         setCombatants([]);
@@ -856,7 +875,6 @@ function CombatManager() {
                 <div className='col'>
                     <CardContainer
                         combatants={combatants} // Now using the sorted combatants state
-                        onChange={handleCardOnChange}
                         currentCombatant={currentCombatantIndex}
                     />
                 </div>

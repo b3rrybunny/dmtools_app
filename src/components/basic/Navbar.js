@@ -7,7 +7,7 @@ function Navbar() {
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
       <div className="container-fluid">
         {/* Header/Homepage */}
-        <a class="navbar-brand" href="/">
+        <a className="navbar-brand" href="/">
           <img src={logo} height="26" style={{marginLeft: '5px'}}/>
         </a>
         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,20 +31,21 @@ function Navbar() {
               </a>
               <ul className="dropdown-menu">
                 <li><Link className="dropdown-item" to='/AddCharacter'>Add Character</Link></li>
+                <li><Link className="dropdown-item" to='/AddMonster'>Add Monster</Link></li>
                 <li><Link className="dropdown-item" to='/ViewCharacters'>View Characters</Link></li>
               </ul>
             </li>
-            {/* Home */}
+            {/* Data Management */}
             <li className="nav-item">
-              <Link className="nav-link" to="/">Home</Link>
+              <Link className="nav-link" to="/DataManagement">Data Management</Link>
             </li>
             {/* About */}
             <li className="nav-item">
               <Link className="nav-link" to="/about">About</Link>
             </li>
-            {/* Contact */}
+            {/* Testing */}
             <li className="nav-item">
-              <Link className="nav-link" to="/contact">Contact</Link>
+              <Link className="nav-link" to="/Testing">Testing</Link>
             </li>
           </ul>
         </div>

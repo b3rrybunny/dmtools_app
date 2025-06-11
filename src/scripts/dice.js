@@ -39,7 +39,7 @@ export function rollDice(notation = '1d6 + 3') {
   if (total === 0) {
     total = 1;
   }
-  console.log('Rolled ' + cleanNotation + ': ' + total.toString());
+  console.log('%c🎲Rolled ' + cleanNotation + ': ' + total.toString(), 'color: blue');
   return total;
 }
 
