@@ -9,3 +9,33 @@
     overflow-x: hidden;
     overflow-y: hidden;
 }
+
+/* Fade in and drop down animation */
+.fade-drop-in {
+  animation: fadeDropIn 0.6s ease-out forwards;
+}
+
+/* Optional: Set initial state for elements that will be animated */
+.fade-drop-in-initial {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+@keyframes fadeDropIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.center-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 92.5vh;
+  width: 100%;
+}

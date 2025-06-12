@@ -18,6 +18,12 @@ function DataManagement() {
         setProxyJson({ "no data": "to display" });
     }, []);
 
+    // Page reload
+    const [reloadKey, setReloadKey] = useState(0);
+    function handleReload() {
+        setReloadKey(prevKey => prevKey + 1);
+    }
+
     // Data control
     const [dataType, setDataType] = useState('');
     const handleDataTypeChange = (e) => {
@@ -29,25 +35,29 @@ function DataManagement() {
         else {
             setProxyJson(storage.retrieve(newDataType));
         }
+        setReloadKey(reloadKey + 1);
     }
     const [proxyJson, setProxyJson] = useState();
     const handleJsonChange = (data) => {
         setProxyJson(data);
     }
     const [editable, setEditable] = useState(false);
+    
 
     // Data saving
+    const [saveable, setSaveable] = useState(true);
+    const onValidChange = (val) => {
+        setSaveable(val);
+    }
     const saveData = () => {
         storage.saveData(proxyJson, dataType);
         setEditable(false);
-        setProxyJson(null);
-        setDataType('');
+        setReloadKey(reloadKey + 1);
     }
     const eraseData = () => {
         storage.erase(dataType);
-        setEditable(false);
-        setProxyJson(null);
         setDataType('');
+        setReloadKey(reloadKey + 1);
     }
 
     return (
@@ -76,12 +86,12 @@ function DataManagement() {
                                 onClick={() => setEditable(!editable)}
                                 disabled={dataType !== '' ? false : true}
                             >
-                                Make Editable
+                                {editable ? 'Stop editing' : 'Start editing'}
                             </button>
                             <button
                                 className='btn btn-success'
                                 onClick={saveData}
-                                disabled={dataType !== '' ? false : true}
+                                disabled={dataType !== '' && !saveable === false ? false : true}
                             >
                                 Save data
                             </button>
@@ -96,9 +106,11 @@ function DataManagement() {
                     } />
                     <HorizLine />
                     <JsonDisplay
+                        key={reloadKey}
                         jsonData={proxyJson}
                         editable={editable}
                         onChange={handleJsonChange}
+                        onValidChange={onValidChange}
                     />
                 </>
             } />
