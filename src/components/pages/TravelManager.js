@@ -1,7 +1,5 @@
 // Modules ------------------------------------------------------------------
-import * as bootstrap from 'bootstrap';
-import { useState, useEffect, useRef, memo } from 'react';
-import ReactDOMServer from 'react-dom/server';
+import { useState, useEffect } from 'react';
 import isEqual from 'lodash/isEqual';
 
 
@@ -10,17 +8,13 @@ import isEqual from 'lodash/isEqual';
 // Elements / Scripts
 import HorizLine from '../basic/HorizontalLine';
 import SideBySide from '../basic/SideBySide';
-import CharacterCard from '../basic/CharacterCard';
 import ProgressBar from '../basic/ProgressBar';
 import BasicCon from '../basic/BasicContainer';
-import * as tools from '../../scripts/tools';
 // Data
 import rawMonstersData from '../../data/srd_5e_monsters.json';
 import * as storage from '../../scripts/storage';
 // CSS / Assets
 import '../../css/TravelManager.css';
-import player_character from '../../assets/player_character.png';
-import NPC_img from '../../assets/NPC.png';
 
 // Encounter JSON Format
 // Each number corresponds to a roll of a d20.
@@ -44,13 +38,13 @@ import NPC_img from '../../assets/NPC.png';
 */
 
 function EncounterInput({ data, onAddEncounter, onAddJsonData }) {
-    // JSON
+    // JSON variable
     const [jsonData, setJsonData] = useState('');
     const onJsonDataChange = (e) => {
         setJsonData(e.target.value);
     }
 
-    // Monster Input
+    // Monster input variables
     const [monsterName, setMonsterName] = useState('');
     const [monsterNum, setMonsterNum] = useState('1');
     const onMonsterNumChange = (e) => {
@@ -61,7 +55,7 @@ function EncounterInput({ data, onAddEncounter, onAddJsonData }) {
         setMonsterChance(e.target.value);
     }
 
-    // Custom Characters
+    // Custom Characters inpu variables
     const [chars, setChars] = useState([]);
     const [customMonsters, setCustomMonsters] = useState([]);
     useEffect(() => {
@@ -82,7 +76,7 @@ function EncounterInput({ data, onAddEncounter, onAddJsonData }) {
         setCustomChance(e.target.value);
     }
 
-    // Autocomplete
+    // Autocomplete stuff
     const [suggestions, setSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [customSuggestions, setCustomSuggestions] = useState([]);
@@ -152,7 +146,6 @@ function EncounterInput({ data, onAddEncounter, onAddJsonData }) {
         setMonsterNum('1');
         setMonsterChance('5');
     }
-
     function handleAddCustomEncounter() {
         const result = { 'chance': customChance, 'data': {} };
         result['data']['type'] = 'custom';
@@ -164,13 +157,12 @@ function EncounterInput({ data, onAddEncounter, onAddJsonData }) {
         setCustomNum('1');
         setCustomChance('5');
     }
-
     function handleAddJsonData() {
         onAddJsonData(jsonData);
         setJsonData('');
     }
 
-    // Util
+    // Helper functions
     const [availSpaces, setAvailSpaces] = useState(20);
     function isSpace() {
         const obj = data;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const JsonDisplay = ({ jsonData = null, editable = false, onChange = null }) => {
@@ -13,7 +13,6 @@ const JsonDisplay = ({ jsonData = null, editable = false, onChange = null }) => 
       setJsonText('');
     }
     // Only run once on initial mount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleTextChange = (e) => {

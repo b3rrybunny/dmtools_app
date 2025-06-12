@@ -1,22 +1,14 @@
 // Modules ------------------------------------------------------------------
-import * as bootstrap from 'bootstrap';
-import { useState, useEffect, useRef, memo } from 'react';
-import ReactDOMServer from 'react-dom/server';
-
+import { useState, useEffect} from 'react';
 
 // Custom -------------------------------------------------------------------
-// Elements / Scripts
-import HPBlock from '../basic/HPBlock';
-import ACBlock from '../basic/ACBlock';
+// Elements
 import HorizLine from '../basic/HorizontalLine';
 import SideBySide from '../basic/SideBySide';
 import BasicCon from '../basic/BasicContainer';
 import JsonDisplay from '../basic/JsonDisplay';
-import * as tools from '../../scripts/tools';
-import * as dice from '../../scripts/dice';
-// Data
-import rawMonstersData from '../../data/srd_5e_monsters.json';
-import * as SRDapi from '../../scripts/dndSRD5eapi';
+
+// Data / Scripts
 import * as storage from '../../scripts/storage';
 
 function DataManagement() {
@@ -44,7 +36,7 @@ function DataManagement() {
     }
     const [editable, setEditable] = useState(false);
 
-    // Data manipulation
+    // Data saving
     const saveData = () => {
         storage.saveData(proxyJson, dataType);
         setEditable(false);

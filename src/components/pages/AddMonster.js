@@ -1,31 +1,24 @@
 // Modules ------------------------------------------------------------------
-import * as bootstrap from 'bootstrap';
-import { useState, useEffect, useRef, memo } from 'react';
+import { useState, useEffect, useRef} from 'react';
 import ReactDOMServer from 'react-dom/server';
 import { createPortal } from 'react-dom';
 
 
 // Custom -------------------------------------------------------------------
-// Elements / Scripts
-import HPBlock from '../basic/HPBlock';
+// Elements
 import ACBlock from '../basic/ACBlock';
 import HorizLine from '../basic/HorizontalLine';
 import SideBySide from '../basic/SideBySide';
 import MonsterCard from '../basic/MonsterCard';
 import BasicCon from '../basic/BasicContainer';
+// Data / Scripts
 import * as tools from '../../scripts/tools';
-import * as dice from '../../scripts/dice';
-// Data
-import rawMonstersData from '../../data/srd_5e_monsters.json';
 import * as SRDapi from '../../scripts/dndSRD5eapi';
 import * as storage from '../../scripts/storage';
 // CSS / Assets
 import '../../css/MonsterDataPage.css';
-
-
 // Data Init
 const allSpellsData = await (SRDapi.getAllSpells());
-const allEquipmentData = await (SRDapi.getAllEquipment());
 const allLanguageData = await (SRDapi.getAllLanguages());
 
 
@@ -68,6 +61,7 @@ function GeneralInfoinput({ onAddGeneralInfo }) {
         handleAddGeneralInfo();
     }
 
+    // Helper functions
     function compileData() {
         return ({
             'name': name,
@@ -78,7 +72,6 @@ function GeneralInfoinput({ onAddGeneralInfo }) {
             'xp': xp
         });
     }
-
     function handleAddGeneralInfo() {
         onAddGeneralInfo(compileData());
     }
@@ -989,7 +982,7 @@ function JsonInput({ value, onChange, onAdd }) {
 
 // Main components ---------------------------------------------------------
 function MonsterInput({ onReload }) {
-    // Stats
+    // Stats variables
     const [profBonus, setProfBonus] = useState('2'); //Proficiency Bonus
     const onProfBonusChange = (e) => {
         setProfBonus(e.target.value);
@@ -1018,6 +1011,7 @@ function MonsterInput({ onReload }) {
     const onCHAChange = (e) => {
         setCHA(e.target.value);
     };
+    // Stats input table function
     function StatsInputTable() {
         return (
             <>
@@ -1144,6 +1138,7 @@ function MonsterInput({ onReload }) {
     const onSpeedChange = (e) => {
         setSpeed(e.target.value);
     };
+    // Combat stats input fucntion
     function CombatInfoInput() {
         return (
             <>
@@ -1254,7 +1249,7 @@ function MonsterInput({ onReload }) {
         );
     }
 
-    // Skills
+    // Skills variables
     const [Acrobatics, setAcrobatics] = useState(false); //Acrobatics
     const onAcrobaticsChange = (e) => {
         setAcrobatics(e.target.checked);
@@ -1327,6 +1322,7 @@ function MonsterInput({ onReload }) {
     const onSurvivalChange = (e) => {
         setSurvival(e.target.checked);
     };
+    // Skills input functions
     function SkillsInput() {
         return (
             <BasicCon margin={2.5} content={
@@ -1500,7 +1496,7 @@ function MonsterInput({ onReload }) {
         );
     }
 
-    // Saving Throws
+    // Saving Throws variables
     const [STRThrow, setSTRThrow] = useState(false); //Strength Saving Throw
     const onSTRThrowChange = (e) => {
         setSTRThrow(e.target.checked);
@@ -1525,6 +1521,7 @@ function MonsterInput({ onReload }) {
     const onCHAThrowChange = (e) => {
         setCHAThrow(e.target.checked);
     };
+    // Saving Throws input function
     function SavingThrowsInput() {
         return (
             <BasicCon margin={2.5} content={
@@ -1585,17 +1582,19 @@ function MonsterInput({ onReload }) {
         );
     }
 
-    // Actions
+    // Actions Variables
     const [actions, setActions] = useState([]); // Array with objects that describe actions
     const [actionType, setActionType] = useState(''); //Action type
     const onActionTypeChange = (e) => {
         setActionType(e.target.value);
     }
+    // Action add function
     function onAddAction(actionData) {
         setActions(prevActions => [...prevActions, actionData]);
         // Clear Actions Fields
         resetActions();
     }
+    // Actions input function
     function ActionsInput() {
         return (
             <>
@@ -1636,6 +1635,7 @@ function MonsterInput({ onReload }) {
             </>
         );
     }
+    // Actions display function
     function DisplayActions() {
         return (
             <div>
@@ -1646,33 +1646,33 @@ function MonsterInput({ onReload }) {
         );
     }
 
-    // Attacks
+    // Attacks array
     function onAddAttack(attackData) {
         setActions(prevActions => [...prevActions, attackData]);
         // Clear Actions Fields
         resetActions();
     }
 
-    // Spells
+    // Spells array
     function onAddSpell(spellData) {
         setActions(prevActions => [...prevActions, spellData]);
         // Clear Actions Fields
         resetActions();
     }
 
-    // General Info
+    // General Info object
     const [generalInfo, setGeneralInfo] = useState({});
     function onAddGeneralInfo(infoData) {
         setGeneralInfo(infoData);
     }
 
-    // Languages
+    // Languages array
     const [languages, setLanguages] = useState([]);
     function onAddLanguage(language) {
         setLanguages(prevLanguages => [...prevLanguages, language]);
     }
 
-    // Senses
+    // Senses variables
     const [senseValue, setSenseValue] = useState('');
     const onSenseValueChange = (e) => {
         setSenseValue(e.target.value);
@@ -1688,6 +1688,7 @@ function MonsterInput({ onReload }) {
         setSenseRange('');
         setSenseValue('');
     }
+    // Senses display function
     function DisplaySenses() {
         return (
             <div>
@@ -1697,6 +1698,7 @@ function MonsterInput({ onReload }) {
             </div>
         );
     }
+    // Senses input function
     function SensesInput() {
         return (
             <BasicCon margin={2.5} content={
@@ -1732,11 +1734,12 @@ function MonsterInput({ onReload }) {
         );
     }
 
-    // Image
+    // Image URL string
     const [imgUrl, setImgUrl] = useState(''); // Image url
     const onImgUrlChange = (e) => {
         setImgUrl(e.target.value);
     }
+    // Image URL input function
     function ImageInput() {
         return (
             <BasicCon margin={2.5} content={
@@ -1772,7 +1775,7 @@ function MonsterInput({ onReload }) {
         saveMonsterData(data);
     }
 
-    // Util functions
+    // Helper functions
     function getMod(statNum, bonus = 0) {
         switch (parseInt(statNum)) {
             case 0:
@@ -1825,7 +1828,6 @@ function MonsterInput({ onReload }) {
                 return (10 + parseInt(bonus));
         }
     }
-
     function ModifierText({ stat, prof = false }) {
         const modifier = getMod(stat, (prof ? parseInt(profBonus) : 0));
 
@@ -1843,16 +1845,15 @@ function MonsterInput({ onReload }) {
 
         return (<p style={{ color: getColor(modifier), textAlign: 'center', margin: '0px' }}>{modifier >= 0 ? ('+' + modifier) : (modifier)}</p>);
     }
-
     const resetActions = () => {
         // Reset Action fields
         setActionType('');
     };
-
     function handleReload() {
         onReload();
     }
 
+    // Save data function
     function saveMonsterData(data = null) {
         const monsterData = {};
         console.log('saveMonsterData called with:', data);
@@ -2032,7 +2033,7 @@ function MonsterInput({ onReload }) {
         onReload();
     }
 
-    // Body
+    // Component Body
     return (
         <div className='monster-input'>
             <div className='row' style={{ display: 'grid', gridTemplateColumns: '1fr auto' }}>
@@ -2137,7 +2138,7 @@ function AddMonster() {
         else setMonsters(null);
     }, [reloadKey]); // Re-run when reloadKey changes
 
-
+    // Monsters display function
     function DisplayMonsters() {
         return (
             <div>
@@ -2150,6 +2151,7 @@ function AddMonster() {
         );
     }
 
+    // Page component body
     return (
         <div className='monster-data-page'>
             <MonsterInput onReload={handleReload} key={reloadKey} />

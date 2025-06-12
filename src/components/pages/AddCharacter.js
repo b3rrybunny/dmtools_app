@@ -1,33 +1,24 @@
 // Modules ------------------------------------------------------------------
-import * as bootstrap from 'bootstrap';
 import { useState, useEffect, useRef, memo } from 'react';
 import ReactDOMServer from 'react-dom/server';
 import { createPortal } from 'react-dom';
 
-
 // Custom -------------------------------------------------------------------
-// Elements / Scripts
+// Elements
 import HPBlock from '../basic/HPBlock';
 import ACBlock from '../basic/ACBlock';
 import HorizLine from '../basic/HorizontalLine';
 import SideBySide from '../basic/SideBySide';
 import CharacterCard from '../basic/CharacterCard';
 import BasicCon from '../basic/BasicContainer';
+// Data / Scripts
 import * as tools from '../../scripts/tools';
-import * as dice from '../../scripts/dice';
-// Data
-import rawMonstersData from '../../data/srd_5e_monsters.json';
 import * as SRDapi from '../../scripts/dndSRD5eapi';
 import * as storage from '../../scripts/storage';
 // CSS / Assets
 import '../../css/CharacterDataPage.css';
-import player_character from '../../assets/player_character.png';
-import NPC_img from '../../assets/NPC.png';
-
-
 // Data Init
 const allSpellsData = await (SRDapi.getAllSpells());
-const allEquipmentData = await (SRDapi.getAllEquipment());
 const allLanguageData = await (SRDapi.getAllLanguages());
 
 
@@ -70,6 +61,7 @@ function GeneralInfoinput({ onAddGeneralInfo }) {
         handleAddGeneralInfo();
     }
 
+    // Helper functions
     function compileData() {
         return ({
             'name': name,
@@ -82,7 +74,6 @@ function GeneralInfoinput({ onAddGeneralInfo }) {
             'isNPC': (type === 'npc' ? true : false)
         });
     }
-
     function handleAddGeneralInfo() {
         onAddGeneralInfo(compileData());
     }
@@ -1002,7 +993,7 @@ function JsonInput({ value, onChange, onAdd }) {
 
 // Main components ---------------------------------------------------------
 function CharacterInput({ onReload }) {
-    // Stats
+    // Stats Variables
     const [profBonus, setProfBonus] = useState('2'); //Proficiency Bonus
     const onProfBonusChange = (e) => {
         setProfBonus(e.target.value);
@@ -1031,6 +1022,7 @@ function CharacterInput({ onReload }) {
     const onCHAChange = (e) => {
         setCHA(e.target.value);
     };
+    // Stats input component
     function StatsInputTable() {
         return (
             <>
@@ -1166,6 +1158,7 @@ function CharacterInput({ onReload }) {
     const onSpeedChange = (e) => {
         setSpeed(e.target.value);
     };
+    // Combat stats input component
     function CombatInfoInput() {
         return (
             <>
@@ -1230,7 +1223,7 @@ function CharacterInput({ onReload }) {
         );
     }
 
-    // Skills
+    // Skills Variables
     const [Acrobatics, setAcrobatics] = useState(false); //Acrobatics
     const onAcrobaticsChange = (e) => {
         setAcrobatics(e.target.checked);
@@ -1303,6 +1296,7 @@ function CharacterInput({ onReload }) {
     const onSurvivalChange = (e) => {
         setSurvival(e.target.checked);
     };
+    // Skills input component
     function SkillsInput() {
         return (
             <BasicCon margin={2.5} content={
@@ -1501,6 +1495,7 @@ function CharacterInput({ onReload }) {
     const onCHAThrowChange = (e) => {
         setCHAThrow(e.target.checked);
     };
+    // Saving Throws input component
     function SavingThrowsInput() {
         return (
             <BasicCon margin={2.5} content={
@@ -1567,11 +1562,13 @@ function CharacterInput({ onReload }) {
     const onActionTypeChange = (e) => {
         setActionType(e.target.value);
     }
+    // Action add func
     function onAddAction(actionData) {
         setActions(prevActions => [...prevActions, actionData]);
         // Clear Actions Fields
         resetActions();
     }
+    // Actions input component
     function ActionsInput() {
         return (
             <>
@@ -1612,6 +1609,7 @@ function CharacterInput({ onReload }) {
             </>
         );
     }
+    // Actions display component
     function DisplayActions() {
         return (
             <div>
@@ -1622,33 +1620,33 @@ function CharacterInput({ onReload }) {
         );
     }
 
-    // Attacks
+    // Attacks array
     function onAddAttack(attackData) {
         setActions(prevActions => [...prevActions, attackData]);
         // Clear Actions Fields
         resetActions();
     }
 
-    // Spells
+    // Spells array
     function onAddSpell(spellData) {
         setActions(prevActions => [...prevActions, spellData]);
         // Clear Actions Fields
         resetActions();
     }
 
-    // General Info
+    // General Info object
     const [generalInfo, setGeneralInfo] = useState({});
     function onAddGeneralInfo(infoData) {
         setGeneralInfo(infoData);
     }
 
-    // Languages
+    // Languages array
     const [languages, setLanguages] = useState([]);
     function onAddLanguage(language) {
         setLanguages(prevLanguages => [...prevLanguages, language]);
     }
 
-    // Senses
+    // Senses arrays
     const [senseValue, setSenseValue] = useState('');
     const onSenseValueChange = (e) => {
         setSenseValue(e.target.value);
@@ -1664,6 +1662,7 @@ function CharacterInput({ onReload }) {
         setSenseRange('');
         setSenseValue('');
     }
+    // Senses display component
     function DisplaySenses() {
         return (
             <div>
@@ -1673,6 +1672,7 @@ function CharacterInput({ onReload }) {
             </div>
         );
     }
+    // Senses input component
     function SensesInput() {
         return (
             <BasicCon margin={2.5} content={
@@ -1708,11 +1708,12 @@ function CharacterInput({ onReload }) {
         );
     }
 
-    // Image
+    // Image string
     const [imgUrl, setImgUrl] = useState(''); // Image url
     const onImgUrlChange = (e) => {
         setImgUrl(e.target.value);
     }
+    // Image url input component
     function ImageInput() {
         return (
             <BasicCon margin={2.5} content={
@@ -1738,17 +1739,17 @@ function CharacterInput({ onReload }) {
         );
     }
 
-    // Note
+    // Note string
     const [note, setNote] = useState('');
 
-    // JSON Input
+    // JSON Input string
     const [jsonInput, setJsonInput] = useState('');
     function onJsonAdd() {
         const data = JSON.parse(jsonInput);
         saveCharacterData(data);
     }
 
-    // Util functions
+    // Helper functions
     function getMod(statNum, bonus = 0) {
         switch (parseInt(statNum)) {
             case 0:
@@ -1801,7 +1802,6 @@ function CharacterInput({ onReload }) {
                 return (10 + parseInt(bonus));
         }
     }
-
     function ModifierText({ stat, prof = false }) {
         const modifier = getMod(stat, (prof ? parseInt(profBonus) : 0));
 
@@ -1819,16 +1819,15 @@ function CharacterInput({ onReload }) {
 
         return (<p style={{ color: getColor(modifier), textAlign: 'center', margin: '0px' }}>{modifier >= 0 ? ('+' + modifier) : (modifier)}</p>);
     }
-
     const resetActions = () => {
         // Reset Action fields
         setActionType('');
     };
-
     function handleReload() {
         onReload();
     }
 
+    // Data saving function
     function saveCharacterData(data = null) {
         const charData = {};
 
@@ -2007,7 +2006,7 @@ function CharacterInput({ onReload }) {
         onReload();
     }
 
-    // Body
+    // Component Body
     return (
         <div className='character-input'>
             <div className='row' style={{ display: 'grid', gridTemplateColumns: '1fr auto' }}>
@@ -2087,6 +2086,7 @@ function CharacterInput({ onReload }) {
     );
 }
 
+// Page component
 function AddCharacter() {
     // Page Title
     useEffect(() => {
@@ -2111,7 +2111,7 @@ function AddCharacter() {
         else setChars(null);
     }, [reloadKey]); // Re-run when reloadKey changes
 
-
+    // Display characters function
     function DisplayChars() {
         return (
             <div>
@@ -2124,6 +2124,7 @@ function AddCharacter() {
         );
     }
 
+    // Page body
     return (
         <div className='character-data-page'>
             <CharacterInput onReload={handleReload} key={reloadKey} />

@@ -1,26 +1,15 @@
 // Modules ------------------------------------------------------------------
-import * as bootstrap from 'bootstrap';
-import { useState, useEffect, useRef, memo } from 'react';
-import ReactDOMServer from 'react-dom/server';
-
+import { useState } from 'react';
 
 // Custom -------------------------------------------------------------------
-// Elements / Scripts
-import HPBlock from '../basic/HPBlock';
-import ACBlock from '../basic/ACBlock';
+// Elements
 import HorizLine from '../basic/HorizontalLine';
 import SideBySide from '../basic/SideBySide';
 import BasicCon from '../basic/BasicContainer';
-import * as tools from '../../scripts/tools';
-import * as dice from '../../scripts/dice';
-// Data
-import rawMonstersData from '../../data/srd_5e_monsters.json';
-import * as SRDapi from '../../scripts/dndSRD5eapi';
+// Data / Scripts
 import * as storage from '../../scripts/storage';
 // CSS / Assets
 import '../../css/CharacterCard.css';
-import player_character from '../../assets/player_character.png';
-import NPC_img from '../../assets/NPC.png';
 
 function DeletePopup({ isOpen, onConfirm, onCancel, charName, charID }) {
     if (!isOpen) return null;
@@ -63,9 +52,19 @@ function DeletePopup({ isOpen, onConfirm, onCancel, charName, charID }) {
 }
 
 function CharacterCard({ data }) {
+    // Vis control
     const [isVisible, setIsVisible] = useState(true);
     const destroySelf = () => setIsVisible(false);
+    const [isOpen, setIsOpen] = useState(false);
+    const openDeletePopup = () => setIsOpen(true);
+    const onPopupClosed = () => setIsOpen(false);
+    const onDelete = () => {
+        onPopupClosed();
+        storage.eraseChar(data.ID);
+        destroySelf();
+    };
 
+    // Util functions
     function getModifier(stat) {
         const numericStat = Number(stat); // Converts strings to numbers (e.g., "18" → 18)
         if (isNaN(numericStat)) return "(Invalid)"; // Fallback for non-numbers
@@ -73,7 +72,6 @@ function CharacterCard({ data }) {
         const modifier = Math.floor((numericStat - 10) / 2);
         return modifier >= 0 ? `(+${modifier})` : `(${modifier})`;
     }
-
     function ModifierText({ modifier }) {
         if (modifier[1] === "+") {
             return (<p style={{ color: 'green', textAlign: 'center', margin: '0px' }}>{modifier}</p>)
@@ -82,7 +80,6 @@ function CharacterCard({ data }) {
             return (<p style={{ color: 'red', textAlign: 'center', margin: '0px' }}>{modifier}</p>)
         }
     }
-
     function StatsTable({ data }) {
         if (data.STR &&
             data.DEX &&
@@ -128,6 +125,7 @@ function CharacterCard({ data }) {
         }
     }
 
+    // Buttons
     const [isCopied, setIsCopied] = useState(false);
     function copyJson() {
         const string = JSON.stringify(data);
@@ -144,14 +142,7 @@ function CharacterCard({ data }) {
         copyToClipboard();
     }
 
-    const [isOpen, setIsOpen] = useState(false);
-    const openDeletePopup = () => setIsOpen(true);
-    const onPopupClosed = () => setIsOpen(false);
-    const onDelete = () => {
-        onPopupClosed();
-        storage.eraseChar(data.ID);
-        destroySelf();
-    };
+    
 
     if (!isVisible) return null;
     return (

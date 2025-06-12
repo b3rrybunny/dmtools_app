@@ -1,25 +1,14 @@
 // Modules ------------------------------------------------------------------
-import * as bootstrap from 'bootstrap';
-import { useState, useEffect, useRef, memo } from 'react';
-import ReactDOMServer from 'react-dom/server';
-
+import { useState, useEffect } from 'react';
 
 // Custom -------------------------------------------------------------------
-// Elements / Scripts
-import HPBlock from '../basic/HPBlock';
-import ACBlock from '../basic/ACBlock';
-import HorizLine from '../basic/HorizontalLine';
+// Elements
 import SideBySide from '../basic/SideBySide';
 import BasicCon from '../basic/BasicContainer';
-import * as tools from '../../scripts/tools';
-import * as dice from '../../scripts/dice';
-// Data
-import rawMonstersData from '../../data/srd_5e_monsters.json';
-import * as SRDapi from '../../scripts/dndSRD5eapi';
-import * as storage from '../../scripts/storage';
 // Assets/CSS
 import '../../css/CombatantCard.css';
 
+// Helper functions
 function getModifier(stat) {
     const numericStat = Number(stat); // Converts strings to numbers (e.g., "18" → 18)
     if (isNaN(numericStat)) return "(Invalid)"; // Fallback for non-numbers
@@ -27,7 +16,6 @@ function getModifier(stat) {
     const modifier = Math.floor((numericStat - 10) / 2);
     return modifier >= 0 ? `(+${modifier})` : `(${modifier})`;
 }
-
 function ModifierText({ modifier }) {
     if (modifier[1] === "+") {
         return (<p style={{ color: 'green', textAlign: 'center', margin: '0px' }}>{modifier}</p>)
@@ -36,7 +24,6 @@ function ModifierText({ modifier }) {
         return (<p style={{ color: 'red', textAlign: 'center', margin: '0px' }}>{modifier}</p>)
     }
 }
-
 function StatsTable({ data }) {
     if (data.STR &&
         data.DEX &&
@@ -82,6 +69,7 @@ function StatsTable({ data }) {
     }
 }
 
+// Main component
 function CombatantCard({ data, isActive, index }) {
     // Proxy values
     const [proxyHP, setProxyHP] = useState(0);
