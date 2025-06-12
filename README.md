@@ -40,6 +40,7 @@ This app uses:
  - [React and React-Router](https://react.dev/)
  - [Bootstrap](https://getbootstrap.com/)
  - [READMEs created with readme.so](https://readme.so/)
+
 Code was written primarily by myself, with minimal help from [DeepSeek](https://chat.deepseek.com/) when I got stuck.
 
 
