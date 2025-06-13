@@ -6,6 +6,7 @@ import { useState } from 'react';
 import HorizLine from '../basic/HorizontalLine';
 import SideBySide from '../basic/SideBySide';
 import BasicCon from '../basic/BasicContainer';
+import JsonDisplay from './JsonDisplay';
 // Data / Scripts
 import * as storage from '../../scripts/storage';
 // CSS / Assets
@@ -51,18 +52,98 @@ function DeletePopup({ isOpen, onConfirm, onCancel, charName, charID }) {
     );
 }
 
-function CharacterCard({ data }) {
-    // Vis control
-    const [isVisible, setIsVisible] = useState(true);
-    const destroySelf = () => setIsVisible(false);
-    const [isOpen, setIsOpen] = useState(false);
-    const openDeletePopup = () => setIsOpen(true);
-    const onPopupClosed = () => setIsOpen(false);
-    const onDelete = () => {
-        onPopupClosed();
-        storage.eraseChar(data.ID);
-        destroySelf();
+function EditPopup({ isOpen, onConfirm, onCancel, data }) {
+    const [ editData, setEditData ] = useState(data);
+    const handleJsonChange = (input) => {
+        setEditData(input);
     };
+    const [ saveable, setSaveable ] = useState(true);
+    const onValidChange = (val) => {
+        setSaveable(val);
+    };
+    const handleConfirm = () => {
+        onConfirm(editData);
+    };
+
+    if (!isOpen) return null;
+    return (
+        <>
+            <div style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 9999
+            }}>
+                <div style={{
+                    backgroundColor: 'white',
+                    padding: '2px',
+                    borderRadius: '8px',
+                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+                    maxWidth: '500px',
+                    width: '100%',
+                    margin: '0 5px',
+                    alignContent: 'center'
+                }}>
+                    <h5 style={{ color: 'blue' }}>Editing {data.name ? data.name : '[INVALID CHAR NAME]'} @ ID: {data.ID}</h5>
+                    <JsonDisplay
+                        jsonData={editData}
+                        editable={true}
+                        onChange={handleJsonChange}
+                        onValidChange={onValidChange}
+                    />
+                    <SideBySide content={
+                        <>
+                            <button
+                                className='btn btn-danger'
+                                onClick={handleConfirm}
+                                disabled={!saveable === false ? false : true}
+                            >
+                                Confirm & save
+                            </button>
+                            <button
+                                className='btn btn-secondary'
+                                onClick={onCancel}
+                            >
+                                Nevermind
+                            </button>
+                        </>
+                    } />
+                </div>
+            </div>
+        </>
+    );
+}
+
+function CharacterCard({ data, fireReload }) {
+    // Vis control
+    const [ isVisible, setIsVisible ] = useState(true);
+    const destroySelf = () => setIsVisible(false);
+
+    // Delete popup
+    const [ isDeleteOpen, setIsDeleteOpen ] = useState(false);
+    const openDeletePopup = () => setIsDeleteOpen(true);
+    const onDeletePopupClosed = () => setIsDeleteOpen(false);
+    const onDelete = () => {
+        onDeletePopupClosed();
+        storage.eraseChar(data.ID);
+        fireReload();
+    };
+
+    // Edit popup
+    const [ isEditOpen, setIsEditOpen ] = useState(false);
+    const openEditPopup = () => setIsEditOpen(true);
+    const onEditPopupClosed = () => setIsEditOpen(false);
+    const onEdit = (newData) => {
+        onEditPopupClosed();
+        storage.saveChar(newData, newData.ID);
+        fireReload();
+    }
 
     // Util functions
     function getModifier(stat) {
@@ -73,7 +154,7 @@ function CharacterCard({ data }) {
         return modifier >= 0 ? `(+${modifier})` : `(${modifier})`;
     }
     function ModifierText({ modifier }) {
-        if (modifier[1] === "+") {
+        if (modifier[ 1 ] === "+") {
             return (<p style={{ color: 'green', textAlign: 'center', margin: '0px' }}>{modifier}</p>)
         }
         else {
@@ -126,7 +207,7 @@ function CharacterCard({ data }) {
     }
 
     // Buttons
-    const [isCopied, setIsCopied] = useState(false);
+    const [ isCopied, setIsCopied ] = useState(false);
     function copyJson() {
         const string = JSON.stringify(data);
         const copyToClipboard = () => {
@@ -142,7 +223,7 @@ function CharacterCard({ data }) {
         copyToClipboard();
     }
 
-    
+
 
     if (!isVisible) return null;
     return (
@@ -162,10 +243,15 @@ function CharacterCard({ data }) {
                             } />
                         </div>
                         {/* Buttons */}
-                        <div className='col'>
-                            <button className='btn btn-primary' onClick={copyJson}>{isCopied ? 'Copied!' : 'Copy character JSON to clipboard'}</button>
-                            <button className='btn btn-danger' onClick={openDeletePopup}>Delete Character</button>
-                        </div>
+                        <SideBySide content={
+                            <>
+                                <button className='btn btn-primary' onClick={copyJson}>{isCopied ? 'Copied!' : 'Copy character JSON to clipboard'}</button>
+                                <button className='btn btn-success' onClick={openEditPopup}>Edit character JSON</button>
+                                <button className='btn btn-danger' onClick={openDeletePopup}>Delete Character</button>
+                            </>
+                        } />
+
+
                     </div>
                     <HorizLine />
                     {/* Body */}
@@ -201,7 +287,7 @@ function CharacterCard({ data }) {
                             } />
                             <SideBySide content={
                                 <BasicCon content={
-                                    <h5>Saving Throws: {data['Saving Throws']}</h5>
+                                    <h5>Saving Throws: {data[ 'Saving Throws' ]}</h5>
                                 } />
                             } />
                             <SideBySide content={
@@ -227,7 +313,7 @@ function CharacterCard({ data }) {
                                 <>
                                     <h5>Actions:</h5>
                                     <div
-                                        dangerouslySetInnerHTML={{ __html: data['Actions'] }}
+                                        dangerouslySetInnerHTML={{ __html: data[ 'Actions' ] }}
                                         style={{ justifyContent: 'left', textAlign: 'left' }}
                                     />
                                 </>
@@ -235,11 +321,17 @@ function CharacterCard({ data }) {
                         </div>
                     </div>
                     <DeletePopup
-                        isOpen={isOpen}
+                        isOpen={isDeleteOpen}
                         onConfirm={onDelete}
-                        onCancel={onPopupClosed}
+                        onCancel={onDeletePopupClosed}
                         charName={data.name}
                         charID={data.ID}
+                    />
+                    <EditPopup
+                        isOpen={isEditOpen}
+                        onConfirm={onEdit}
+                        onCancel={onEditPopupClosed}
+                        data={data}
                     />
                 </>
             } />

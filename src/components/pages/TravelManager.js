@@ -2,8 +2,6 @@
 import { useState, useEffect } from 'react';
 import isEqual from 'lodash/isEqual';
 
-
-
 // Custom -------------------------------------------------------------------
 // Elements / Scripts
 import HorizLine from '../basic/HorizontalLine';
@@ -797,7 +795,7 @@ function TravelManager() {
     }
 
     return (
-        <div className='travel-manager'>
+        <div className='travel-manager fade-drop-in'>
             <div className='justify-content-center mb-2'>
                 <BasicCon content={
                     <>

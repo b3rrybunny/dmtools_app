@@ -1,263 +1,43 @@
 // Modules ------------------------------------------------------------------
-import * as bootstrap from 'bootstrap';
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-
 // Custom -------------------------------------------------------------------
-// Elements / Scripts
-import HPBlock from '../basic/HPBlock';
+// Elements
 import HorizLine from '../basic/HorizontalLine';
 import SideBySide from '../basic/SideBySide';
-import CharacterCard from '../basic/CharacterCard';
+import CombatantCard from '../basic/CombatantCard';
 import BasicCon from '../basic/BasicContainer';
-import * as tools from '../../scripts/tools';
-import * as dice from '../../scripts/dice';
-// Data
+// Data / Scripts
 import rawMonstersData from '../../data/srd_5e_monsters.json';
+import * as dice from '../../scripts/dice';
+import * as tools from '../../scripts/tools';
 import * as storage from '../../scripts/storage';
 // CSS / Assets
 import '../../css/CombatManager.css';
-import player_character from '../../assets/player_character.png';
-import NPC_img from '../../assets/NPC.png';
-import CombatantCard from '../basic/CombatantCard';
 
 
-
-function getModifier(stat) {
-    const numericStat = Number(stat); // Converts strings to numbers (e.g., "18" → 18)
-    if (isNaN(numericStat)) return "(Invalid)"; // Fallback for non-numbers
-
-    const modifier = Math.floor((numericStat - 10) / 2);
-    return modifier >= 0 ? `(+${modifier})` : `(${modifier})`;
-}
-
-function ModifierText({ modifier }) {
-    if (modifier[1] === "+") {
-        return (<p style={{ color: 'green', textAlign: 'center', margin: '0px' }}>{modifier}</p>)
-    }
-    else {
-        return (<p style={{ color: 'red', textAlign: 'center', margin: '0px' }}>{modifier}</p>)
-    }
-}
-
-function StatsTable({ data }) {
-    if (data.STR &&
-        data.DEX &&
-        data.CON &&
-        data.INT &&
-        data.WIS &&
-        data.CHA) {
-        return (
-            <>
-                <table>
-                    <tbody>
-                        <tr>
-                            <td>STR: </td>
-                            <td>{data.STR} </td>
-                            <td><ModifierText modifier={data.STR_mod ? data.STR_mod : getModifier(data.STR)} /></td>
-                            <td>DEX: </td>
-                            <td>{data.DEX} </td>
-                            <td><ModifierText modifier={data.DEX_mod ? data.DEX_mod : getModifier(data.DEX)} /></td>
-                        </tr>
-                        <tr>
-                            <td>CON: </td>
-                            <td>{data.CON} </td>
-                            <td><ModifierText modifier={data.CON_mod ? data.CON_mod : getModifier(data.CON)} /></td>
-                            <td>INT: </td>
-                            <td>{data.INT} </td>
-                            <td><ModifierText modifier={data.INT_mod ? data.INT_mod : getModifier(data.INT)} /></td>
-                        </tr>
-                        <tr>
-                            <td>WIS: </td>
-                            <td>{data.WIS} </td>
-                            <td><ModifierText modifier={data.WIS_mod ? data.WIS_mod : getModifier(data.WIS)} /></td>
-                            <td>CHA: </td>
-                            <td>{data.CHA} </td>
-                            <td><ModifierText modifier={data.CHA_mod ? data.CHA_mod : getModifier(data.CHA)} /></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </>
-        )
-    }
-    else {
-        return (<p>No stats data.</p>)
-    }
-}
-
-function CreatureImg({ img }) {
-    if (img === 'player') {
-        return (
-            <div className="col-md-4 card-img-player" style={{ alignContent: 'center', justifyContent: 'center', padding: '0px' }}>
-                <img src={player_character} className="img-fluid rounded" style={{ maxHeight: '270px' }} />
-            </div>
-        )
-    }
-    else if (img === 'npc') {
-        return (
-            <div className="col-md-4 card-img-npc" style={{ alignContent: 'center', justifyContent: 'center', padding: '0px' }}>
-                <img src={NPC_img} className="img-fluid rounded" style={{ maxHeight: '270px' }} />
-            </div>
-        )
-    }
-    else {
-        return (
-            <div className="col-md-4 card-img-monster" style={{ alignContent: 'center', justifyContent: 'center', padding: '0px' }}>
-                <img src={img} className="img-fluid rounded" style={{ maxHeight: '270px' }} />
-            </div>
-        )
-    }
-}
-
-function CreatureActions({ data = null }) {
-    const infoToDisplay = [
-        'Actions',
-        'Legendary Actions',
-        'Speed',
-        'Saving Throws',
-        'Senses'
-    ];
-
-    const content = [];
-
-    for (const key of infoToDisplay) {
-        if (key === 'Actions') {
-            if (data?.[key]) {
-                content.push(
-                    <div key={key} className=''>
-                        <h5>{key}:</h5>
-                        <div dangerouslySetInnerHTML={{ __html: data[key] }} />
-                        <hr style={{ marginRight: '5px' }} />
-                    </div>
-                );
-            }
-        }
-        else if (key === 'Legendary Actions') {
-            if (data?.[key]) {
-                content.push(
-                    <div key={key} className=''>
-                        <h5>{key}:</h5>
-                        <div dangerouslySetInnerHTML={{ __html: data[key] }} />
-                        <hr style={{ marginRight: '5px' }} />
-                    </div>
-                );
-            }
-        }
-        else {
-            content.push(
-                <div key={key} className='side-by-side'>
-                    {key}: {data?.[key] ?? 'N/A'}
-                </div>
-            );
-        }
-    }
-
-    return (
-        <div className='creature-info'>
-            {content}
-        </div>
-    );
-}
-
-function CreatureCard({ data = null, index, onChange, isActive }) {
-
-    const handleHPChange = (mod) => {
-        if (data?.rolledHP !== undefined) {
-            // Working with rolledHP
-            const newValue = mod === '+' ? parseInt(data.rolledHP) + 1 : parseInt(data.rolledHP) - 1;
-            onChange(data.id, 'rolledHP', newValue); // Prevent negative HP
-        } else {
-            // Working with regular hp
-            const currentHP = data.hp || 0;
-            const newValue = mod === '+' ? parseInt(currentHP) + 1 : parseInt(currentHP) - 1;
-            onChange(data.id, 'hp', newValue);
-        }
-    }
-
-    return (
-        <div className={"card mb-3 " + (
-            data?.isPlayer ? 'player-card' : //player card style
-                data?.isNPC ? 'npc-card' : //npc cards style
-                    'monster-card' //default (monster) style
-        ) + (
-                isActive ? ' active' : //Active combatant
-                    ' inactive' //Nonactive combatant
-            ) + (
-                data?.rolledHP <= 0 ? ' danger' : //HP <=0, bg changes to warning
-                    data.hp <= 0 ? ' danger' : //HP <=0, bg changes to warning
-                        ''
-            )
-        }>
-            <div className="row g-0">
-                {
-                    data?.isPlayer ? <CreatureImg img='player' /> : //player img
-                        data?.isNPC ? <CreatureImg img='npc' /> : //npc img
-                            <CreatureImg img={data.img_url} /> //default img
-                }
-                <div className="col-md-8" style={{ padding: '5px' }}>
-                    {/* Index. Name */}
-                    <div className='side-by-side'>
-                        <h1 className="card-title">{index}. {data.name}</h1>
-                        <p>{data.init}</p>
-                    </div>
-                    {/* HP, AC */}
-                    <div className="side-by-side">
-                        <div>
-                            <HPBlock hp={data?.rolledHP !== undefined ? data.rolledHP : data.hp} onChange={handleHPChange} />
-                        </div>
-                        <div className='ac-block'>
-                            <h4>⛊ AC: {dice.extractNumbersOutsideParentheses(data['ac'].toString())}</h4>
-                        </div>
-                    </div>
-                    {/* Stats */}
-                    <StatsTable data={data} />
-                </div>
-
-            </div>
-            <BasicCon margin={3} content={
-                <>
-                    <h5>Traits:</h5>
-                    <div
-                        dangerouslySetInnerHTML={{ __html: data['Traits'] }}
-                        style={{ justifyContent: 'left', textAlign: 'left' }}
-                    />
-                </>
-            } />
-            <div className='row g-0 mt-2 card-extra-info'>
-                <CreatureActions data={data} />
-            </div>
-            <p className="card-text"><small className="text-body-secondary">{
-                data?.manualAdd ? 'Added manually' :
-                    data?.autoAdd ? 'Added via autocomplete' :
-                        'Unknown add method'
-            }</small></p>
-
-        </div>
-    )
-
-}
-
-function CardContainer({ combatants, currentCombatant, onChange }) {
+function CardContainer({ combatants, currentCombatant }) {
     const cardRefs = useRef([]);
 
     // Auto-scroll to current combatant when currentCombatant changes
     useEffect(() => {
-        if (cardRefs.current[currentCombatant]) {
-            cardRefs.current[currentCombatant].scrollIntoView({
+        if (cardRefs.current[ currentCombatant ]) {
+            cardRefs.current[ currentCombatant ].scrollIntoView({
                 behavior: 'smooth',
                 block: 'start', // Centers the element vertically in the viewport
                 inline: 'nearest'
             });
         }
-    }, [currentCombatant]);
+    }, [ currentCombatant ]);
 
     return (
         <div className="card-container">
             {combatants.map((combatant, index) => (
                 <div
                     key={combatant.id}
-                    ref={el => cardRefs.current[index] = el}
+                    ref={el => cardRefs.current[ index ] = el}
+                    className='fade-drop-in'
                 >
                     <CombatantCard
                         data={combatant}
@@ -271,38 +51,38 @@ function CardContainer({ combatants, currentCombatant, onChange }) {
 }
 
 function InputWindow({ onTestPopulate, onAutocompleteAdd, onManualAdd, onClear, onCustomAdd }) {
-    const [suggestions, setSuggestions] = useState([]);
-    const [showSuggestions, setShowSuggestions] = useState(false);
-    const [customSuggestions, setCustomSuggestions] = useState([]);
-    const [showCustomSuggestions, setCustomShowSuggestions] = useState(false);
+    const [ suggestions, setSuggestions ] = useState([]);
+    const [ showSuggestions, setShowSuggestions ] = useState(false);
+    const [ customSuggestions, setCustomSuggestions ] = useState([]);
+    const [ showCustomSuggestions, setCustomShowSuggestions ] = useState(false);
 
     // Auto
-    const [autoAdvSelected, setAutoAdvSelected] = useState('');
-    const [autoValue, setAutoValue] = useState('');
-    const [numToAdd, setNumToAdd] = useState('1');
-    const [customMonsters, setCustomMonsters] = useState([]);
+    const [ autoAdvSelected, setAutoAdvSelected ] = useState('');
+    const [ autoValue, setAutoValue ] = useState('');
+    const [ numToAdd, setNumToAdd ] = useState('1');
+    const [ customMonsters, setCustomMonsters ] = useState([]);
     useEffect(() => {
         const monsterData = storage.retrieve('monsterData');
         setCustomMonsters(monsterData ? monsterData.monsters : []);
     }, []); // Empty dependency array means this runs once on mount
-    const monsterPool = [...rawMonstersData, ...customMonsters];
+    const monsterPool = [ ...rawMonstersData, ...customMonsters ];
 
     // Manual
-    const [manualName, setManualName] = useState('');
-    const [manualAdvSelected, setManualAdvSelected] = useState('');
-    const [manualHP, setManualHP] = useState('');
-    const [manualAC, setManualAC] = useState('');
-    const [manualInit, setManualInit] = useState('');
-    const [manualType, setManualType] = useState('player');
+    const [ manualName, setManualName ] = useState('');
+    const [ manualAdvSelected, setManualAdvSelected ] = useState('');
+    const [ manualHP, setManualHP ] = useState('');
+    const [ manualAC, setManualAC ] = useState('');
+    const [ manualInit, setManualInit ] = useState('');
+    const [ manualType, setManualType ] = useState('player');
 
     // Custom Characters
-    const [chars, setChars] = useState([]);
+    const [ chars, setChars ] = useState([]);
     useEffect(() => {
         const charData = storage.retrieve('charData');
         setChars(charData ? charData.chars : []);
     }, []); // Empty dependency array means this runs once on mount
-    const [customName, setCustomName] = useState('');
-    const [customInit, setCustomInit] = useState('');
+    const [ customName, setCustomName ] = useState('');
+    const [ customInit, setCustomInit ] = useState('');
     const handleCustomInitChange = (e) => {
         setCustomInit(e.target.value);
     }
@@ -334,7 +114,7 @@ function InputWindow({ onTestPopulate, onAutocompleteAdd, onManualAdd, onClear, 
     };
     const handleCustomAdd = () => {
         const charData = chars.find(char => char.name === customName);
-        charData['init'] = customInit;
+        charData[ 'init' ] = customInit;
         onCustomAdd(charData); // Pass data to parent
 
         setCustomName(''); // Optional: Clear input after submission
@@ -739,16 +519,16 @@ function CombatManager() {
     }, []);
 
     // Data
-    const [combatants, setCombatants] = useState([]);
-    const [currentCombatantIndex, setCurrentCombatantIndex] = useState(0);
+    const [ combatants, setCombatants ] = useState([]);
+    const [ currentCombatantIndex, setCurrentCombatantIndex ] = useState(0);
 
     // Add Funcs
-    const [monsterPool, setMonsterPool] = useState([]);
+    const [ monsterPool, setMonsterPool ] = useState([]);
     useEffect(() => {
         const monsterData = storage.retrieve('monsterData');
         const customMonsters = monsterData ? monsterData.monsters : [];
 
-        setMonsterPool([...rawMonstersData, ...customMonsters]);
+        setMonsterPool([ ...rawMonstersData, ...customMonsters ]);
     }, []); // Empty dependency array means this runs once on mount
 
     const addMonsterData = (monsterName, adv = '') => {
@@ -767,7 +547,7 @@ function CombatManager() {
         monsterToAdd.rolledHP = dice.rollDice(monsterToAdd.hp);
         monsterToAdd.id = Date.now() + Math.random();
         monsterToAdd.autoAdd = true;
-        setCombatants(prevCombatants => [...prevCombatants, monsterToAdd]);
+        setCombatants(prevCombatants => [ ...prevCombatants, monsterToAdd ]);
         // Sort after adding
         setTimeout(() => sortCombatantsByInit(), 0);
     }
@@ -778,13 +558,13 @@ function CombatManager() {
 
     function handleManualAdd(manualData) {
         manualData.manualAdd = true;
-        setCombatants(prevCombatants => [...prevCombatants, manualData]);
+        setCombatants(prevCombatants => [ ...prevCombatants, manualData ]);
         // Sort after adding
         setTimeout(() => sortCombatantsByInit(), 0);
     }
 
     function handleCustomAdd(charData) {
-        setCombatants(prevCombatants => [...prevCombatants, charData]);
+        setCombatants(prevCombatants => [ ...prevCombatants, charData ]);
         // Sort after adding
         setTimeout(() => sortCombatantsByInit(), 0);
     }
@@ -796,14 +576,14 @@ function CombatManager() {
             selections.push(Math.floor(Math.random() * (dataLength + 1)));
         }
         selections.forEach(index => {
-            const monsterName = rawMonstersData[index].name;
+            const monsterName = rawMonstersData[ index ].name;
             addMonsterData(monsterName);
         })
     }
 
     // Imported data from Travel Manager
-    const [searchParams] = useSearchParams();
-    const [hasProcessedParams, setHasProcessedParams] = useState(false);
+    const [ searchParams ] = useSearchParams();
+    const [ hasProcessedParams, setHasProcessedParams ] = useState(false);
 
     useEffect(() => {
         // Only process params if monsterPool is populated AND we haven't processed yet
@@ -831,7 +611,7 @@ function CombatManager() {
 
             setHasProcessedParams(true);
         }
-    }, [searchParams, hasProcessedParams, monsterPool]); // Add monsterPool as dependency
+    }, [ searchParams, hasProcessedParams, monsterPool ]); // Add monsterPool as dependency
 
     // Combat flow control
     function handleOnPrev() {
@@ -855,7 +635,7 @@ function CombatManager() {
     // Util
     const sortCombatantsByInit = () => {
         setCombatants(prevCombatants => {
-            const sorted = [...prevCombatants].sort((a, b) => {
+            const sorted = [ ...prevCombatants ].sort((a, b) => {
                 const aInit = a.init || 0;
                 const bInit = b.init || 0;
                 return bInit - aInit; // Descending order (highest initiative first)
@@ -878,9 +658,9 @@ function CombatManager() {
                         currentCombatant={currentCombatantIndex}
                     />
                 </div>
-                <div className='col ml-0' style={{ paddingLeft: '0px' }}>
+                <div className='col ml-0 fade-drop-in' style={{ paddingLeft: '0px' }}>
                     <CombatControl
-                        data={combatants.length > 0 ? combatants[currentCombatantIndex] : null} // Use the sorted combatants state
+                        data={combatants.length > 0 ? combatants[ currentCombatantIndex ] : null} // Use the sorted combatants state
                         onSort={sortCombatantsByInit}
                         onPrev={handleOnPrev}
                         onNext={handleOnNext}

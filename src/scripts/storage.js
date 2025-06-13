@@ -53,38 +53,68 @@ export function erase(storageItem = null) {
     }
 }
 
-export function saveChar(data) {
-    if (check('charData')) {
-        if (data?.['ID']) {
-            console.log('%c⚠️ saveChar(): Input data already has an ID. Overwriting...', 'color: yellow');
-            data['ID'] = tools.genID();
-            console.log('%c⚠️ New charData ID: ' + data['ID'], 'color: yellow');
+export function saveChar(data, id = null) {
+    if (check('charData')) { // If charData exists...
+        if (data?.[ 'ID' ]) { //...if input data has an ID...
+            if (parseInt(data[ 'ID' ]) === id) { //...if input data matches input ID...
+                const charData = retrieve('charData');
+                const count = charData.count;
+                const newCharArray = charData.chars.map(item =>
+                    item.ID === id ? data : item
+                )
+                const newCharData = {
+                    'count': count,
+                    'chars': newCharArray
+                }
+                //...overwrite character @ specified ID.
+                localStorage.setItem('charData', JSON.stringify(newCharData));
+                console.log('%c✅ Overwrit character @ ID ' + id + ' Data:', 'color: lime');
+                tools.prettyLog(newCharData, 'Character Data');
+                return;
+            }
+            else if (parseInt(data[ 'ID' ]) !== id) { //...if input data ID does NOT match input ID...
+                //...raise error and do not save.
+                console.error('Cannot save character @ ID ' + id + '. Input ID does not match.');
+                return;
+            }
+            else if (id === null) { //..if there was no input ID...
+                //...overwrite ID.
+                console.log('%c⚠️ saveChar(): Input data already has an ID. Overwriting...', 'color: yellow');
+                data[ 'ID' ] = tools.genID();
+                console.log('%c⚠️ New charData ID: ' + data[ 'ID' ], 'color: yellow');
+            }
         }
-        else {
-            data['ID'] = tools.genID();
+        else { //...if input ID does not exist, generate one.
+            data[ 'ID' ] = tools.genID();
         }
         const charData = retrieve('charData');
-        charData['count'] = parseInt(charData['count']) + 1;
-        charData['chars'] = [...charData['chars'], data];
+        charData[ 'count' ] = parseInt(charData[ 'count' ]) + 1;
+        charData[ 'chars' ] = [ ...charData[ 'chars' ], data ];
         localStorage.setItem('charData', JSON.stringify(charData));
         console.log('%c✅ Saved charData in local storage. Data:', 'color: lime');
         tools.prettyLog(charData, 'Character Data');
     }
-    else {
-        if (data?.['ID']) {
-            console.log('%c⚠️ saveChar(): Input data already has an ID. Overwriting...', 'color: yellow');
-            data['ID'] = tools.genID();
-            console.log('%c⚠️ New charData ID: ' + data['ID'], 'color: yellow');
+    else { //If charData does not exist...
+        if (data?.[ 'ID' ]) { //...if input data has an ID...
+            if (parseInt(data[ 'ID' ]) !== id) { //...if input data ID does NOT match input ID...
+                //...raise error and do not save.
+                console.error('Cannot save character @ ID ' + id + '. Input ID does not match.');
+                return;
+            }
+            else if (id === null) { //..if there was no input ID...
+                //...overwrite ID.
+                console.log('%c⚠️ saveChar(): Input data already has an ID. Overwriting...', 'color: yellow');
+                data[ 'ID' ] = tools.genID();
+                console.log('%c⚠️ New charData ID: ' + data[ 'ID' ], 'color: yellow');
+            }
         }
-        else {
-            data['ID'] = tools.genID();
+        else { //...if input ID does not exist, generate one.
+            data[ 'ID' ] = tools.genID();
         }
         const charData = {
             'count': 1,
-            'chars': [
-                data
-            ]
-        };
+            'chars': [ data ]
+        }
         localStorage.setItem('charData', JSON.stringify(charData));
         console.log('%c✅ Created and saved charData in local storage. Data:', 'color: lime');
         tools.prettyLog(charData, 'Character Data');
@@ -94,8 +124,8 @@ export function saveChar(data) {
 export function eraseChar(charID) {
     if (check('charData')) {
         const charData = retrieve('charData');
-        const newCharDataArray = charData['chars'].filter(item => item['ID'] !== charID);
-        charData['chars'] = newCharDataArray;
+        const newCharDataArray = charData[ 'chars' ].filter(item => item[ 'ID' ] !== charID);
+        charData[ 'chars' ] = newCharDataArray;
         localStorage.setItem('charData', JSON.stringify(charData));
         console.log("%c✅ Removed character @ ID: " + charID + ". New charData:", 'color: lime');
         tools.prettyLog(charData, 'Character Data');
@@ -105,38 +135,68 @@ export function eraseChar(charID) {
     }
 }
 
-export function saveMonster(data) {
-    if (check('monsterData')) {
-        if (data?.['ID']) {
-            console.log('%c⚠️ saveMonster(): Input data already has an ID. Overwriting...', 'color: yellow');
-            data['ID'] = tools.genID();
-            console.log('%c⚠️ New monsterData ID: ' + data['ID'], 'color: yellow');
+export function saveMonster(data, id = null) {
+    if (check('monsterData')) { // If monsterData exists...
+        if (data?.[ 'ID' ]) { //...if input data has an ID...
+            if (parseInt(data[ 'ID' ]) === id) { //...if input data matches input ID...
+                const monsterData = retrieve('monsterData');
+                const count = monsterData.count;
+                const newMonsterArray = monsterData.monsters.map(item =>
+                    item.ID === id ? data : item
+                )
+                const newMonsterData = {
+                    'count': count,
+                    'monsters': newMonsterArray
+                }
+                //...overwrite monster @ specified ID.
+                localStorage.setItem('monsterData', JSON.stringify(newMonsterData));
+                console.log('%c✅ Overwrit monster @ ID ' + id + ' Data:', 'color: lime');
+                tools.prettyLog(newMonsterData, 'Monster Data');
+                return;
+            }
+            else if (parseInt(data[ 'ID' ]) !== id) { //...if input data ID does NOT match input ID...
+                //...raise error and do not save.
+                console.error('Cannot save monster @ ID ' + id + '. Input ID does not match.');
+                return;
+            }
+            else if (id === null) { //..if there was no input ID...
+                //...overwrite ID.
+                console.log('%c⚠️ saveMonster(): Input data already has an ID. Overwriting...', 'color: yellow');
+                data[ 'ID' ] = tools.genID();
+                console.log('%c⚠️ New monsterData ID: ' + data[ 'ID' ], 'color: yellow');
+            }
         }
-        else {
-            data['ID'] = tools.genID();
+        else { //...if input ID does not exist, generate one.
+            data[ 'ID' ] = tools.genID();
         }
         const monsterData = retrieve('monsterData');
-        monsterData['count'] = parseInt(monsterData['count']) + 1;
-        monsterData['monsters'] = [...monsterData['monsters'], data];
+        monsterData[ 'count' ] = parseInt(monsterData[ 'count' ]) + 1;
+        monsterData[ 'monsters' ] = [ ...monsterData[ 'monsters' ], data ];
         localStorage.setItem('monsterData', JSON.stringify(monsterData));
         console.log('%c✅ Saved monsterData in local storage. Data:', 'color: lime');
         tools.prettyLog(monsterData, 'Monster Data');
     }
-    else {
-        if (data?.['ID']) {
-            console.log('%c⚠️ saveMonster(): Input data already has an ID. Overwriting...', 'color: yellow');
-            data['ID'] = tools.genID();
-            console.log('%c⚠️ New monsterData ID: ' + data['ID'], 'color: yellow');
+    else { //If monsterData does not exist...
+        if (data?.[ 'ID' ]) { //...if input data has an ID...
+            if (parseInt(data[ 'ID' ]) !== id) { //...if input data ID does NOT match input ID...
+                //...raise error and do not save.
+                console.error('Cannot save monster @ ID ' + id + '. Input ID does not match.');
+                return;
+            }
+            else if (id === null) { //..if there was no input ID...
+                //...overwrite ID.
+                console.log('%c⚠️ saveMonster(): Input data already has an ID. Overwriting...', 'color: yellow');
+                data[ 'ID' ] = tools.genID();
+                console.log('%c⚠️ New monsterData ID: ' + data[ 'ID' ], 'color: yellow');
+            }
         }
-        else {
-            data['ID'] = tools.genID();
+        else { //...if input ID does not exist, generate one.
+            data[ 'ID' ] = tools.genID();
         }
         const monsterData = {
             'count': 1,
-            'monsters': [
-                data
-            ]
-        };
+            'monsters': [ data ]
+        }
         localStorage.setItem('monsterData', JSON.stringify(monsterData));
         console.log('%c✅ Created and saved monsterData in local storage. Data:', 'color: lime');
         tools.prettyLog(monsterData, 'Monster Data');
@@ -146,8 +206,8 @@ export function saveMonster(data) {
 export function eraseMonster(monsterID) {
     if (check('monsterData')) {
         const monsterData = retrieve('monsterData');
-        const newMonsterDataArray = monsterData['monsters'].filter(item => item['ID'] !== monsterID);
-        monsterData['monsters'] = newMonsterDataArray;
+        const newMonsterDataArray = monsterData[ 'monsters' ].filter(item => item[ 'ID' ] !== monsterID);
+        monsterData[ 'monsters' ] = newMonsterDataArray;
         localStorage.setItem('monsterData', JSON.stringify(monsterData));
         console.log("%c✅ Removed monsteracter @ ID: " + monsterID + ". New monsterData:", 'color: lime');
         tools.prettyLog(monsterData, 'Monster Data');

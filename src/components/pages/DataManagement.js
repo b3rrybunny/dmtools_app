@@ -29,6 +29,7 @@ function DataManagement() {
     const handleDataTypeChange = (e) => {
         const newDataType = e.target.value;
         setDataType(newDataType);
+        setEditable(false);
         if (newDataType === '') {
             setProxyJson({ "no data": "to display" });
         }
@@ -61,7 +62,7 @@ function DataManagement() {
     }
 
     return (
-        <div style={{overflowY: 'auto !important', height: '92.5vh'}}>
+        <div className='fade-drop-in' style={{overflowY: 'auto !important', height: '92.5vh'}}>
             <BasicCon margin={7} content={
                 <>
                     <h1>Data Management</h1>

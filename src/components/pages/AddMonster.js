@@ -1,8 +1,7 @@
 // Modules ------------------------------------------------------------------
-import { useState, useEffect, useRef} from 'react';
+import { useState, useEffect, useRef } from 'react';
 import ReactDOMServer from 'react-dom/server';
 import { createPortal } from 'react-dom';
-
 
 // Custom -------------------------------------------------------------------
 // Elements
@@ -25,37 +24,37 @@ const allLanguageData = await (SRDapi.getAllLanguages());
 // Subcomponents ------------------------------------------------------------
 function GeneralInfoinput({ onAddGeneralInfo }) {
     // General Info
-    const [name, setName] = useState(''); //Name
+    const [ name, setName ] = useState(''); //Name
     const onNameChange = (e) => {
         setName(e.target.value);
         handleAddGeneralInfo();
     }
-    const [chrClass, setChrClass] = useState('Generic'); //Class
+    const [ chrClass, setChrClass ] = useState('Generic'); //Class
     const onChrClassChange = (e) => {
         setChrClass(e.target.value);
         handleAddGeneralInfo();
     }
-    const [level, setLevel] = useState('1'); //Level
+    const [ level, setLevel ] = useState('1'); //Level
     const onLevelChange = (e) => {
         setLevel(e.target.value);
         handleAddGeneralInfo();
     }
-    const [race, setRace] = useState(''); //Race
+    const [ race, setRace ] = useState(''); //Race
     const onRaceChange = (e) => {
         setRace(e.target.value);
         handleAddGeneralInfo();
     }
-    const [alignment, setAlignment] = useState(''); //Alignment
+    const [ alignment, setAlignment ] = useState(''); //Alignment
     const onAlignmentChange = (e) => {
         setAlignment(e.target.value);
         handleAddGeneralInfo();
     }
-    const [xp, setXp] = useState('0'); //Experience Points
+    const [ xp, setXp ] = useState('0'); //Experience Points
     const onXpChange = (e) => {
         setXp(e.target.value);
         handleAddGeneralInfo();
     }
-    const [type, setType] = useState(''); //Monster type
+    const [ type, setType ] = useState(''); //Monster type
     const onTypeChange = (e) => {
         setType(e.target.value);
         handleAddGeneralInfo();
@@ -182,63 +181,63 @@ function GeneralInfoinput({ onAddGeneralInfo }) {
 
 function AttackInput({ onAddAttack }) {
     // Variables
-    const [attackType, setAttackType] = useState(''); //Attack type
+    const [ attackType, setAttackType ] = useState(''); //Attack type
     const onAttackTypeChange = (e) => {
         setAttackType(e.target.value);
     }
-    const [attackRange, setAttackRange] = useState('5'); //Attack reach
+    const [ attackRange, setAttackRange ] = useState('5'); //Attack reach
     const onAttackRangeChange = (e) => {
         setAttackRange(e.target.value);
     }
-    const [attackDesc, setAttackDesc] = useState(''); //Attack desc
+    const [ attackDesc, setAttackDesc ] = useState(''); //Attack desc
     const onAttackDescChange = (e) => {
         setAttackDesc(e.target.value);
     }
-    const [attackToHit, setAttackToHit] = useState('0'); //Attack to hit modifier
+    const [ attackToHit, setAttackToHit ] = useState('0'); //Attack to hit modifier
     const onAttackToHitChange = (e) => {
         setAttackToHit(e.target.value);
     }
-    const [attackTargets, setAttackTargets] = useState('1'); //Number of targets attack can hit
+    const [ attackTargets, setAttackTargets ] = useState('1'); //Number of targets attack can hit
     const onAttackTargetsChange = (e) => {
         setAttackTargets(e.target.value);
     }
-    const [attackNumOfDice, setAttackNumOfDice] = useState('1'); //Number of dice for damage roll
+    const [ attackNumOfDice, setAttackNumOfDice ] = useState('1'); //Number of dice for damage roll
     const onAttackNumOfDiceChange = (e) => {
         setAttackNumOfDice(e.target.value);
     }
-    const [attackDice, setAttackDice] = useState('4'); //Dice type for damage roll
+    const [ attackDice, setAttackDice ] = useState('4'); //Dice type for damage roll
     const onAttackDiceChange = (e) => {
         setAttackDice(e.target.value);
     }
-    const [attackDamageType, setAttackDamageType] = useState(''); //Damage type for attack
+    const [ attackDamageType, setAttackDamageType ] = useState(''); //Damage type for attack
     const onAttackDamageTypeChange = (e) => {
         setAttackDamageType(e.target.value);
     }
-    const [attackDamageMod, setAttackDamageMod] = useState('0'); //Damage modifier for attack
+    const [ attackDamageMod, setAttackDamageMod ] = useState('0'); //Damage modifier for attack
     const onAttackDamageModChange = (e) => {
         setAttackDamageMod(e.target.value);
     }
-    const [attackAddlDamage, setAttackAddlDamage] = useState('false'); //Does attack have add'l damage?
+    const [ attackAddlDamage, setAttackAddlDamage ] = useState('false'); //Does attack have add'l damage?
     const onAttackAddlDamageChange = (e) => {
         setAttackAddlDamage(e.target.value);
     }
-    const [attackAddlNumOfDice, setAttackAddlNumOfDice] = useState('1'); //Number of dice for add'l damage roll
+    const [ attackAddlNumOfDice, setAttackAddlNumOfDice ] = useState('1'); //Number of dice for add'l damage roll
     const onAttackAddlNumOfDiceChange = (e) => {
         setAttackAddlNumOfDice(e.target.value);
     }
-    const [attackAddlDice, setAttackAddlDice] = useState('4'); //Dice type for add'l damage roll
+    const [ attackAddlDice, setAttackAddlDice ] = useState('4'); //Dice type for add'l damage roll
     const onAttackAddlDiceChange = (e) => {
         setAttackAddlDice(e.target.value);
     }
-    const [attackAddlDamageType, setAttackAddlDamageType] = useState(''); //add'l Damage type for attack
+    const [ attackAddlDamageType, setAttackAddlDamageType ] = useState(''); //add'l Damage type for attack
     const onAttackAddlDamageTypeChange = (e) => {
         setAttackAddlDamageType(e.target.value);
     }
-    const [attackAddlDamageMod, setAttackAddlDamageMod] = useState('0'); //add'l Damage modifier for attack
+    const [ attackAddlDamageMod, setAttackAddlDamageMod ] = useState('0'); //add'l Damage modifier for attack
     const onAttackAddlDamageModChange = (e) => {
         setAttackAddlDamageMod(e.target.value);
     }
-    const [attackNote, setAttackNote] = useState('');
+    const [ attackNote, setAttackNote ] = useState('');
 
     // Functions
     function handleAddAttack() {
@@ -506,10 +505,10 @@ function AttackInput({ onAddAttack }) {
 
 function SpellInput({ onAddSpell }) {
     // Variables
-    const [spellName, setSpellName] = useState('');
-    const [suggestions, setSuggestions] = useState([]);
-    const [showSuggestions, setShowSuggestions] = useState(false);
-    const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+    const [ spellName, setSpellName ] = useState('');
+    const [ suggestions, setSuggestions ] = useState([]);
+    const [ showSuggestions, setShowSuggestions ] = useState(false);
+    const [ dropdownPosition, setDropdownPosition ] = useState({ top: 0, left: 0, width: 0 });
     const inputRef = useRef(null);
 
     // Autocomplete functions
@@ -573,7 +572,7 @@ function SpellInput({ onAddSpell }) {
             window.removeEventListener('scroll', handleScroll, true);
             window.removeEventListener('resize', handleResize);
         };
-    }, [showSuggestions]);
+    }, [ showSuggestions ]);
     const renderDropdown = () => {
         if (!showSuggestions || suggestions.length === 0) return null;
 
@@ -659,7 +658,7 @@ function SpellInput({ onAddSpell }) {
             <strong><em>{spellData.name}, Level {spellData.level}. </em></strong>
         )
         const spellDescString = (
-            spellDataDescCompleteString() + (spellData?.higher_level ? (' At Higher Levels: ' + spellData.higher_level[0]) : '')
+            spellDataDescCompleteString() + (spellData?.higher_level ? (' At Higher Levels: ' + spellData.higher_level[ 0 ]) : '')
         )
         const spellSpecsEl = (
             <>
@@ -712,11 +711,11 @@ function SpellInput({ onAddSpell }) {
 
 function OtherActionInput({ onAddAction }) {
     // Variables
-    const [actionName, setActionName] = useState('');
+    const [ actionName, setActionName ] = useState('');
     const onActionNameChange = (e) => {
         setActionName(e.target.value);
     }
-    const [actionDesc, setActionDesc] = useState('Exhales fire in a 15-ft cone. Each creature makes a DC 13 DEX check, taking (7d6) fire damage on a failed save, or half on a successful one.'); //Action name
+    const [ actionDesc, setActionDesc ] = useState('Exhales fire in a 15-ft cone. Each creature makes a DC 13 DEX check, taking (7d6) fire damage on a failed save, or half on a successful one.'); //Action name
     const onActionDescChange = (e) => {
         setActionDesc(e.target.value);
     }
@@ -784,10 +783,10 @@ function OtherActionInput({ onAddAction }) {
 
 function LanguageInput({ data, onAddLanguage }) {
     // Variables
-    const [language, setLanguage] = useState('');
-    const [suggestions, setSuggestions] = useState([]);
-    const [showSuggestions, setShowSuggestions] = useState(false);
-    const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+    const [ language, setLanguage ] = useState('');
+    const [ suggestions, setSuggestions ] = useState([]);
+    const [ showSuggestions, setShowSuggestions ] = useState(false);
+    const [ dropdownPosition, setDropdownPosition ] = useState({ top: 0, left: 0, width: 0 });
     const inputRef = useRef(null);
 
     // Autocomplete functions
@@ -851,7 +850,7 @@ function LanguageInput({ data, onAddLanguage }) {
             window.removeEventListener('scroll', handleScroll, true);
             window.removeEventListener('resize', handleResize);
         };
-    }, [showSuggestions]);
+    }, [ showSuggestions ]);
     const renderDropdown = () => {
         if (!showSuggestions || suggestions.length === 0) return null;
 
@@ -983,31 +982,31 @@ function JsonInput({ value, onChange, onAdd }) {
 // Main components ---------------------------------------------------------
 function MonsterInput({ onReload }) {
     // Stats variables
-    const [profBonus, setProfBonus] = useState('2'); //Proficiency Bonus
+    const [ profBonus, setProfBonus ] = useState('2'); //Proficiency Bonus
     const onProfBonusChange = (e) => {
         setProfBonus(e.target.value);
     };
-    const [STR, setSTR] = useState('10'); //STR
+    const [ STR, setSTR ] = useState('10'); //STR
     const onSTRChange = (e) => {
         setSTR(e.target.value);
     };
-    const [DEX, setDEX] = useState('10'); //DEX
+    const [ DEX, setDEX ] = useState('10'); //DEX
     const onDEXChange = (e) => {
         setDEX(e.target.value);
     };
-    const [CON, setCON] = useState('10'); //CON
+    const [ CON, setCON ] = useState('10'); //CON
     const onCONChange = (e) => {
         setCON(e.target.value);
     };
-    const [INT, setINT] = useState('10'); //INT
+    const [ INT, setINT ] = useState('10'); //INT
     const onINTChange = (e) => {
         setINT(e.target.value);
     };
-    const [WIS, setWIS] = useState('10'); //WIS
+    const [ WIS, setWIS ] = useState('10'); //WIS
     const onWISChange = (e) => {
         setWIS(e.target.value);
     };
-    const [CHA, setCHA] = useState('10'); //CHA
+    const [ CHA, setCHA ] = useState('10'); //CHA
     const onCHAChange = (e) => {
         setCHA(e.target.value);
     };
@@ -1107,12 +1106,12 @@ function MonsterInput({ onReload }) {
     }
 
     // Combat stats
-    const [hpNumOfDice, setHpNumOfDice] = useState('1');
-    const [hpDice, setHpDice] = useState('4');
-    const [hpFlat, setHpFlat] = useState('1');
-    const [hpMod, setHpMod] = useState('0');
+    const [ hpNumOfDice, setHpNumOfDice ] = useState('1');
+    const [ hpDice, setHpDice ] = useState('4');
+    const [ hpFlat, setHpFlat ] = useState('1');
+    const [ hpMod, setHpMod ] = useState('0');
 
-    const [ac, setAc] = useState('10'); //Armor Class
+    const [ ac, setAc ] = useState('10'); //Armor Class
     const onAcChange = (e) => {
         setAc(e.target.value);
     };
@@ -1126,15 +1125,15 @@ function MonsterInput({ onReload }) {
                 break;
         }
     };
-    const [initBonus, setInitBonus] = useState('0'); //Initiative Bonus
+    const [ initBonus, setInitBonus ] = useState('0'); //Initiative Bonus
     const onInitBonusChange = (e) => {
         setInitBonus(e.target.value);
     };
-    const [insp, setInsp] = useState('0'); //Inspiration
+    const [ insp, setInsp ] = useState('0'); //Inspiration
     const onInspChange = (e) => {
         setInsp(e.target.value);
     };
-    const [speed, setSpeed] = useState('30'); //Speed
+    const [ speed, setSpeed ] = useState('30'); //Speed
     const onSpeedChange = (e) => {
         setSpeed(e.target.value);
     };
@@ -1250,75 +1249,75 @@ function MonsterInput({ onReload }) {
     }
 
     // Skills variables
-    const [Acrobatics, setAcrobatics] = useState(false); //Acrobatics
+    const [ Acrobatics, setAcrobatics ] = useState(false); //Acrobatics
     const onAcrobaticsChange = (e) => {
         setAcrobatics(e.target.checked);
     };
-    const [AnimalHandling, setAnimalHandling] = useState(false); //Animal Handling
+    const [ AnimalHandling, setAnimalHandling ] = useState(false); //Animal Handling
     const onAnimalHandlingChange = (e) => {
         setAnimalHandling(e.target.checked);
     };
-    const [Arcana, setArcana] = useState(false); //Arcana
+    const [ Arcana, setArcana ] = useState(false); //Arcana
     const onArcanaChange = (e) => {
         setArcana(e.target.checked);
     };
-    const [Athletics, setAthletics] = useState(false); //Athletics
+    const [ Athletics, setAthletics ] = useState(false); //Athletics
     const onAthleticsChange = (e) => {
         setAthletics(e.target.checked);
     };
-    const [Deception, setDeception] = useState(false); //Deception
+    const [ Deception, setDeception ] = useState(false); //Deception
     const onDeceptionChange = (e) => {
         setDeception(e.target.checked);
     };
-    const [History, setHistory] = useState(false); //History
+    const [ History, setHistory ] = useState(false); //History
     const onHistoryChange = (e) => {
         setHistory(e.target.checked);
     };
-    const [Insight, setInsight] = useState(false); //Insight
+    const [ Insight, setInsight ] = useState(false); //Insight
     const onInsightChange = (e) => {
         setInsight(e.target.checked);
     };
-    const [Intimidation, setIntimidation] = useState(false); //Intimidation
+    const [ Intimidation, setIntimidation ] = useState(false); //Intimidation
     const onIntimidationChange = (e) => {
         setIntimidation(e.target.checked);
     };
-    const [Investigation, setInvestigation] = useState(false); //Investigation
+    const [ Investigation, setInvestigation ] = useState(false); //Investigation
     const onInvestigationChange = (e) => {
         setInvestigation(e.target.checked);
     };
-    const [Medicine, setMedicine] = useState(false); //Medicine
+    const [ Medicine, setMedicine ] = useState(false); //Medicine
     const onMedicineChange = (e) => {
         setMedicine(e.target.checked);
     };
-    const [Nature, setNature] = useState(false); //Nature
+    const [ Nature, setNature ] = useState(false); //Nature
     const onNatureChange = (e) => {
         setNature(e.target.checked);
     };
-    const [Perception, setPerception] = useState(false); //Perception
+    const [ Perception, setPerception ] = useState(false); //Perception
     const onPerceptionChange = (e) => {
         setPerception(e.target.checked);
     };
-    const [Performance, setPerformance] = useState(false); //Performance
+    const [ Performance, setPerformance ] = useState(false); //Performance
     const onPerformanceChange = (e) => {
         setPerformance(e.target.checked);
     };
-    const [Persuasion, setPersuasion] = useState(false); //Persuasion
+    const [ Persuasion, setPersuasion ] = useState(false); //Persuasion
     const onPersuasionChange = (e) => {
         setPersuasion(e.target.checked);
     };
-    const [Religion, setReligion] = useState(false); //Religion
+    const [ Religion, setReligion ] = useState(false); //Religion
     const onReligionChange = (e) => {
         setReligion(e.target.checked);
     };
-    const [SleightOfHand, setSleightOfHand] = useState(false); //Sleight of Hand
+    const [ SleightOfHand, setSleightOfHand ] = useState(false); //Sleight of Hand
     const onSleightOfHandChange = (e) => {
         setSleightOfHand(e.target.checked);
     };
-    const [Stealth, setStealth] = useState(false); //Stealth
+    const [ Stealth, setStealth ] = useState(false); //Stealth
     const onStealthChange = (e) => {
         setStealth(e.target.checked);
     };
-    const [Survival, setSurvival] = useState(false); //Survival
+    const [ Survival, setSurvival ] = useState(false); //Survival
     const onSurvivalChange = (e) => {
         setSurvival(e.target.checked);
     };
@@ -1497,27 +1496,27 @@ function MonsterInput({ onReload }) {
     }
 
     // Saving Throws variables
-    const [STRThrow, setSTRThrow] = useState(false); //Strength Saving Throw
+    const [ STRThrow, setSTRThrow ] = useState(false); //Strength Saving Throw
     const onSTRThrowChange = (e) => {
         setSTRThrow(e.target.checked);
     };
-    const [DEXThrow, setDEXThrow] = useState(false); //DexteritySaving Throw
+    const [ DEXThrow, setDEXThrow ] = useState(false); //DexteritySaving Throw
     const onDEXThrowChange = (e) => {
         setDEXThrow(e.target.checked);
     };
-    const [CONThrow, setCONThrow] = useState(false); //Constituion Saving Throw
+    const [ CONThrow, setCONThrow ] = useState(false); //Constituion Saving Throw
     const onCONThrowChange = (e) => {
         setCONThrow(e.target.checked);
     };
-    const [INTThrow, setINTThrow] = useState(false); //Intelligence Saving Throw
+    const [ INTThrow, setINTThrow ] = useState(false); //Intelligence Saving Throw
     const onINTThrowChange = (e) => {
         setINTThrow(e.target.checked);
     };
-    const [WISThrow, setWISThrow] = useState(false); //Wisdom Saving Throw
+    const [ WISThrow, setWISThrow ] = useState(false); //Wisdom Saving Throw
     const onWISThrowChange = (e) => {
         setWISThrow(e.target.checked);
     };
-    const [CHAThrow, setCHAThrow] = useState(false); //Charisma Saving Throw
+    const [ CHAThrow, setCHAThrow ] = useState(false); //Charisma Saving Throw
     const onCHAThrowChange = (e) => {
         setCHAThrow(e.target.checked);
     };
@@ -1583,14 +1582,14 @@ function MonsterInput({ onReload }) {
     }
 
     // Actions Variables
-    const [actions, setActions] = useState([]); // Array with objects that describe actions
-    const [actionType, setActionType] = useState(''); //Action type
+    const [ actions, setActions ] = useState([]); // Array with objects that describe actions
+    const [ actionType, setActionType ] = useState(''); //Action type
     const onActionTypeChange = (e) => {
         setActionType(e.target.value);
     }
     // Action add function
     function onAddAction(actionData) {
-        setActions(prevActions => [...prevActions, actionData]);
+        setActions(prevActions => [ ...prevActions, actionData ]);
         // Clear Actions Fields
         resetActions();
     }
@@ -1648,43 +1647,43 @@ function MonsterInput({ onReload }) {
 
     // Attacks array
     function onAddAttack(attackData) {
-        setActions(prevActions => [...prevActions, attackData]);
+        setActions(prevActions => [ ...prevActions, attackData ]);
         // Clear Actions Fields
         resetActions();
     }
 
     // Spells array
     function onAddSpell(spellData) {
-        setActions(prevActions => [...prevActions, spellData]);
+        setActions(prevActions => [ ...prevActions, spellData ]);
         // Clear Actions Fields
         resetActions();
     }
 
     // General Info object
-    const [generalInfo, setGeneralInfo] = useState({});
+    const [ generalInfo, setGeneralInfo ] = useState({});
     function onAddGeneralInfo(infoData) {
         setGeneralInfo(infoData);
     }
 
     // Languages array
-    const [languages, setLanguages] = useState([]);
+    const [ languages, setLanguages ] = useState([]);
     function onAddLanguage(language) {
-        setLanguages(prevLanguages => [...prevLanguages, language]);
+        setLanguages(prevLanguages => [ ...prevLanguages, language ]);
     }
 
     // Senses variables
-    const [senseValue, setSenseValue] = useState('');
+    const [ senseValue, setSenseValue ] = useState('');
     const onSenseValueChange = (e) => {
         setSenseValue(e.target.value);
     }
-    const [senseRange, setSenseRange] = useState('5');
+    const [ senseRange, setSenseRange ] = useState('5');
     const onSenseRangeChange = (e) => {
         setSenseRange(e.target.value);
     }
-    const [senses, setSenses] = useState([]);
+    const [ senses, setSenses ] = useState([]);
     function onSensesChange() {
         let senseString = senseValue + ' ' + senseRange + 'ft.';
-        setSenses(prevSenses => [...prevSenses, senseString]);
+        setSenses(prevSenses => [ ...prevSenses, senseString ]);
         setSenseRange('');
         setSenseValue('');
     }
@@ -1735,7 +1734,7 @@ function MonsterInput({ onReload }) {
     }
 
     // Image URL string
-    const [imgUrl, setImgUrl] = useState(''); // Image url
+    const [ imgUrl, setImgUrl ] = useState(''); // Image url
     const onImgUrlChange = (e) => {
         setImgUrl(e.target.value);
     }
@@ -1766,10 +1765,10 @@ function MonsterInput({ onReload }) {
     }
 
     // Note
-    const [note, setNote] = useState('');
+    const [ note, setNote ] = useState('');
 
     // JSON Input
-    const [jsonInput, setJsonInput] = useState('');
+    const [ jsonInput, setJsonInput ] = useState('');
     function onJsonAdd() {
         const data = JSON.parse(jsonInput);
         saveMonsterData(data);
@@ -1863,39 +1862,39 @@ function MonsterInput({ onReload }) {
         if (data) {
 
             // General Info
-            monsterData['name'] = (data.name);
-            monsterData['level'] = data.level;
-            monsterData['meta'] = (
+            monsterData[ 'name' ] = (data.name);
+            monsterData[ 'level' ] = data.level;
+            monsterData[ 'meta' ] = (
                 (data?.race ? (data.race) : '') +
                 (data?.class ? (' ' + data.class) : '') +
                 (data?.alignment ? (', ' + data.alignment) : '')
             );
-            monsterData['xp'] = data.xp;
-            monsterData['isMonster'] = false;
+            monsterData[ 'xp' ] = data.xp;
+            monsterData[ 'isMonster' ] = false;
 
             // Stats
-            monsterData['STR'] = data.STR;
-            monsterData['STR_mod'] = ('(' + (getMod(data.STR) >= 0 ? ('+' + getMod(data.STR)) : getMod(data.STR)) + ')');
-            monsterData['DEX'] = data.DEX;
-            monsterData['DEX_mod'] = ('(' + (getMod(data.DEX) >= 0 ? ('+' + getMod(data.DEX)) : getMod(data.DEX)) + ')');
-            monsterData['CON'] = data.CON;
-            monsterData['CON_mod'] = ('(' + (getMod(data.CON) >= 0 ? ('+' + getMod(data.CON)) : getMod(data.CON)) + ')');
-            monsterData['INT'] = data.INT;
-            monsterData['INT_mod'] = ('(' + (getMod(data.INT) >= 0 ? ('+' + getMod(data.INT)) : getMod(data.INT)) + ')');
-            monsterData['WIS'] = data.WIS;
-            monsterData['WIS_mod'] = ('(' + (getMod(data.WIS) >= 0 ? ('+' + getMod(data.WIS)) : getMod(data.WIS)) + ')');
-            monsterData['CHA'] = data.CHA;
-            monsterData['CHA_mod'] = ('(' + (getMod(data.CHA) >= 0 ? ('+' + getMod(data.CHA)) : getMod(data.CHA)) + ')');
+            monsterData[ 'STR' ] = data.STR;
+            monsterData[ 'STR_mod' ] = ('(' + (getMod(data.STR) >= 0 ? ('+' + getMod(data.STR)) : getMod(data.STR)) + ')');
+            monsterData[ 'DEX' ] = data.DEX;
+            monsterData[ 'DEX_mod' ] = ('(' + (getMod(data.DEX) >= 0 ? ('+' + getMod(data.DEX)) : getMod(data.DEX)) + ')');
+            monsterData[ 'CON' ] = data.CON;
+            monsterData[ 'CON_mod' ] = ('(' + (getMod(data.CON) >= 0 ? ('+' + getMod(data.CON)) : getMod(data.CON)) + ')');
+            monsterData[ 'INT' ] = data.INT;
+            monsterData[ 'INT_mod' ] = ('(' + (getMod(data.INT) >= 0 ? ('+' + getMod(data.INT)) : getMod(data.INT)) + ')');
+            monsterData[ 'WIS' ] = data.WIS;
+            monsterData[ 'WIS_mod' ] = ('(' + (getMod(data.WIS) >= 0 ? ('+' + getMod(data.WIS)) : getMod(data.WIS)) + ')');
+            monsterData[ 'CHA' ] = data.CHA;
+            monsterData[ 'CHA_mod' ] = ('(' + (getMod(data.CHA) >= 0 ? ('+' + getMod(data.CHA)) : getMod(data.CHA)) + ')');
 
             // Combat
-            monsterData['profBonus'] = data.profBonus;
-            monsterData['hp'] = data.hp;
-            monsterData['ac'] = data.ac;
-            monsterData['initBonus'] = data.initBonus;
-            monsterData['Speed'] = (data.speed + 'ft.');
+            monsterData[ 'profBonus' ] = data.profBonus;
+            monsterData[ 'hp' ] = data.hp;
+            monsterData[ 'ac' ] = data.ac;
+            monsterData[ 'initBonus' ] = data.initBonus;
+            monsterData[ 'Speed' ] = (data.speed + 'ft.');
 
             // Skills
-            monsterData['Skills'] = (
+            monsterData[ 'Skills' ] = (
                 (Acrobatics ? ('Acrobatics +(' + getMod(data.DEX, data.profBonus).toString() + '), ') : '') +
                 (AnimalHandling ? ('Animal Handling +(' + getMod(data.WIS, data.profBonus).toString() + '), ') : '') +
                 (Arcana ? ('Arcana +(' + getMod(data.INT, data.profBonus).toString() + '), ') : '') +
@@ -1916,7 +1915,7 @@ function MonsterInput({ onReload }) {
             );
 
             // Saving Throws
-            monsterData["Saving Throws"] = (
+            monsterData[ "Saving Throws" ] = (
                 (STRThrow ? ('STR +(' + getMod(data.STR, data.profBonus).toString() + '), ') : '') +
                 (DEXThrow ? ('DEX +(' + getMod(data.DEX, data.profBonus).toString() + '), ') : '') +
                 (CONThrow ? ('CON +(' + getMod(data.CON, data.profBonus).toString() + '), ') : '') +
@@ -1926,19 +1925,19 @@ function MonsterInput({ onReload }) {
             );
 
             // Actions
-            monsterData["Actions"] = data.Actions
+            monsterData[ "Actions" ] = data.Actions
 
             // Languages
-            monsterData['Languages'] = data.Languages;
+            monsterData[ 'Languages' ] = data.Languages;
 
             // Senses
-            monsterData["Senses"] = data.Senses;
+            monsterData[ "Senses" ] = data.Senses;
 
             // Image
-            monsterData['img_url'] = data['img_url'];
+            monsterData[ 'img_url' ] = data[ 'img_url' ];
 
             // Note
-            monsterData['note'] = data.note;
+            monsterData[ 'note' ] = data.note;
 
             // Save to local storage
             storage.saveMonster(monsterData);
@@ -1948,39 +1947,39 @@ function MonsterInput({ onReload }) {
 
 
         // General Info
-        monsterData['name'] = generalInfo.name;
-        monsterData['level'] = generalInfo.level;
-        monsterData['meta'] = (
+        monsterData[ 'name' ] = generalInfo.name;
+        monsterData[ 'level' ] = generalInfo.level;
+        monsterData[ 'meta' ] = (
             (generalInfo?.race ? (generalInfo.race) : '') +
             (generalInfo?.class ? (' ' + generalInfo.class) : '') +
             (generalInfo?.alignment ? (', ' + generalInfo.alignment) : '')
         );
-        monsterData['xp'] = generalInfo.xp;
-        monsterData['isMonster'] = true;
+        monsterData[ 'xp' ] = generalInfo.xp;
+        monsterData[ 'isMonster' ] = true;
 
         // Stats
-        monsterData['STR'] = STR;
-        monsterData['STR_mod'] = ('(' + (getMod(STR) >= 0 ? ('+' + getMod(STR)) : getMod(STR)) + ')');
-        monsterData['DEX'] = DEX;
-        monsterData['DEX_mod'] = ('(' + (getMod(DEX) >= 0 ? ('+' + getMod(DEX)) : getMod(DEX)) + ')');
-        monsterData['CON'] = CON;
-        monsterData['CON_mod'] = ('(' + (getMod(CON) >= 0 ? ('+' + getMod(CON)) : getMod(CON)) + ')');
-        monsterData['INT'] = INT;
-        monsterData['INT_mod'] = ('(' + (getMod(INT) >= 0 ? ('+' + getMod(INT)) : getMod(INT)) + ')');
-        monsterData['WIS'] = WIS;
-        monsterData['WIS_mod'] = ('(' + (getMod(WIS) >= 0 ? ('+' + getMod(WIS)) : getMod(WIS)) + ')');
-        monsterData['CHA'] = CHA;
-        monsterData['CHA_mod'] = ('(' + (getMod(CHA) >= 0 ? ('+' + getMod(CHA)) : getMod(CHA)) + ')');
+        monsterData[ 'STR' ] = STR;
+        monsterData[ 'STR_mod' ] = ('(' + (getMod(STR) >= 0 ? ('+' + getMod(STR)) : getMod(STR)) + ')');
+        monsterData[ 'DEX' ] = DEX;
+        monsterData[ 'DEX_mod' ] = ('(' + (getMod(DEX) >= 0 ? ('+' + getMod(DEX)) : getMod(DEX)) + ')');
+        monsterData[ 'CON' ] = CON;
+        monsterData[ 'CON_mod' ] = ('(' + (getMod(CON) >= 0 ? ('+' + getMod(CON)) : getMod(CON)) + ')');
+        monsterData[ 'INT' ] = INT;
+        monsterData[ 'INT_mod' ] = ('(' + (getMod(INT) >= 0 ? ('+' + getMod(INT)) : getMod(INT)) + ')');
+        monsterData[ 'WIS' ] = WIS;
+        monsterData[ 'WIS_mod' ] = ('(' + (getMod(WIS) >= 0 ? ('+' + getMod(WIS)) : getMod(WIS)) + ')');
+        monsterData[ 'CHA' ] = CHA;
+        monsterData[ 'CHA_mod' ] = ('(' + (getMod(CHA) >= 0 ? ('+' + getMod(CHA)) : getMod(CHA)) + ')');
 
         // Combat
-        monsterData['profBonus'] = profBonus;
-        monsterData['hp'] = (hpFlat + ' (' + hpNumOfDice + 'd' + hpDice + '+ ' + hpMod + ')')
-        monsterData['ac'] = ac;
-        monsterData['initBonus'] = initBonus;
-        monsterData['Speed'] = (speed + 'ft.');
+        monsterData[ 'profBonus' ] = profBonus;
+        monsterData[ 'hp' ] = (hpFlat + ' (' + hpNumOfDice + 'd' + hpDice + '+ ' + hpMod + ')')
+        monsterData[ 'ac' ] = ac;
+        monsterData[ 'initBonus' ] = initBonus;
+        monsterData[ 'Speed' ] = (speed + 'ft.');
 
         // Skills
-        monsterData['Skills'] = (
+        monsterData[ 'Skills' ] = (
             (Acrobatics ? ('Acrobatics +(' + getMod(DEX, profBonus).toString() + '), ') : '') +
             (AnimalHandling ? ('Animal Handling +(' + getMod(WIS, profBonus).toString() + '), ') : '') +
             (Arcana ? ('Arcana +(' + getMod(INT, profBonus).toString() + '), ') : '') +
@@ -2001,7 +2000,7 @@ function MonsterInput({ onReload }) {
         );
 
         // Saving Throws
-        monsterData["Saving Throws"] = (
+        monsterData[ "Saving Throws" ] = (
             (STRThrow ? ('STR +(' + getMod(STR, profBonus).toString() + '), ') : '') +
             (DEXThrow ? ('DEX +(' + getMod(DEX, profBonus).toString() + '), ') : '') +
             (CONThrow ? ('CON +(' + getMod(CON, profBonus).toString() + '), ') : '') +
@@ -2011,22 +2010,22 @@ function MonsterInput({ onReload }) {
         ).replace(/,+$/, "");
 
         // Actions
-        monsterData["Actions"] = actions.map(element => ReactDOMServer.renderToStaticMarkup(element)).join('');
+        monsterData[ "Actions" ] = actions.map(element => ReactDOMServer.renderToStaticMarkup(element)).join('');
 
         // Languages
         let langString = languages.join(', ');
-        monsterData['Languages'] = langString;
+        monsterData[ 'Languages' ] = langString;
 
         // Senses
         let sensesString = senses.join(', ');
         sensesString = sensesString + ', Passive Perception ' + (Perception ? (parseInt(WIS) + parseInt(profBonus)) : WIS);
-        monsterData["Senses"] = sensesString;
+        monsterData[ "Senses" ] = sensesString;
 
         // Image
-        monsterData['img_url'] = imgUrl;
+        monsterData[ 'img_url' ] = imgUrl;
 
         // Note
-        monsterData['note'] = note;
+        monsterData[ 'note' ] = note;
 
         // Save to local storage
         storage.saveMonster(monsterData);
@@ -2120,23 +2119,23 @@ function AddMonster() {
     }, []);
 
     // Page reload
-    const [reloadKey, setReloadKey] = useState(0);
+    const [ reloadKey, setReloadKey ] = useState(0);
     function handleReload() {
         setReloadKey(prevKey => prevKey + 1);
     }
 
     // Data Retrieval 
-    const [monsters, setMonsters] = useState(null);
+    const [ monsters, setMonsters ] = useState(null);
     // Sync with localStorage on mount/reload
     useEffect(() => {
         const data = storage.retrieve('monsterData');
         if (data) {
             setMonsters(data.monsters);
             console.log("AddMonster.js: 'monsterData' retrieved. Data: ");
-            tools.prettyLog(monsters, 'Monster Data');
+            tools.prettyLog(data, 'Monster Data');
         }
         else setMonsters(null);
-    }, [reloadKey]); // Re-run when reloadKey changes
+    }, [ reloadKey ]); // Re-run when reloadKey changes
 
     // Monsters display function
     function DisplayMonsters() {
@@ -2144,7 +2143,10 @@ function AddMonster() {
             <div>
                 {monsters.map((monster, index) => (
                     <SideBySide key={index} content={
-                        <MonsterCard data={monster} />
+                        <MonsterCard
+                            data={monster}
+                            fireReload={handleReload}
+                        />
                     } />
                 ))}
             </div>
@@ -2153,7 +2155,7 @@ function AddMonster() {
 
     // Page component body
     return (
-        <div className='monster-data-page'>
+        <div className='monster-data-page fade-drop-in'>
             <MonsterInput onReload={handleReload} key={reloadKey} />
             {monsters !== null ?
                 <DisplayMonsters />

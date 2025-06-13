@@ -102,10 +102,11 @@ const JsonDisplay = ({ jsonData = null, editable = false, onChange = null, onVal
         readOnly={!editable}
         className={`form-control font-monospace ${isValid ? '' : 'is-invalid'}`}
         style={{
-          height: '350px',
+          maxHeight: '350px',
+          minHeight: '200px',
           lineHeight: '1.5',
           tabSize: 2,
-          minWidth: '500px',
+          minWidth: '450px',
           backgroundColor: editable ? 'white' : 'gray',
           color: editable ? 'black' : 'white'
         }}
@@ -114,9 +115,9 @@ const JsonDisplay = ({ jsonData = null, editable = false, onChange = null, onVal
 
       <div className="mt-2 text-muted small">
         {editable ? (
-          <p>Edit the JSON above. It will be validated as you type, but only formatted when you click the button.</p>
+          <p style={{margin: '0px'}}>Edit the JSON above. It will be validated as you type, but only formatted when you click the button. Only valid JSONs will be saveable.</p>
         ) : (
-          <p>JSON is displayed in read-only mode with proper formatting.</p>
+          <p style={{margin: '0px'}}>JSON currently displayed in read-only mode. Click the "Start editing" button to edit.</p>
         )}
       </div>
     </div>
