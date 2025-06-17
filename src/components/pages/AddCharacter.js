@@ -1841,7 +1841,9 @@ function CharacterInput({ onReload }) {
             });
         }
 
-        if (data) {
+        if (data !== null) {
+            console.log('Adding character via JSON.');
+
 
             // General Info
             charData[ 'name' ] = (data.name);
@@ -1931,6 +1933,7 @@ function CharacterInput({ onReload }) {
             return null;
         }
 
+        console.log('Adding character via input.');
 
         // General Info
         charData[ 'name' ] = generalInfo.name;
@@ -2048,7 +2051,7 @@ function CharacterInput({ onReload }) {
                     <button
                         className='btn btn-success'
                         style={{ margin: '5px' }}
-                        onClick={saveCharacterData}
+                        onClick={() => saveCharacterData()}
                     >
                         Add Character
                     </button>
