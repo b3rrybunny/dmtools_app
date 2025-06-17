@@ -2,6 +2,8 @@
 import { useState, useEffect, useRef, memo } from 'react';
 import ReactDOMServer from 'react-dom/server';
 import { createPortal } from 'react-dom';
+import { Link } from 'react-router-dom';
+
 
 // Custom -------------------------------------------------------------------
 // Elements
@@ -1831,6 +1833,14 @@ function CharacterInput({ onReload }) {
     function saveCharacterData(data = null) {
         const charData = {};
 
+        function handleUndefinedValues(obj) {
+            Object.keys(obj).forEach(key => {
+                if (obj[ key ] === undefined) {
+                    obj[ key ] = '!UNDEFINED!';
+                }
+            });
+        }
+
         if (data) {
 
             // General Info
@@ -1911,6 +1921,9 @@ function CharacterInput({ onReload }) {
 
             // Note
             charData[ 'note' ] = data.note;
+
+            // Undefined check
+            handleUndefinedValues(charData);
 
             // Save to local storage
             storage.saveChar(charData);
@@ -2000,6 +2013,9 @@ function CharacterInput({ onReload }) {
 
         // Note
         charData[ 'note' ] = note;
+
+        // Undefined check
+        handleUndefinedValues(charData);
 
         // Save to local storage
         storage.saveChar(charData);
@@ -2133,7 +2149,9 @@ function AddCharacter() {
             <CharacterInput onReload={handleReload} key={reloadKey} />
             {chars !== null ?
                 <DisplayChars />
-                : null
+                : <BasicCon margin={7} content={
+                    <h3>No characters to display.</h3>
+                } />
             }
         </div>
     );

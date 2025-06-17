@@ -13,6 +13,7 @@ const CombatManager = lazy(() => import('./components/pages/CombatManager'));
 const AddCharacter = lazy(() => import('./components/pages/AddCharacter'));
 const AddMonster = lazy(() => import('./components/pages/AddMonster'));
 const ViewCharacters = lazy(() => import('./components/pages/ViewCharacters'));
+const ViewMonsters = lazy(() => import('./components/pages/ViewMonsters'));
 const TravelManager = lazy(() => import('./components/pages/TravelManager'));
 const DataManagement = lazy(() => import('./components/pages/DataManagement'));
 
@@ -38,6 +39,7 @@ function App() {
             <Route path='/AddCharacter' element={<AddCharacter />} />
             <Route path='/AddMonster' element={<AddMonster />} />
             <Route path='/ViewCharacters' element={<ViewCharacters />} />
+            <Route path='/ViewMonsters' element={<ViewMonsters />} />
             <Route path='/TravelManager' element={<TravelManager />} />
             <Route path='/DataManagement' element={<DataManagement />} />
           </Routes>

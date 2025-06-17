@@ -32,6 +32,7 @@ function Navbar() {
                 <li><Link className="dropdown-item" to='/AddCharacter'>Add Character</Link></li>
                 <li><Link className="dropdown-item" to='/AddMonster'>Add Monster</Link></li>
                 <li><Link className="dropdown-item" to='/ViewCharacters'>View Characters</Link></li>
+                <li><Link className="dropdown-item" to='/ViewMonsters'>View Monsters</Link></li>
               </ul>
             </li>
             {/* Data Management */}

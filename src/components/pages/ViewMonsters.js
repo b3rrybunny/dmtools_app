@@ -7,16 +7,16 @@ import { Link } from 'react-router-dom';
 import BasicCon from '../basic/BasicContainer';
 import HorizLine from '../basic/HorizontalLine';
 import SideBySide from '../basic/SideBySide';
-import CharacterCard from '../basic/CharacterCard';
+import MonsterCard from '../basic/MonsterCard';
 // Data / Scripts
 import * as tools from '../../scripts/tools';
 import * as storage from '../../scripts/storage';
 
 
-function ViewCharacters() {
+function ViewMonsters() {
     // Page Title
     useEffect(() => {
-        document.title = "View Characters";
+        document.title = "View Monsters";
     }, []);
 
     // Reload key
@@ -26,25 +26,25 @@ function ViewCharacters() {
     }
 
     // Data Retrieval 
-    const [ chars, setChars ] = useState(null);
+    const [ monsters, setMonsters ] = useState(null);
     // Sync with localStorage on mount/reload
     useEffect(() => {
-        const data = storage.retrieve('charData');
+        const data = storage.retrieve('monsterData');
         if (data) {
-            setChars(data.chars);
-            tools.prettyLog(data, 'Character Data');
+            setMonsters(data.monsters);
+            tools.prettyLog(data, 'Monster Data');
         }
-        else setChars(null);
+        else setMonsters(null);
     }, [ reloadKey ]); // Re-run when reloadKey changes
 
-    // Display characters function
-    function DisplayChars() {
+    // Display monsteracters function
+    function DisplayMonsters() {
         return (
             <div>
-                {chars.map((char, index) => (
+                {monsters.map((monster, index) => (
                     <SideBySide key={index} content={
-                        <CharacterCard
-                            data={char}
+                        <MonsterCard
+                            data={monster}
                             fireReload={handleReload}
                         />
                     } />
@@ -57,23 +57,23 @@ function ViewCharacters() {
         <div className='fade-drop-in' style={{overflowY: 'auto', height: '92.5vh'}}>
             <BasicCon margin={5} content={
                 <>
-                    <h2>View Custom Characters</h2>
+                    <h2>View Custom Monsters</h2>
                     <HorizLine />
-                    <h5>Here you can view your custom characters.</h5>
-                    <Link to='/AddCharacter'>
-                        <button className='btn btn-success'>Click here to add a character.</button>
+                    <h5>Here you can view your custom monsters.</h5>
+                    <Link to='/AddMonster'>
+                        <button className='btn btn-success'>Click here to add a monster.</button>
                     </Link>
                 </>
             } />
             <HorizLine />
-            {chars !== null ?
-                <DisplayChars />
+            {monsters !== null ?
+                <DisplayMonsters />
                 : <BasicCon margin={7} content={
-                    <h3>No characters to display. Make one <Link to='/AddCharacter'>here.</Link></h3>
+                    <h3>No monsters to display. Make one <Link to='/AddMonster'>here.</Link></h3>
                 } />
             }
         </div>
     );
 }
 
-export default ViewCharacters;
+export default ViewMonsters;

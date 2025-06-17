@@ -1855,9 +1855,14 @@ function MonsterInput({ onReload }) {
     // Save data function
     function saveMonsterData(data = null) {
         const monsterData = {};
-        console.log('saveMonsterData called with:', data);
-        console.log('typeof data:', typeof data);
-        console.log('Boolean(data):', Boolean(data));
+
+        function handleUndefinedValues(obj) {
+            Object.keys(obj).forEach(key => {
+                if (obj[ key ] === undefined) {
+                    obj[ key ] = '!UNDEFINED!';
+                }
+            });
+        }
 
         if (data) {
 
@@ -1938,6 +1943,9 @@ function MonsterInput({ onReload }) {
 
             // Note
             monsterData[ 'note' ] = data.note;
+
+            // Undefined check
+            handleUndefinedValues(monsterData);
 
             // Save to local storage
             storage.saveMonster(monsterData);
@@ -2026,6 +2034,9 @@ function MonsterInput({ onReload }) {
 
         // Note
         monsterData[ 'note' ] = note;
+
+        // Undefined check
+        handleUndefinedValues(monsterData);
 
         // Save to local storage
         storage.saveMonster(monsterData);
@@ -2159,7 +2170,9 @@ function AddMonster() {
             <MonsterInput onReload={handleReload} key={reloadKey} />
             {monsters !== null ?
                 <DisplayMonsters />
-                : null
+                : <BasicCon margin={7} content={
+                    <h3>No monsters to display.</h3>
+                } />
             }
         </div>
     );

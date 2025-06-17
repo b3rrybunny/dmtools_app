@@ -124,6 +124,11 @@ export function saveChar(data, id = null) {
 export function eraseChar(charID) {
     if (check('charData')) {
         const charData = retrieve('charData');
+        if (charData[ 'chars' ].length === 1) {
+            console.log('%c⚠️ Only one character in charData. Erasing entire item.', 'color: yellow');
+            erase('charData');
+            return;
+        }
         const newCharDataArray = charData[ 'chars' ].filter(item => item[ 'ID' ] !== charID);
         charData[ 'chars' ] = newCharDataArray;
         localStorage.setItem('charData', JSON.stringify(charData));
@@ -206,6 +211,11 @@ export function saveMonster(data, id = null) {
 export function eraseMonster(monsterID) {
     if (check('monsterData')) {
         const monsterData = retrieve('monsterData');
+        if (monsterData[ 'monsters' ].length === 1) {
+            console.log('%c⚠️ Only one monster in monsterData. Erasing entire item.', 'color: yellow');
+            erase('monsterData');
+            return;
+        }
         const newMonsterDataArray = monsterData[ 'monsters' ].filter(item => item[ 'ID' ] !== monsterID);
         monsterData[ 'monsters' ] = newMonsterDataArray;
         localStorage.setItem('monsterData', JSON.stringify(monsterData));
