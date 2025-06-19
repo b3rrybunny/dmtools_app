@@ -1,23 +1,127 @@
 // Modules ------------------------------------------------------------------
-import * as bootstrap from 'bootstrap';
-import { useState, useEffect, useRef, memo } from 'react';
-import ReactDOMServer from 'react-dom/server';
-
+import { useState, useEffect } from 'react';
 
 // Custom -------------------------------------------------------------------
-// Elements / Scripts
-import HPBlock from '../basic/HPBlock';
-import ACBlock from '../basic/ACBlock';
+// Elements
 import HorizLine from '../basic/HorizontalLine';
 import SideBySide from '../basic/SideBySide';
 import BasicCon from '../basic/BasicContainer';
+import BasicInfoInput from '../basic/creature_input/BasicInfoInput';
+import StatsInput from '../basic/creature_input/StatsInput';
+import CombatInfoInput from '../basic/creature_input/CombatInfoInput';
+import SkillsInput from '../basic/creature_input/SkillsInput';
+// Data / Script
 import * as tools from '../../scripts/tools';
 import * as dice from '../../scripts/dice';
-// Data
 import rawMonstersData from '../../data/srd_5e_monsters.json';
 import * as SRDapi from '../../scripts/dndSRD5eapi';
 import * as storage from '../../scripts/storage';
 // Assets/CSS
+
+
+
+
+function AddCreature() {
+  // Master creature object with all data
+  const [ master, setMaster ] = useState();
+  useEffect(() => {
+    console.log('master altered')
+    tools.prettyLog(master);
+  }, [ master ]);
+  // Initial chosen type
+  const [ type, setType ] = useState('monster');
+  useEffect(() => {
+    setMaster({ type: type })
+  }, [ type ])
+
+  // #region Child object data with corresponding useEffect statements that update master on change
+  const [ basicInfo, setBasicInfo ] = useState({});
+  useEffect(() => {
+    setMaster(prev => ({
+      ...prev,
+      ...basicInfo
+    }));
+  }, [ basicInfo ]);
+  const [ stats, setStats ] = useState({});
+  useEffect(() => {
+    setMaster(prev => ({
+      ...prev,
+      ...stats
+    }));
+  }, [ stats ]);
+  const [ combatInfo, setCombatInfo ] = useState({});
+  useEffect(() => {
+    setMaster(prev => ({
+      ...prev,
+      ...combatInfo
+    }));
+  }, [ combatInfo ]);
+  const [ skills, setSkills ] = useState({});
+  useEffect(() => {
+    setMaster(prev => ({
+      ...prev,
+      ...skills
+    }));
+  }, [ skills ]);
+  // #endregion
+
+  // Vis control
+  const [ isTypeChosen, setIsTypeChosen ] = useState(false);
+
+  return (
+    <div style={{ overflowY: 'auto', overflowX: 'hidden', height: '92.5vh' }}>
+      {isTypeChosen ?
+        <>
+          <div className='row g-1 mt-1 ms-0 me-0'>
+            <div className='col'>
+              <BasicInfoInput
+                data={master}
+                onChange={(newData) => setBasicInfo(newData)} />
+            </div>
+          </div>
+          <div className='row g-1 mt-1 ms-0 me-0' style={{ display: 'grid', gridTemplateColumns: 'auto auto 1fr' }}>
+            <div className='col'>
+              <StatsInput
+                data={master}
+                onChange={(newData) => setStats(newData)} />
+            </div>
+            <div className='col'>
+              <SkillsInput
+                data={master}
+                onChange={(newData) => setSkills(newData)} />
+            </div>
+            <div className='col'>
+              <CombatInfoInput
+                data={master}
+                onChange={(newData) => setCombatInfo(newData)} />
+            </div>
+          </div>
+        </>
+        : <div className='center-screen'>
+          <BasicCon content={
+            <>
+              <h1 style={{ textAlign: 'center' }}>Welcome to the creature creator!</h1>
+              <h3 style={{ textAlign: 'center' }}>Select a type to get started.</h3>
+              <div className='input-group'>
+                <span className='input-group-text'>Type</span>
+                <select value={type} onChange={(e) => setType(e.target.value)} className='form-select'>
+                  <option value='monster'>Monster</option>
+                  <option value='player'>Player character</option>
+                  <option value='npc'>NPC</option>
+                </select>
+                <button className='btn btn-success' onClick={() => setIsTypeChosen(true)}>Start</button>
+              </div>
+            </>
+          } />
+        </div>
+      }
+
+
+    </div>
+  );
+}
+
+
 
 
 function Testing({ data }) {
@@ -27,12 +131,7 @@ function Testing({ data }) {
   }, []);
 
   return (
-    <>
-
-
-
-
-    </>
+    <AddCreature />
   );
 }
 

@@ -789,7 +789,7 @@ function LanguageInput({ data, onAddLanguage }) {
     const [ dropdownPosition, setDropdownPosition ] = useState({ top: 0, left: 0, width: 0 });
     const inputRef = useRef(null);
 
-    // Autocomplete functions
+    // #region Autocomplete functions
     const onLanguageChange = (e) => {
         const value = e.target.value;
         setLanguage(value);
@@ -894,6 +894,7 @@ function LanguageInput({ data, onAddLanguage }) {
             document.body
         );
     };
+    // #endregion
 
     // Add functions
     function handleAddLanguage() {
