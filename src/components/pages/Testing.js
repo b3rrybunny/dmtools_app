@@ -97,7 +97,7 @@ function AddCreature() {
             </div>
           </div>
         </>
-        : <div className='center-screen'>
+        : <div className='center-screen fade-drop-in'>
           <BasicCon content={
             <>
               <h1 style={{ textAlign: 'center' }}>Welcome to the creature creator!</h1>
