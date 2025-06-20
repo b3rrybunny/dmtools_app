@@ -9,7 +9,7 @@ import BasicCon from '../BasicContainer';
 // Scripts
 import * as tools from '../../../scripts/tools';
 
-function StatsInput({ data, onChange }) {
+function StatsInput({ data, onChange, bgColor = 'rgba(255, 255, 255, 0.616)' }) {
 
     const [ STR, setSTR ] = useState(10);
     const [ DEX, setDEX ] = useState(10);
@@ -34,14 +34,14 @@ function StatsInput({ data, onChange }) {
     }, [ STR, DEX, CON, INT, WIS, CHA ])
 
     return (
-        <BasicCon margin={0} width='fit-content' content={
+        <BasicCon bgColor={bgColor} margin={0} width='fit-content' content={
             <>
                 <h3>Stats</h3>
                 <HorizLine />
                 <div className='row g-1'>
                     <div className='col'>
                         <div className='input-group'>
-                            <span className='input-group-text font-monospace rounded-tl rounded-bottom-0'>STR</span>
+                            <span className='input-group-text font-monospace rounded-tl rounded-bottom-0 bg-dark text-white'>STR</span>
                             <input
                                 type='number'
                                 min='1'
@@ -53,7 +53,7 @@ function StatsInput({ data, onChange }) {
                             <span className='input-group-text font-monospace rounded-tr rounded-bottom-0'>{tools.getModifierTextEl(STR)}</span>
                         </div>
                         <div className='input-group'>
-                            <span className='input-group-text font-monospace rounded-0'>DEX</span>
+                            <span className='input-group-text font-monospace rounded-0 bg-dark text-white'>DEX</span>
                             <input
                                 type='number'
                                 min='1'
@@ -62,10 +62,10 @@ function StatsInput({ data, onChange }) {
                                 onChange={(e) => setDEX(Number(e.target.value))}
                                 className='form-control'
                             ></input>
-                            <span className='input-group-text font-monospace rounded-0'>{tools.getModifierTextEl(DEX)}</span>
+                            <span className='input-group-text font-monospace rounded-0 '>{tools.getModifierTextEl(DEX)}</span>
                         </div>
                         <div className='input-group'>
-                            <span className='input-group-text font-monospace rounded-0'>CON</span>
+                            <span className='input-group-text font-monospace rounded-0 bg-dark text-white'>CON</span>
                             <input
                                 type='number'
                                 min='1'
@@ -77,7 +77,7 @@ function StatsInput({ data, onChange }) {
                             <span className='input-group-text font-monospace rounded-0'>{tools.getModifierTextEl(CON)}</span>
                         </div>
                         <div className='input-group'>
-                            <span className='input-group-text font-monospace rounded-0'>INT</span>
+                            <span className='input-group-text font-monospace rounded-0 bg-dark text-white'>INT</span>
                             <input
                                 type='number'
                                 min='1'
@@ -89,7 +89,7 @@ function StatsInput({ data, onChange }) {
                             <span className='input-group-text font-monospace rounded-0'>{tools.getModifierTextEl(INT)}</span>
                         </div>
                         <div className='input-group'>
-                            <span className='input-group-text font-monospace rounded-0'>WIS</span>
+                            <span className='input-group-text font-monospace rounded-0 bg-dark text-white'>WIS</span>
                             <input
                                 type='number'
                                 min='1'
@@ -101,7 +101,7 @@ function StatsInput({ data, onChange }) {
                             <span className='input-group-text rounded-0'>{tools.getModifierTextEl(WIS)}</span>
                         </div>
                         <div className='input-group'>
-                            <span className='input-group-text font-monospace rounded-bl rounded-top-0'>CHA</span>
+                            <span className='input-group-text font-monospace rounded-bl rounded-top-0 bg-dark text-white'>CHA</span>
                             <input
                                 type='number'
                                 min='1'

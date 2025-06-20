@@ -67,6 +67,20 @@ function AddCreature() {
 
   // Vis control
   const [ isTypeChosen, setIsTypeChosen ] = useState(false);
+  const [ bgColor, setBgColor ] = useState('rgba(255, 255, 255, 0.616)');
+  useEffect(() => {
+    switch (type) {
+      case 'monster':
+        setBgColor('#ffababb8');
+        break;
+      case 'player':
+        setBgColor('#cdffc5b8');
+        break;
+      case 'npc':
+        setBgColor('rgba(197, 210, 255, 0.72)');
+        break;
+    }
+  }, [ isTypeChosen ]);
 
   return (
     <div style={{ overflowY: 'auto', overflowX: 'hidden', height: '92.5vh' }}>
@@ -76,24 +90,32 @@ function AddCreature() {
             <div className='col'>
               <BasicInfoInput
                 data={master}
-                onChange={(newData) => setBasicInfo(newData)} />
+                onChange={(newData) => setBasicInfo(newData)} 
+                bgColor={bgColor}
+                />
             </div>
           </div>
           <div className='row g-1 mt-1 ms-0 me-0' style={{ display: 'grid', gridTemplateColumns: 'auto auto 1fr' }}>
             <div className='col'>
               <StatsInput
                 data={master}
-                onChange={(newData) => setStats(newData)} />
+                onChange={(newData) => setStats(newData)} 
+                bgColor={bgColor}
+                />
             </div>
             <div className='col'>
               <SkillsInput
                 data={master}
-                onChange={(newData) => setSkills(newData)} />
+                onChange={(newData) => setSkills(newData)} 
+                bgColor={bgColor}
+                />
             </div>
             <div className='col'>
               <CombatInfoInput
                 data={master}
-                onChange={(newData) => setCombatInfo(newData)} />
+                onChange={(newData) => setCombatInfo(newData)} 
+                bgColor={bgColor}
+                />
             </div>
           </div>
         </>
@@ -103,7 +125,7 @@ function AddCreature() {
               <h1 style={{ textAlign: 'center' }}>Welcome to the creature creator!</h1>
               <h3 style={{ textAlign: 'center' }}>Select a type to get started.</h3>
               <div className='input-group'>
-                <span className='input-group-text'>Type</span>
+                <span className='input-group-text bg-dark text-white'>Type</span>
                 <select value={type} onChange={(e) => setType(e.target.value)} className='form-select'>
                   <option value='monster'>Monster</option>
                   <option value='player'>Player character</option>

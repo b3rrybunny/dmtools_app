@@ -1,3 +1,22 @@
+:root {
+  --bs-primary: #6610f2;
+  --bs-secondary: #9c27b0;
+  --bs-success: #4caf50;
+  --bs-info: #00bcd4;
+  --bs-warning: #ff9800;
+  --bs-danger: #f44336;
+  --bs-light: #f8f9fa;
+  --bs-dark: #585858;
+  --bs-input-group-addon-border-color: #585858;
+  --bs-input-border-color: #585858;
+}
+.input-group > .form-control,
+.input-group > .form-select,
+.input-group > .form-floating,
+.input-group > .input-group-text {
+  border-color: var(--bs-input-group-addon-border-color);
+}
+
 .App {
     height: 100%;
     width: 100%;

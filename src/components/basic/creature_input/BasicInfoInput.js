@@ -7,7 +7,7 @@ import HorizLine from '../HorizontalLine';
 import SideBySide from '../SideBySide';
 import BasicCon from '../BasicContainer';
 
-function BasicInfoInput({ data, onChange }) {
+function BasicInfoInput({ data, onChange, bgColor = 'rgba(255, 255, 255, 0.616)' }) {
 
     const [ name, setName ] = useState(data.name || '');
     const [ race, setRace ] = useState(data.race || '');
@@ -67,14 +67,14 @@ function BasicInfoInput({ data, onChange }) {
 
     return (
         <>
-            <BasicCon margin={0} content={
+            <BasicCon bgColor={bgColor} margin={0} content={
                 <>
-                    <h3>Basic Info</h3>
+                    <h3 className='text-capitalized'>Basic Info - <span className='text-uppercase'>{data.type}</span></h3>
                     <HorizLine />
                     <div className='row g-1 mb-1'>
                         <div className='col-4'>
                             <div className='input-group'>
-                                <span className='input-group-text'>Name</span>
+                                <span className='input-group-text bg-dark text-white'>Name</span>
                                 <input
                                     type='text'
                                     placeholder='Izalith the Stinky'
@@ -86,7 +86,7 @@ function BasicInfoInput({ data, onChange }) {
                         </div>
                         <div className='col-4'>
                             <div className='input-group'>
-                                <span className='input-group-text'>Race</span>
+                                <span className='input-group-text bg-dark text-white'>Race</span>
                                 <input
                                     type='text'
                                     placeholder='Wood Elf'
@@ -98,7 +98,7 @@ function BasicInfoInput({ data, onChange }) {
                         </div>
                         <div className='col-4'>
                             <div className='input-group'>
-                                <label className='input-group-text'>Alignment</label>
+                                <label className='input-group-text bg-dark text-white'>Alignment</label>
                                 <select value={alignment} onChange={(e) => setAlignment(e.target.value)} className='form-select' id='alignment'>
                                     <option value=''>Choose...</option>
                                     <option value="Lawful Good">Lawful Good</option>
@@ -118,7 +118,7 @@ function BasicInfoInput({ data, onChange }) {
                         <div className='row g-1 mb-1'>
                             <div className='col-4'>
                                 <div className='input-group'>
-                                    <span className='input-group-text'>Class</span>
+                                    <span className='input-group-text bg-dark text-white'>Class</span>
                                     <select value={charClass} onChange={(e) => setCharClass(e.target.value)} id="class" className='form-select'>
                                         <option value="Generic">No Class</option>
                                         <option value="Barbarian">Barbarian</option>
@@ -139,7 +139,7 @@ function BasicInfoInput({ data, onChange }) {
                             </div>
                             <div className='col-4'>
                                 <div className='input-group'>
-                                    <span className='input-group-text'>Level</span>
+                                    <span className='input-group-text bg-dark text-white'>Level</span>
                                     <input
                                         type='number'
                                         min='1'
@@ -153,7 +153,7 @@ function BasicInfoInput({ data, onChange }) {
                             {data.type === 'player' ?
                                 <div className='col-4'>
                                     <div className='input-group'>
-                                        <span className='input-group-text'>XP</span>
+                                        <span className='input-group-text bg-dark text-white'>XP</span>
                                         <input
                                             type='number'
                                             min='0'
@@ -173,7 +173,7 @@ function BasicInfoInput({ data, onChange }) {
                         <div className='row g-1'>
                             <div className='col-2'>
                                 <div className='input-group'>
-                                    <span className='input-group-text'>Challenge rating</span>
+                                    <span className='input-group-text bg-dark text-white'>Challenge rating</span>
                                     <input
                                         type='number'
                                         min='0'

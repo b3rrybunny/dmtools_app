@@ -9,7 +9,7 @@ import BasicCon from '../BasicContainer';
 // Scripts
 import * as tools from '../../../scripts/tools';
 
-function CombatInfoInput({ data, onChange }) {
+function CombatInfoInput({ data, onChange, bgColor = 'rgba(255, 255, 255, 0.616)' }) {
     // Data
     const [ HP, setHP ] = useState(1);
     const [ HPNumOfDice, setHPNumOfDice ] = useState(1);
@@ -71,14 +71,14 @@ function CombatInfoInput({ data, onChange }) {
     // #endregion
 
     return (
-        <BasicCon margin={0} content={
+        <BasicCon bgColor={bgColor} margin={0} content={
             <>
                 <h3>Combat Stats</h3>
                 <HorizLine />
                 <div className='row g-1'>
                     <div className='col-8'>
                         <div className='input-group mb-1'>
-                            <span className='input-group-text'>Hit Points</span>
+                            <span className='input-group-text bg-dark text-white'>Hit Points</span>
                             {data.type === 'monster' ?
                                 <>
                                     <input
@@ -120,7 +120,7 @@ function CombatInfoInput({ data, onChange }) {
                     </div>
                     <div className='col-4'>
                         <div className='input-group'>
-                            <span className='input-group-text'>Speed</span>
+                            <span className='input-group-text bg-dark text-white'>Speed</span>
                             <input
                                 type='number'
                                 min='0'
@@ -136,7 +136,7 @@ function CombatInfoInput({ data, onChange }) {
                 <div className='row g-1'>
                     <div className='col-12'>
                         <div className='input-group mb-1'>
-                            <span className='input-group-text'>Armor Class</span>
+                            <span className='input-group-text bg-dark text-white'>Armor Class</span>
                             <input
                                 disabled={!armorTypeOverride}
                                 type='number'
@@ -156,7 +156,7 @@ function CombatInfoInput({ data, onChange }) {
                             </span>
                         </div>
                         <div className='input-group mb-1'>
-                            <span className='input-group-text'>Armor Type</span>
+                            <span className='input-group-text bg-dark text-white'>Armor Type</span>
                             <select value={armorType} onChange={(e) => setArmorType(e.target.value)} className='form-select'>
                                 <option value='unarmored'>None</option>
                                 {data.type === 'monster' ?
@@ -191,8 +191,8 @@ function CombatInfoInput({ data, onChange }) {
                 <div className='row g-1'>
                     <div className='col-12'>
                         <div className='input-group mb-1'>
-                            <span className='input-group-text'>Initiative Bonus</span>
-                            <span className='input-group-text p-0' style={{maxWidth: '75px'}}>
+                            <span className='input-group-text bg-dark text-white'>Initiative Bonus</span>
+                            <span className='input-group-text p-0' style={{ maxWidth: '75px' }}>
                                 {initBonus > 0 ? '+ ' : ''}
                                 <input
                                     disabled={!initBonusOverride}

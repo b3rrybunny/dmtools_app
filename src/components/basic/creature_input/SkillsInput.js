@@ -14,7 +14,7 @@ import * as tools from '../../../scripts/tools';
 const allProficiencyData = await (SRDapi.getAllProficiencies());
 const allLanguageData = await (SRDapi.getAllLanguages());
 
-function SkillsInput({ data, onChange }) {
+function SkillsInput({ data, onChange, bgColor = 'rgba(255, 255, 255, 0.616)' }) {
 
     const [ profBonus, setProfBonus ] = useState(2);
     const [ profBonusOverride, setProfBonusOverride ] = useState(false);
@@ -46,8 +46,8 @@ function SkillsInput({ data, onChange }) {
         if (spellOverride === false && tools.getSpellcastingAbility(data.charClass) !== null && data.type !== 'monster') {
             const ability = tools.getSpellcastingAbility(data.charClass);
             setSpellAbility(ability);
-            setSpellSaveDC(8 + profBonus + tools.getStatMod(data[ability]));
-            setSpellATKBonus(tools.getStatMod(data[ability]) + profBonus);
+            setSpellSaveDC(8 + profBonus + tools.getStatMod(data[ ability ]));
+            setSpellATKBonus(tools.getStatMod(data[ ability ]) + profBonus);
         }
     }, [ data, profBonusOverride, spellOverride, profBonus ])
     // #endregion
@@ -55,7 +55,26 @@ function SkillsInput({ data, onChange }) {
     // #region Data relay ------------------------------------
     function compileData() {
         const compiled = {};
-
+        compiled.savingThrows = savingThrows;
+        compiled.skills = skills;
+        compiled.languages = languages;
+        compiled.profBonus = profBonus;
+        compiled.senses = senses;
+        if (data.type !== 'monster') {
+            compiled.proficiencies = proficiencies;
+            if (tools.getSpellcastingAbility(data.charClass) !== null) {
+                compiled.spellAbility = spellAbility;
+                compiled.spellSaveDC = spellSaveDC;
+                compiled.spellATKBonus = spellATKBonus;
+            }
+        }
+        else {
+            if (spellAbility !== '') {
+                compiled.spellAbility = spellAbility;
+                compiled.spellSaveDC = spellSaveDC;
+                compiled.spellATKBonus = spellATKBonus;
+            }
+        }
         return compiled;
     }
     useEffect(() => {
@@ -362,14 +381,14 @@ function SkillsInput({ data, onChange }) {
 
     // Component Body ----------------------------------------
     return (
-        <BasicCon content={
+        <BasicCon bgColor={bgColor} content={
             <>
                 <h3>Proficiencies & Skills</h3>
                 <HorizLine />
                 <div className='row g-1 mb-1'>
                     <div className='col-12'>
                         <div className='input-group'>
-                            <span className='input-group-text'>Proficiency Bonus</span>
+                            <span className='input-group-text bg-dark text-white'>Proficiency Bonus</span>
                             <span className='input-group-text p-0 flex-fill'>
                                 {profBonus > 0 ? <span className='ms-1'>+</span> : null}
                                 <input
@@ -400,7 +419,7 @@ function SkillsInput({ data, onChange }) {
                         {data.type === 'player' || data.type === 'npc' ?
                             <>
                                 <div className='input-group w-100'>
-                                    <span className='input-group-text rounded-top-left rounded-bottom-0'>Proficiencies</span>
+                                    <span className='input-group-text rounded-top-left rounded-bottom-0 bg-dark text-white'>Proficiencies</span>
                                     <div className="input-group-text rounded-0 p-0 flex-fill" style={{ position: 'relative' }}>
                                         <input
                                             ref={profInputRef}
@@ -416,7 +435,7 @@ function SkillsInput({ data, onChange }) {
                                     </div>
                                     <button className='btn btn-success rounded-top-right rounded-bottom-0' onClick={addProficiency}>Add Proficiency</button>
                                 </div>
-                                <div className='bg-light rounded-bottom'>
+                                <div className='bg-light rounded-bottom border border-top-0 border-dark'>
                                     {proficiencies.length !== 0 ?
                                         <>
                                             <p className='ms-3 mb-0'>Added proficiencies:</p>
@@ -435,7 +454,7 @@ function SkillsInput({ data, onChange }) {
                 <div className='row g-1 mb-1' style={{ display: 'grid', gridTemplateColumns: 'auto 1fr' }}>
                     <div className='col'>
                         <div className='input-group w-100'>
-                            <span className='input-group-text rounded-top-left rounded-bottom-0'>Languages</span>
+                            <span className='input-group-text rounded-top-left rounded-bottom-0 bg-dark text-white'>Languages</span>
                             <div className="input-group-text rounded-0 p-0" style={{ position: 'relative', maxWidth: '110px' }}>
                                 <input
                                     ref={langInputRef}
@@ -451,7 +470,7 @@ function SkillsInput({ data, onChange }) {
                             </div>
                             <button className='btn btn-success rounded-top-right rounded-bottom-0' onClick={addLanguage}>Add Language</button>
                         </div>
-                        <div className='bg-light rounded-bottom'>
+                        <div className='bg-light rounded-bottom border border-top-0 border-dark'>
                             {languages.length !== 0 ?
                                 <>
                                     <p className='ms-3 mb-0'>Added languages:</p>
@@ -465,7 +484,7 @@ function SkillsInput({ data, onChange }) {
                     </div>
                     <div className='col'>
                         <div className='input-group w-100'>
-                            <span className='input-group-text rounded-top-left rounded-bottom-0'>Senses</span>
+                            <span className='input-group-text rounded-top-left rounded-bottom-0 bg-dark text-white'>Senses</span>
                             <input
                                 type="text"
                                 value={sense}
@@ -474,10 +493,10 @@ function SkillsInput({ data, onChange }) {
                                 className="form-control"
                                 style={{ maxWidth: '100px' }}
                             />
-                            <span className='input-group-text rounded-0'>Range</span>
+                            <span className='input-group-text rounded-0 bg-dark text-white'>Range</span>
                             <input
                                 type="number"
-                                min='1'
+                                min='0'
                                 step='5'
                                 value={senseRange}
                                 onChange={(e) => setSenseRange(e.target.value)}
@@ -487,7 +506,7 @@ function SkillsInput({ data, onChange }) {
                             <span className='input-group-text'>ft.</span>
                             <button className='btn btn-success rounded-top-right rounded-bottom-0' onClick={addSense}>Add Sense</button>
                         </div>
-                        <div className='bg-light rounded-bottom'>
+                        <div className='bg-light rounded-bottom border border-top-0 border-dark'>
                             {senses.length !== 0 ?
                                 <>
                                     <p className='ms-3 mb-0'>Added senses:</p>
@@ -505,7 +524,7 @@ function SkillsInput({ data, onChange }) {
                         <h5>Saving Throws</h5>
                         <HorizLine />
                         <div className='input-group'>
-                            <div className='input-group-text rounded-tl rounded-bottom-0'>
+                            <div className='input-group-text rounded-tl rounded-bottom-0 bg-dark text-white'>
                                 <input
                                     type="checkbox"
                                     className="form-check-input"
@@ -517,7 +536,7 @@ function SkillsInput({ data, onChange }) {
                             <span className='input-group-text font-monospace flex-fill rounded-tr rounded-bottom-0'>{tools.getModifierTextEl(data.STR, (savingThrows.includes('STR')), profBonus)}</span>
                         </div>
                         <div className='input-group'>
-                            <div className='input-group-text rounded-0'>
+                            <div className='input-group-text rounded-0 bg-dark text-white'>
                                 <input
                                     type="checkbox"
                                     className="form-check-input"
@@ -529,7 +548,7 @@ function SkillsInput({ data, onChange }) {
                             <span className='input-group-text font-monospace flex-fill rounded-0'>{tools.getModifierTextEl(data.DEX, (savingThrows.includes('DEX')), profBonus)}</span>
                         </div>
                         <div className='input-group'>
-                            <div className='input-group-text rounded-0'>
+                            <div className='input-group-text rounded-0 bg-dark text-white'>
                                 <input
                                     type="checkbox"
                                     className="form-check-input"
@@ -541,7 +560,7 @@ function SkillsInput({ data, onChange }) {
                             <span className='input-group-text font-monospace flex-fill rounded-0'>{tools.getModifierTextEl(data.CON, (savingThrows.includes('CON')), profBonus)}</span>
                         </div>
                         <div className='input-group'>
-                            <div className='input-group-text rounded-0'>
+                            <div className='input-group-text rounded-0 bg-dark text-white'>
                                 <input
                                     type="checkbox"
                                     className="form-check-input"
@@ -553,7 +572,7 @@ function SkillsInput({ data, onChange }) {
                             <span className='input-group-text font-monospace flex-fill rounded-0'>{tools.getModifierTextEl(data.INT, (savingThrows.includes('INT')), profBonus)}</span>
                         </div>
                         <div className='input-group'>
-                            <div className='input-group-text rounded-0'>
+                            <div className='input-group-text rounded-0 bg-dark text-white'>
                                 <input
                                     type="checkbox"
                                     className="form-check-input"
@@ -565,7 +584,7 @@ function SkillsInput({ data, onChange }) {
                             <span className='input-group-text font-monospace flex-fill rounded-0'>{tools.getModifierTextEl(data.WIS, (savingThrows.includes('WIS')), profBonus)}</span>
                         </div>
                         <div className='input-group'>
-                            <div className='input-group-text rounded-bl rounded-top-0'>
+                            <div className='input-group-text rounded-bl rounded-top-0 bg-dark text-white'>
                                 <input
                                     type="checkbox"
                                     className="form-check-input"
@@ -583,7 +602,7 @@ function SkillsInput({ data, onChange }) {
                         <div style={{ maxHeight: '27.5vh', overflowY: 'auto' }}>
                             {/* Strength Skills */}
                             <div className='input-group'>
-                                <div className='input-group-text rounded-tl rounded-bottom-0'>
+                                <div className='input-group-text rounded-tl rounded-bottom-0 bg-dark text-white'>
                                     <input
                                         type="checkbox"
                                         className="form-check-input"
@@ -597,7 +616,7 @@ function SkillsInput({ data, onChange }) {
 
                             {/* Dexterity Skills */}
                             <div className='input-group'>
-                                <div className='input-group-text rounded-0'>
+                                <div className='input-group-text rounded-0 bg-dark text-white'>
                                     <input
                                         type="checkbox"
                                         className="form-check-input"
@@ -610,7 +629,7 @@ function SkillsInput({ data, onChange }) {
                             </div>
 
                             <div className='input-group'>
-                                <div className='input-group-text rounded-0'>
+                                <div className='input-group-text rounded-0 bg-dark text-white'>
                                     <input
                                         type="checkbox"
                                         className="form-check-input"
@@ -623,7 +642,7 @@ function SkillsInput({ data, onChange }) {
                             </div>
 
                             <div className='input-group'>
-                                <div className='input-group-text rounded-0'>
+                                <div className='input-group-text rounded-0 bg-dark text-white'>
                                     <input
                                         type="checkbox"
                                         className="form-check-input"
@@ -637,7 +656,7 @@ function SkillsInput({ data, onChange }) {
 
                             {/* Intelligence Skills */}
                             <div className='input-group'>
-                                <div className='input-group-text rounded-0'>
+                                <div className='input-group-text rounded-0 bg-dark text-white'>
                                     <input
                                         type="checkbox"
                                         className="form-check-input"
@@ -650,7 +669,7 @@ function SkillsInput({ data, onChange }) {
                             </div>
 
                             <div className='input-group'>
-                                <div className='input-group-text rounded-0'>
+                                <div className='input-group-text rounded-0 bg-dark text-white'>
                                     <input
                                         type="checkbox"
                                         className="form-check-input"
@@ -663,7 +682,7 @@ function SkillsInput({ data, onChange }) {
                             </div>
 
                             <div className='input-group'>
-                                <div className='input-group-text rounded-0'>
+                                <div className='input-group-text rounded-0 bg-dark text-white'>
                                     <input
                                         type="checkbox"
                                         className="form-check-input"
@@ -676,7 +695,7 @@ function SkillsInput({ data, onChange }) {
                             </div>
 
                             <div className='input-group'>
-                                <div className='input-group-text rounded-0'>
+                                <div className='input-group-text rounded-0 bg-dark text-white'>
                                     <input
                                         type="checkbox"
                                         className="form-check-input"
@@ -689,7 +708,7 @@ function SkillsInput({ data, onChange }) {
                             </div>
 
                             <div className='input-group'>
-                                <div className='input-group-text rounded-0'>
+                                <div className='input-group-text rounded-0 bg-dark text-white'>
                                     <input
                                         type="checkbox"
                                         className="form-check-input"
@@ -703,7 +722,7 @@ function SkillsInput({ data, onChange }) {
 
                             {/* Wisdom Skills */}
                             <div className='input-group'>
-                                <div className='input-group-text rounded-0'>
+                                <div className='input-group-text rounded-0 bg-dark text-white'>
                                     <input
                                         type="checkbox"
                                         className="form-check-input"
@@ -716,7 +735,7 @@ function SkillsInput({ data, onChange }) {
                             </div>
 
                             <div className='input-group'>
-                                <div className='input-group-text rounded-0'>
+                                <div className='input-group-text rounded-0 bg-dark text-white'>
                                     <input
                                         type="checkbox"
                                         className="form-check-input"
@@ -729,7 +748,7 @@ function SkillsInput({ data, onChange }) {
                             </div>
 
                             <div className='input-group'>
-                                <div className='input-group-text rounded-0'>
+                                <div className='input-group-text rounded-0 bg-dark text-white'>
                                     <input
                                         type="checkbox"
                                         className="form-check-input"
@@ -742,7 +761,7 @@ function SkillsInput({ data, onChange }) {
                             </div>
 
                             <div className='input-group'>
-                                <div className='input-group-text rounded-0'>
+                                <div className='input-group-text rounded-0 bg-dark text-white'>
                                     <input
                                         type="checkbox"
                                         className="form-check-input"
@@ -755,7 +774,7 @@ function SkillsInput({ data, onChange }) {
                             </div>
 
                             <div className='input-group'>
-                                <div className='input-group-text rounded-0'>
+                                <div className='input-group-text rounded-0 bg-dark text-white'>
                                     <input
                                         type="checkbox"
                                         className="form-check-input"
@@ -769,7 +788,7 @@ function SkillsInput({ data, onChange }) {
 
                             {/* Charisma Skills */}
                             <div className='input-group'>
-                                <div className='input-group-text rounded-0'>
+                                <div className='input-group-text rounded-0 bg-dark text-white'>
                                     <input
                                         type="checkbox"
                                         className="form-check-input"
@@ -782,7 +801,7 @@ function SkillsInput({ data, onChange }) {
                             </div>
 
                             <div className='input-group'>
-                                <div className='input-group-text rounded-0'>
+                                <div className='input-group-text rounded-0 bg-dark text-white'>
                                     <input
                                         type="checkbox"
                                         className="form-check-input"
@@ -795,7 +814,7 @@ function SkillsInput({ data, onChange }) {
                             </div>
 
                             <div className='input-group'>
-                                <div className='input-group-text rounded-0'>
+                                <div className='input-group-text rounded-0 bg-dark text-white'>
                                     <input
                                         type="checkbox"
                                         className="form-check-input"
@@ -807,7 +826,7 @@ function SkillsInput({ data, onChange }) {
                                 <span className='input-group-text  rounded-0'>{tools.getModifierTextEl(data.CHA, (skills.includes('Performance')), profBonus)}</span>
                             </div>
                             <div className='input-group'>
-                                <div className='input-group-text rounded-bl rounded-top-0'>
+                                <div className='input-group-text rounded-bl rounded-top-0 bg-dark text-white'>
                                     <input
                                         type="checkbox"
                                         className="form-check-input"
@@ -834,20 +853,21 @@ function SkillsInput({ data, onChange }) {
                             <h5>Spellcasting</h5>
                             <HorizLine />
                             <div className='input-group mb-1'>
-                                <span className='input-group-text'>Casting Ability</span>
+                                <span className='input-group-text bg-dark text-white'>Casting Ability</span>
                                 <select
                                     disabled={!spellOverride}
                                     value={spellAbility}
                                     onChange={(e) => setSpellAbility(e.target.value)}
                                     className='form-select'
                                 >
+                                    <option value="">Not a spellcaster</option>
                                     <option value="INT">INT</option>
                                     <option value="WIS">WIS</option>
                                     <option value="CHA">CHA</option>
                                 </select>
                             </div>
                             <div className='input-group mb-1'>
-                                <span className='input-group-text'>Spell Save DC</span>
+                                <span className='input-group-text bg-dark text-white'>Spell Save DC</span>
                                 <input
                                     disabled={!spellOverride}
                                     type='number'
@@ -858,7 +878,7 @@ function SkillsInput({ data, onChange }) {
                                 />
                             </div>
                             <div className='input-group mb-1'>
-                                <span className='input-group-text'>Spell ATK Bonus</span>
+                                <span className='input-group-text bg-dark text-white'>Spell ATK Bonus</span>
                                 <input
                                     disabled={!spellOverride}
                                     type='number'
@@ -868,19 +888,23 @@ function SkillsInput({ data, onChange }) {
                                     className='form-control'
                                 />
                             </div>
-                            <div className='input-group'>
-                                <span className='input-group-text'>
-                                    <input
-                                        type='checkbox'
-                                        checked={spellOverride}
-                                        onChange={(e) => setSpellOverride(e.target.checked)}
-                                        className='form-check-input'
-                                    />
-                                </span>
-                                <span className={'input-group-text flex-fill ' + (spellOverride ? 'bg-danger' : 'bg-danger-subtle')}>
-                                    {spellOverride ? 'Overriding automatic spell stats' : 'Override automatic spell stats?'}
-                                </span>
-                            </div>
+                            {data.type !== 'monster' ?
+                                <div className='input-group'>
+                                    <span className='input-group-text'>
+                                        <input
+                                            type='checkbox'
+                                            checked={spellOverride}
+                                            onChange={(e) => setSpellOverride(e.target.checked)}
+                                            className='form-check-input'
+                                        />
+                                    </span>
+                                    <span className={'input-group-text flex-fill ' + (spellOverride ? 'bg-danger' : 'bg-danger-subtle')}>
+                                        {spellOverride ? 'Overriding automatic spell stats' : 'Override automatic spell stats?'}
+                                    </span>
+                                </div>
+                                : null
+                            }
+
                         </div>
                         : null
                     }
