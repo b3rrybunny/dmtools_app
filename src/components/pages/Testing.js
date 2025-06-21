@@ -118,7 +118,7 @@ function AddCreature() {
               />
             </div>
           </div>
-          <div className='row g-1 mt-1 ms-0 me-0' style={{ display: 'grid', gridTemplateColumns: 'auto auto 1fr' }}>
+          <div className='row g-1 mt-1 ms-0 me-0' style={{ display: 'grid', gridTemplateColumns: 'auto auto 1fr'}}>
             <div className='col'>
               <StatsInput
                 data={master}

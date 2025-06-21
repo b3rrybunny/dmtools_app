@@ -38,6 +38,7 @@ function NoteInput({ data, onChange, bgColor = 'rgba(255, 255, 255, 0.616)' }) {
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
                     placeholder="Backstory, visual description, etc."
+                    style={{minHeight: '10.5vh'}}
                 ></textarea>
             </>
         } />

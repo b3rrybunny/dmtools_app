@@ -69,7 +69,7 @@ function TraitsInput({ data, onChange, bgColor = 'rgba(255, 255, 255, 0.616)' })
                 </div>
                 <div className='row mt-1 g-1'>
                     <div className='col'>
-                        <div className='bg-light rounded border border-dark'>
+                        <div className='bg-light rounded border border-dark' style={{overflowY: 'auto', maxHeight: '40vh'}}>
                             {traits.length !== 0 ?
                                 <>
                                     <p className='ms-3 mb-0'>Added Traits:</p>

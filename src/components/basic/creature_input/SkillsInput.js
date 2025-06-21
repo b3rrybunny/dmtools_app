@@ -445,7 +445,7 @@ function SkillsInput({ data, onChange, bgColor = 'rgba(255, 255, 255, 0.616)' })
                                     </div>
                                     <button className='btn btn-success rounded-top-right rounded-bottom-0' onClick={addProficiency}>Add Proficiency</button>
                                 </div>
-                                <div className='bg-light rounded-bottom border border-top-0 border-dark'>
+                                <div className='bg-light rounded-bottom border border-top-0 border-dark' style={{maxHeight: '15vh', overflowY: 'auto'}}>
                                     {proficiencies.length !== 0 ?
                                         <>
                                             <p className='ms-3 mb-0'>Added proficiencies:</p>
@@ -480,7 +480,7 @@ function SkillsInput({ data, onChange, bgColor = 'rgba(255, 255, 255, 0.616)' })
                             </div>
                             <button className='btn btn-success rounded-top-right rounded-bottom-0' onClick={addLanguage}>Add Language</button>
                         </div>
-                        <div className='bg-light rounded-bottom border border-top-0 border-dark'>
+                        <div className='bg-light rounded-bottom border border-top-0 border-dark' style={{maxHeight: '15vh', overflowY: 'auto'}}>
                             {languages.length !== 0 ?
                                 <>
                                     <p className='ms-3 mb-0'>Added languages:</p>
@@ -516,7 +516,7 @@ function SkillsInput({ data, onChange, bgColor = 'rgba(255, 255, 255, 0.616)' })
                             <span className='input-group-text'>ft.</span>
                             <button className='btn btn-success rounded-top-right rounded-bottom-0' onClick={addSense}>Add Sense</button>
                         </div>
-                        <div className='bg-light rounded-bottom border border-top-0 border-dark'>
+                        <div className='bg-light rounded-bottom border border-top-0 border-dark' style={{maxHeight: '15vh', overflowY: 'auto'}}>
                             {senses.length !== 0 ?
                                 <>
                                     <p className='ms-3 mb-0'>Added senses:</p>
