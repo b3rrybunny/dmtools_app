@@ -159,7 +159,7 @@ export function prettyLog(obj, label = 'Object', isRoot = true) {
     date: 'color: #c2185b; font-weight: bold;',
     array: 'color: #0288d1; font-weight: bold; background: rgba(2,136,209,0.1); padding: 2px 4px; border-radius: 3px;',
     object: 'color: #5d4037; font-weight: bold; background: rgba(93,64,55,0.1); padding: 2px 4px; border-radius: 3px;',
-    rootObject: 'color: #d32f2f; font-weight: bold; font-size: 14px; background: rgba(211,47,47,0.1); padding: 4px 8px; border-radius: 4px;'
+    rootObject: 'color:rgb(211, 47, 194); font-weight: bold; font-size: 14px; background: rgba(211,47,47,0.1); padding: 4px 8px; border-radius: 4px;'
   };
 
   if (obj === null) {
@@ -199,7 +199,7 @@ export function prettyLog(obj, label = 'Object', isRoot = true) {
   const groupStyle = isRoot ? styles.rootObject : styles.object;
 
   if (isRoot || keys.length <= 3) {
-    console.group(groupLabel, groupStyle);
+    console.groupCollapsed(groupLabel, groupStyle);
   } else {
     console.groupCollapsed(groupLabel, groupStyle);
   }

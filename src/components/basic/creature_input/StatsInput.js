@@ -31,7 +31,7 @@ function StatsInput({ data, onChange, bgColor = 'rgba(255, 255, 255, 0.616)' }) 
 
     useEffect(() => {
         onChange(compileData())
-    }, [ STR, DEX, CON, INT, WIS, CHA ])
+    }, [ STR, DEX, CON, INT, WIS, CHA ]);
 
     return (
         <BasicCon bgColor={bgColor} margin={0} width='fit-content' content={

@@ -79,7 +79,17 @@ function SkillsInput({ data, onChange, bgColor = 'rgba(255, 255, 255, 0.616)' })
     }
     useEffect(() => {
         onChange(compileData());
-    }, []);
+    }, [
+        savingThrows,
+        skills,
+        languages,
+        profBonus,
+        senses,
+        proficiencies,
+        spellAbility,
+        spellSaveDC,
+        spellATKBonus
+    ]);
     // #endregion
 
     // #region Handle functions ------------------------------

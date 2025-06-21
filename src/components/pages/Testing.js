@@ -10,6 +10,8 @@ import BasicInfoInput from '../basic/creature_input/BasicInfoInput';
 import StatsInput from '../basic/creature_input/StatsInput';
 import CombatInfoInput from '../basic/creature_input/CombatInfoInput';
 import SkillsInput from '../basic/creature_input/SkillsInput';
+import TraitsInput from '../basic/creature_input/TraitsInput';
+import NoteInput from '../basic/creature_input/NoteInput';
 // Data / Script
 import * as tools from '../../scripts/tools';
 import * as dice from '../../scripts/dice';
@@ -63,6 +65,20 @@ function AddCreature() {
       ...skills
     }));
   }, [ skills ]);
+  const [ traits, setTraits ] = useState({});
+  useEffect(() => {
+    setMaster(prev => ({
+      ...prev,
+      ...traits
+    }));
+  }, [ traits ]);
+  const [ note, setNote ] = useState({});
+  useEffect(() => {
+    setMaster(prev => ({
+      ...prev,
+      ...traits
+    }));
+  }, [ traits ]);
   // #endregion
 
   // Vis control
@@ -90,33 +106,50 @@ function AddCreature() {
             <div className='col'>
               <BasicInfoInput
                 data={master}
-                onChange={(newData) => setBasicInfo(newData)} 
+                onChange={(newData) => setBasicInfo(newData)}
                 bgColor={bgColor}
-                />
+              />
+            </div>
+            <div className='col-4'>
+              <NoteInput
+                data={master}
+                onChange={(newData) => setNote(newData)}
+                bgColor={bgColor}
+              />
             </div>
           </div>
           <div className='row g-1 mt-1 ms-0 me-0' style={{ display: 'grid', gridTemplateColumns: 'auto auto 1fr' }}>
             <div className='col'>
               <StatsInput
                 data={master}
-                onChange={(newData) => setStats(newData)} 
+                onChange={(newData) => setStats(newData)}
                 bgColor={bgColor}
-                />
+              />
             </div>
             <div className='col'>
               <SkillsInput
                 data={master}
-                onChange={(newData) => setSkills(newData)} 
+                onChange={(newData) => setSkills(newData)}
                 bgColor={bgColor}
-                />
+              />
             </div>
+            <div className='col'>
+              <TraitsInput
+                data={master}
+                onChange={(newData) => setTraits(newData)}
+                bgColor={bgColor}
+              />
+            </div>
+          </div>
+          <div className='row g-1 mt-1 ms-0 me-0' style={{ display: 'grid', gridTemplateColumns: 'auto auto 1fr' }}>
             <div className='col'>
               <CombatInfoInput
                 data={master}
-                onChange={(newData) => setCombatInfo(newData)} 
+                onChange={(newData) => setCombatInfo(newData)}
                 bgColor={bgColor}
-                />
+              />
             </div>
+
           </div>
         </>
         : <div className='center-screen fade-drop-in'>

@@ -4,6 +4,7 @@ import Navbar from './components/basic/Navbar';
 import './App.css';
 import * as bootstrap from 'bootstrap';
 import { CircleLoader } from 'react-spinners';
+import BasicCon from './components/basic/BasicContainer';
 
 // Lazy load all page components
 const Home = lazy(() => import('./components/pages/Home'));
@@ -23,14 +24,20 @@ function App() {
   useEffect(() => {
     console.clear(); // Clear console on route change
     console.log('%c📍 Navigated to:' + location.pathname, 'color: lightpink'); // Optional: Log new route
-  }, [location]); // Triggers on location change
+  }, [ location ]); // Triggers on location change
 
   return (
     <div className="App">
       <Navbar />
       <div className="page-container">
         {/* Wrap Routes in Suspense with a fallback */}
-        <Suspense fallback={<CircleLoader />}>
+        <Suspense fallback={
+          <>
+            <div className='center-screen'>
+              <BasicCon content={<CircleLoader />} />
+            </div>
+          </>
+        }>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
