@@ -1,3 +1,5 @@
+import * as tools from './tools.js';
+
 export function extractParenthesesContent(input) {
   const match = input.match(/\(([^)]+)\)/);
   return match ? match[1] : null;
@@ -39,7 +41,7 @@ export function rollDice(notation = '1d6 + 3') {
   if (total === 0) {
     total = 1;
   }
-  console.log('%c🎲Rolled ' + cleanNotation + ': ' + total.toString(), 'color: blue');
+  console.log('%c🎲 Rolled ' + cleanNotation + ': ' + total.toString(), 'color: blue');
   return total;
 }
 
@@ -64,5 +66,5 @@ export function rollInit(dex = 10, adv = false, disadv = false) {
             return (secondCheck);
         }
     }
-    return (rollDice('1d20 + ' + dex.toString()))
+    return (rollDice('1d20 + ' + tools.getStatMod(dex.toString())))
 }
